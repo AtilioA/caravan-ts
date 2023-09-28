@@ -21,4 +21,23 @@ describe('Card', () => {
         const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
         expect(card.value).toBeDefined();
     });
+
+    it('should return the correct value, considering face cards', () => {
+        // Use random values from SUITS and VALUES from cardConstants.ts
+        const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length - 4)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+        expect(card.value).toBeDefined();
+
+        // Count the number of kings and multiply the value by 2 to the power of the number of kings.
+        const kings = card.faceCards.filter((card) => card.value === 'King').length;
+        if (kings > 0) {
+            expect(card.computeValue()).toBe(Number(card.value) * Math.pow(2, kings));
+        } else {
+                expect(card.computeValue()).toBe(Number(card.value));
+        }
+
+        const knownCard = new Card('6', 'Diamonds');
+        knownCard.addFaceCard(new Card('King', 'Hearts'));
+        knownCard.addFaceCard(new Card('King', 'Diamonds'));
+        expect(knownCard.computeValue()).toBe(6 * Math.pow(2, 2));
+    });
 });
