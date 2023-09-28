@@ -36,7 +36,7 @@ describe('Deck', () => {
   });
 
   // Card drawing
-  it('should draw a card from the deck', () => {
+  it('should draw a card from the deck (drawn card should be the first in the deck and no longer in the deck)', () => {
       const deck = new Deck();
       deck.generate(40);
 
@@ -45,15 +45,20 @@ describe('Deck', () => {
       const firstCard = deck.cards[0];
 
       // Begin drawing card
-      const card = deck.drawCard();
-      expect(card).toBeDefined();
+      const drawnCard = deck.drawCard();
+      expect(drawnCard).toBeDefined();
       expect(deck.cards.length).toBeLessThan(deckLength);
 
-      // Card should no longer be in the deck
-      expect(deck.cards.includes(card)).toBe(false);
+      // Drawn card should no longer be in the deck
+      expect(deck.cards.includes(drawnCard)).toBe(false);
 
-      // Card should have been the first in the deck
-      expect(card).toEqual(firstCard);
+      // Drawn card should have been the first in the deck
+      expect(drawnCard).toEqual(firstCard);
+  });
+
+  it('should not allow drawing from an empty deck', () => {
+    const deck = new Deck();
+    expect(() => deck.drawCard()).toThrowError();
   });
 
   it('should shuffle the deck of cards', () => {
