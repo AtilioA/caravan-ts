@@ -13,6 +13,11 @@ export class Card implements ICard {
     }
   }
 
+  // Subclassing would probably be overkill (alternative would be using a Factory)
+  isFaceCard(): boolean {
+    return ['Jack', 'Queen', 'King', 'Joker'].includes(this.value);
+  }
+
   addFaceCard(card: ICard): void {
     this.faceCards.push(card);
   }

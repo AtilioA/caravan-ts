@@ -7,6 +7,7 @@ export interface ICard {
   theme: string;
   faceCards: ICard[]; // to store face cards stacked to this card
 
+  isFaceCard(): boolean;
   addFaceCard(card: ICard): void;
   computeValue(): number;
 }
