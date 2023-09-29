@@ -1,5 +1,5 @@
-import { SUITS, THEMES, VALUED_CARDS, VALUES } from "../constants/cardConstants";
 import { Card } from "../models/Card";
+import { getRandomCard, getRandomSuit, getRandomValue, getRandomValueNonFace } from "../utils/card";
 
 describe('Card', () => {
     it('should create a card with a given value and suit', () => {
@@ -16,17 +16,20 @@ describe('Card', () => {
 
     it('should allow any value and suit from cardConstants', () => {
         // Use random values from SUITS and VALUES from cardConstants.ts
-        const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+        const card = getRandomCard();
         expect(card.value).toBeDefined();
     });
 
     it('should allow any theme from cardConstants', () => {
         // Use random values from THEMES from cardConstants.ts
-        const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)], THEMES[Math.floor(Math.random() * THEMES.length)]);
+        const card = getRandomCard();
         expect(card.theme).toBeDefined();
     });
 
     it('should not allow a theme that is not in cardConstants', () => {
+        expect(() => new Card(getRandomValue(), getRandomSuit(), 'Gun Runners')).toThrow();
+    });
+
     it('should allow attaching face cards', () => {
         const card = new Card('Ace', 'Spades');
         expect(card.attachedCards.length).toBe(0);
@@ -50,14 +53,14 @@ describe('Card', () => {
         const card = new Card('Ace', 'Spades');
         expect(card.attachedCards.length).toBe(0);
 
-        const valuedCard = new Card(VALUED_CARDS[Math.floor(Math.random() * VALUED_CARDS.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+        const valuedCard = new Card(getRandomValueNonFace(), getRandomSuit());
         card.attachFaceCard(valuedCard);
         expect(card.attachedCards.length).toBe(0);
     });
 
     it('should return the correct unknown value, considering face cards', () => {
         // Don't use cards without value (face cards)
-        const card = new Card(VALUED_CARDS[Math.floor(Math.random() * VALUED_CARDS.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+        const card = new Card(getRandomValueNonFace(), getRandomSuit());
         expect(card.value).toBeDefined();
 
         // Count the number of kings and multiply the value by 2 to the power of the number of kings.
@@ -68,7 +71,7 @@ describe('Card', () => {
                 expect(card.computeValue()).toBe(Number(card.value));
         }
     });
-    
+
     it('should return the correct known value, considering face cards', () => {
         const knownCard = new Card('6', 'Diamonds');
         knownCard.attachFaceCard(new Card('King', 'Hearts'));

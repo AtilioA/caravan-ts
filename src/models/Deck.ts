@@ -1,4 +1,5 @@
-import { CardValues, SUITS, VALUES } from "../constants/cardConstants";
+import { CardValues } from "../constants/cardConstants";
+import { getRandomSuit, getRandomValue } from "../utils/card";
 import { Card } from "./Card";
 import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
@@ -33,10 +34,10 @@ export class Deck implements IDeck {
 
   generate(quantity: number): void {
     while(this.cards.length < quantity) {
-      const suit = SUITS[Math.floor(Math.random() * SUITS.length)];
-      const value = VALUES[Math.floor(Math.random() * VALUES.length)];
+      const randomValue = getRandomValue();
+      const randomSuit = getRandomSuit();
 
-      this.addCard(new Card(value, suit));
+      this.addCard(new Card(randomValue, randomSuit));
     }
   }
 
