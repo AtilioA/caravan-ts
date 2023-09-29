@@ -5,9 +5,9 @@ export interface ICard {
   suit: string;
   // Theme is location featuring on the back (can be Ultra-Luxe, Lucky 38, etc.)
   theme: string;
-  faceCards: ICard[]; // to store face cards stacked to this card
+  attachedCards: ICard[]; // to store face cards stacked to this card
 
   isFaceCard(): boolean;
-  addFaceCard(card: ICard): void;
+  attachFaceCard(card: ICard): void;
   computeValue(): number;
 }

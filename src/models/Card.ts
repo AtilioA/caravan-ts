@@ -2,7 +2,7 @@ import { CardValues, SUITS, THEMES, VALUES } from '../constants/cardConstants';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
-  constructor(public value: CardValues, public suit: string, public theme: string = "Default", public faceCards: ICard[] = []) {
+  constructor(public value: CardValues, public suit: string, public theme: string = "Default", public attachedCards: ICard[] = []) {
     // Check if the value and suit are valid
     if (!VALUES.includes(value) || !SUITS.includes(suit)) {
       throw new Error('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
@@ -18,12 +18,15 @@ export class Card implements ICard {
     return ['Jack', 'Queen', 'King', 'Joker'].includes(this.value);
   }
 
-  addFaceCard(card: ICard): void {
-    this.faceCards.push(card);
+  attachFaceCard(card: ICard): void {
+    // Queens are not attached, but added to the bottom of the caravan instead
+    if (card.isFaceCard() && card.value !== 'Queen') {
+      this.attachedCards.push(card);
+    }
   }
 
   computeValue(): number {
-    const nKingsAttached = this.faceCards.filter((card) => card.value === 'King').length;
+    const nKingsAttached = this.attachedCards.filter((card) => card.value === 'King').length;
     if (nKingsAttached > 0) {
       // FIXME: Handle 'ace' value afterwards (use enum)
       return Number(this.value) * Math.pow(2, nKingsAttached);

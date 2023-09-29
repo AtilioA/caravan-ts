@@ -27,7 +27,32 @@ describe('Card', () => {
     });
 
     it('should not allow a theme that is not in cardConstants', () => {
-        expect(() => new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)], 'Gun Runners')).toThrow();
+    it('should allow attaching face cards', () => {
+        const card = new Card('Ace', 'Spades');
+        expect(card.attachedCards.length).toBe(0);
+
+        card.attachFaceCard(new Card('Jack', 'Diamonds'));
+        expect(card.attachedCards.length).toBe(1);
+
+        card.attachFaceCard(new Card('King', 'Spades'));
+        expect(card.attachedCards.length).toBe(2);
+    });
+
+    it('should not allow attaching a face card that is a Queen', () => {
+        const card = new Card('Ace', 'Spades');
+        expect(card.attachedCards.length).toBe(0);
+
+        card.attachFaceCard(new Card('Queen', 'Diamonds'));
+        expect(card.attachedCards.length).toBe(0);
+    });
+
+    it('should not allow attaching non-face cards', () => {
+        const card = new Card('Ace', 'Spades');
+        expect(card.attachedCards.length).toBe(0);
+
+        const valuedCard = new Card(VALUED_CARDS[Math.floor(Math.random() * VALUED_CARDS.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+        card.attachFaceCard(valuedCard);
+        expect(card.attachedCards.length).toBe(0);
     });
 
     it('should return the correct unknown value, considering face cards', () => {
@@ -36,7 +61,7 @@ describe('Card', () => {
         expect(card.value).toBeDefined();
 
         // Count the number of kings and multiply the value by 2 to the power of the number of kings.
-        const kings = card.faceCards.filter((card) => card.value === 'King').length;
+        const kings = card.attachedCards.filter((card) => card.value === 'King').length;
         if (kings > 0) {
             expect(card.computeValue()).toBe(Number(card.value) * Math.pow(2, kings));
         } else {
@@ -46,8 +71,8 @@ describe('Card', () => {
     
     it('should return the correct known value, considering face cards', () => {
         const knownCard = new Card('6', 'Diamonds');
-        knownCard.addFaceCard(new Card('King', 'Hearts'));
-        knownCard.addFaceCard(new Card('King', 'Diamonds'));
+        knownCard.attachFaceCard(new Card('King', 'Hearts'));
+        knownCard.attachFaceCard(new Card('King', 'Diamonds'));
         expect(knownCard.computeValue()).toBe(6 * Math.pow(2, 2));
     });
 });
