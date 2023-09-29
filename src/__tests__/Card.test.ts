@@ -1,4 +1,4 @@
-import { SUITS, THEMES, VALUES } from "../constants/cardConstants";
+import { SUITS, THEMES, VALUED_CARDS, VALUES } from "../constants/cardConstants";
 import { Card } from "../models/Card";
 
 describe('Card', () => {
@@ -9,11 +9,9 @@ describe('Card', () => {
     });
 
     it('should only allow valid values and suits', () => {
-        // Use SUITS and VALUES from cardConstants.ts, any other value should throw an error
         expect(() => new Card('Ace', 'Spades')).not.toThrow();
         expect(() => new Card('Ace', 'Spade')).toThrow();
-        expect(() => new Card('Aces', 'Spades')).toThrow();
-        expect(() => new Card('Aces', 'Spade')).toThrow();
+        // Invalid values are not tested because we already have type enforcement with CardValues
     });
 
     it('should allow any value and suit from cardConstants', () => {
@@ -32,9 +30,9 @@ describe('Card', () => {
         expect(() => new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)], 'Gun Runners')).toThrow();
     });
 
-    it('should return the correct value, considering face cards', () => {
-        // Use random values from SUITS and VALUES from cardConstants.ts
-        const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length - 4)], SUITS[Math.floor(Math.random() * SUITS.length)]);
+    it('should return the correct unknown value, considering face cards', () => {
+        // Don't use cards without value (face cards)
+        const card = new Card(VALUED_CARDS[Math.floor(Math.random() * VALUED_CARDS.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
         expect(card.value).toBeDefined();
 
         // Count the number of kings and multiply the value by 2 to the power of the number of kings.
@@ -44,7 +42,9 @@ describe('Card', () => {
         } else {
                 expect(card.computeValue()).toBe(Number(card.value));
         }
-
+    });
+    
+    it('should return the correct known value, considering face cards', () => {
         const knownCard = new Card('6', 'Diamonds');
         knownCard.addFaceCard(new Card('King', 'Hearts'));
         knownCard.addFaceCard(new Card('King', 'Diamonds'));

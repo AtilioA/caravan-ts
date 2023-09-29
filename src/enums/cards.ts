@@ -1,12 +1,12 @@
-export enum Suits {
+export enum EnumSuits {
   CLUBS = 'Clubs',
   DIAMONDS = 'Diamonds',
   HEARTS = 'Hearts',
   SPADES = 'Spades',
 }
 
-export enum Values {
-  ACE = '1',
+export enum EnumValues {
+  ACE = 'Ace',
   TWO = '2',
   THREE = '3',
   FOUR = '4',
@@ -16,4 +16,8 @@ export enum Values {
   EIGHT = '8',
   NINE = '9',
   TEN = '10',
+  JACK = 'Jack',
+  QUEEN = 'Queen',
+  KING = 'King',
+  JOKER = 'Joker',
 }

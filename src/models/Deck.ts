@@ -1,4 +1,4 @@
-import { SUITS, VALUES } from "../constants/cardConstants";
+import { CardValues, SUITS, VALUES } from "../constants/cardConstants";
 import { Card } from "./Card";
 import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
@@ -6,7 +6,7 @@ import { IDeck } from "./interfaces/IDeck";
 export class Deck implements IDeck {
   constructor(public cards: ICard[] = []) {}
 
-  private _isCardUnique(suit: string, value: string, theme: string): boolean {
+  private _isCardUnique(value: CardValues, suit: string, theme: string): boolean {
     // Check if the card is unique before adding it to the deck (Caravan rules)
     return this.cards.some(card => card.suit === suit && card.value === value && card.theme === theme);
   }
@@ -16,7 +16,7 @@ export class Deck implements IDeck {
   }
 
   addCard(card: ICard): void {
-    if (!this._isCardUnique(card.suit, card.value, card.theme)) {
+    if (!this._isCardUnique(card.value, card.suit, card.theme)) {
       this.cards.push(card);
     }
   }

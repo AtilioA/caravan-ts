@@ -1,8 +1,8 @@
-import { SUITS, THEMES, VALUES } from '../constants/cardConstants';
+import { CardValues, SUITS, THEMES, VALUES } from '../constants/cardConstants';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
-  constructor(public value: string, public suit: string, public theme: string = "Default", public faceCards: ICard[] = []) {
+  constructor(public value: CardValues, public suit: string, public theme: string = "Default", public faceCards: ICard[] = []) {
     // Check if the value and suit are valid
     if (!VALUES.includes(value) || !SUITS.includes(suit)) {
       throw new Error('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
