@@ -1,3 +1,4 @@
+import { THEMES } from "../constants/cardConstants";
 import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
 
@@ -30,9 +31,21 @@ describe('Deck', () => {
 
   it('should not allow duplicate cards from the same set', () => {
     const deck = new Deck();
+    // Both are 'default'-themed cards
     deck.addCard(new Card('Ace', 'Spades'));
     deck.addCard(new Card('Ace', 'Spades'));
     expect(deck.cards.length).toEqual(1);
+  });
+
+  it('should allow duplicate cards with different themes', () => {
+    const deck = new Deck();
+
+    const sampleThemes = (arr: string[], n: number) => arr.sort(() => 0.5 - Math.random()).slice(0, n);
+    const [theme1, theme2] = sampleThemes(THEMES, 2);
+
+    deck.addCard(new Card('Ace', 'Spades', theme1));
+    deck.addCard(new Card('Ace', 'Spades', theme2));
+    expect(deck.cards.length).toEqual(2);
   });
 
   // Card drawing

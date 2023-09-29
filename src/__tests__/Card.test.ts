@@ -1,4 +1,4 @@
-import { SUITS, VALUES } from "../constants/cardConstants";
+import { SUITS, THEMES, VALUES } from "../constants/cardConstants";
 import { Card } from "../models/Card";
 
 describe('Card', () => {
@@ -20,6 +20,16 @@ describe('Card', () => {
         // Use random values from SUITS and VALUES from cardConstants.ts
         const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)]);
         expect(card.value).toBeDefined();
+    });
+
+    it('should allow any theme from cardConstants', () => {
+        // Use random values from THEMES from cardConstants.ts
+        const card = new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)], THEMES[Math.floor(Math.random() * THEMES.length)]);
+        expect(card.theme).toBeDefined();
+    });
+
+    it('should not allow a theme that is not in cardConstants', () => {
+        expect(() => new Card(VALUES[Math.floor(Math.random() * VALUES.length)], SUITS[Math.floor(Math.random() * SUITS.length)], 'Gun Runners')).toThrow();
     });
 
     it('should return the correct value, considering face cards', () => {
