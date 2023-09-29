@@ -2,6 +2,7 @@ import { CardValues, SUITS, THEMES, VALUES } from '../constants/cardConstants';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
+  // TODO: change suit type to EnumSuits
   constructor(public value: CardValues, public suit: string, public theme: string = "Default", public attachedCards: ICard[] = []) {
     // Check if the value and suit are valid
     if (!VALUES.includes(value) || !SUITS.includes(suit)) {

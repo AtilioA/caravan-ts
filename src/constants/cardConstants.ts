@@ -18,6 +18,7 @@ export const ValueMapping: Record<CardValues, number> = {
 };
 export const VALUES = Object.keys(ValueMapping) as CardValues[];
 export const VALUED_CARDS = VALUES.filter((value) => !['Jack', 'Queen', 'King', 'Joker'].includes(value));
+export const FACE_CARDS = VALUES.filter((value) => ['Jack', 'Queen', 'King', 'Joker'].includes(value));
 
 export const SUITS = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 export const THEMES = ['Default', 'Vault 21', 'Ultra-Luxe', 'Silver Rush', 'The Tops', 'Atomic Wrangler Casino', 'Lucky 38', 'Gomorrah', 'Bison Steve'];

@@ -2,6 +2,7 @@ import { CardValues } from "../../constants/cardConstants";
 
 export interface ICard {
   value: CardValues;
+  // TODO: change to EnumSuits
   suit: string;
   // Theme is location featuring on the back (can be Ultra-Luxe, Lucky 38, etc.)
   theme: string;
