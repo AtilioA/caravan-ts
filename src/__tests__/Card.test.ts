@@ -10,8 +10,7 @@ describe('Card', () => {
 
     it('should only allow valid values and suits', () => {
         expect(() => new Card('Ace', 'Spades')).not.toThrow();
-        expect(() => new Card('Ace', 'Spade')).toThrow();
-        // Invalid values are not tested because we already have type enforcement with CardValues
+        // Invalid values are not tested because we already have type enforcement with CardValue and CardSuit
     });
 
     it('should allow any value and suit from cardConstants', () => {

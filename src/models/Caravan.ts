@@ -1,12 +1,12 @@
-import { CardValues, ValueMapping } from '../constants/cardConstants';
+import { CardSuit, CardValue, ValueMapping } from '../constants/cardConstants';
 import { Direction } from '../enums/directions';
 import { ICaravan } from './interfaces/ICaravan';
 import { ICard } from './interfaces/ICard';
 
 export class Caravan implements ICaravan {
-  constructor(public cards: ICard[] = [], public direction: Direction | null = null, public suit: string | null = null, public bid: number = 0) {}
+  constructor(public cards: ICard[] = [], public direction: Direction | null = null, public suit: CardSuit | null = null, public bid: number = 0) {}
 
-  private _isValueInDirection(value: CardValues): boolean {
+  private _isValueInDirection(value: CardValue): boolean {
     const lastCardValue = ValueMapping[this.cards[this.cards.length - 1].value]
 
     switch (this.direction) {

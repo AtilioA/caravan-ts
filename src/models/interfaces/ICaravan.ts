@@ -1,12 +1,11 @@
-import { EnumSuits } from "../../enums/cards";
+import { CardSuit } from "../../constants/cardConstants";
 import { Direction } from "../../enums/directions";
 import { ICard } from "./ICard";
 
 export interface ICaravan {
-  // TODO: change to EnumSuits
   cards: ICard[];
   direction: Direction | null;
-  suit: string | null;
+  suit: CardSuit | null;
   bid: number;
 
   addCard(card: ICard): void;

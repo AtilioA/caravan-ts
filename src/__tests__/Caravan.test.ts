@@ -1,4 +1,3 @@
-import { EnumSuits } from "../enums/cards";
 import { Direction } from "../enums/directions";
 import { Caravan } from "../models/Caravan";
 import { Card } from "../models/Card";
@@ -15,7 +14,7 @@ describe('Caravan', () => {
     });
 
     it('should check if a card can be added to the caravan (empty, suit defined)', () => {
-        const caravan = new Caravan([], Direction.ASCENDING, EnumSuits.CLUBS, 0);
+        const caravan = new Caravan([], Direction.ASCENDING, 'Clubs', 0);
 
         let isValid = caravan.canAddCard(new Card('2', 'Spades'));
         expect(isValid).toBe(true);
@@ -25,7 +24,7 @@ describe('Caravan', () => {
     });
 
     it('should check if a card can be added to the caravan (differing suit)', () => {
-        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, EnumSuits.DIAMONDS, 0);
+        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, 'Diamonds', 0);
 
         let isValid = caravan.canAddCard(new Card('2', 'Clubs'));
         expect(isValid).toBe(false);
@@ -35,7 +34,7 @@ describe('Caravan', () => {
     });
 
     it('should check if a card can be added to the caravan (same suit)', () => {
-        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, EnumSuits.DIAMONDS, 0);
+        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, 'Diamonds', 0);
 
         let isValid = caravan.canAddCard(new Card('2', 'Diamonds'));
         expect(isValid).toBe(true);
@@ -77,68 +76,68 @@ describe('Caravan', () => {
 
     it('should set suit property to the suit of the first added card', () => {
         const caravan = new Caravan();
-        const card = new Card('5', EnumSuits.DIAMONDS);
+        const card = new Card('5', 'Diamonds');
 
         caravan.addCard(card);
 
-        expect(caravan.suit).toEqual(EnumSuits.DIAMONDS);
+        expect(caravan.suit).toEqual('Diamonds');
     });
 
     it('should change the suit property when adding cards of different suits', () => {
-        const caravan = new Caravan([new Card('5', EnumSuits.DIAMONDS)], null, EnumSuits.DIAMONDS, 5);
-        caravan.addCard(new Card('6', EnumSuits.CLUBS));
+        const caravan = new Caravan([new Card('5', 'Diamonds')], null, 'Diamonds', 5);
+        caravan.addCard(new Card('6', 'Clubs'));
 
-        expect(caravan.suit).toEqual(EnumSuits.CLUBS);
+        expect(caravan.suit).toEqual('Clubs');
     });
 
     it('should set the direction property based on the values of the first two added cards', () => {
         const caravan = new Caravan();
 
-        caravan.addCard(new Card('5', EnumSuits.DIAMONDS));
-        caravan.addCard(new Card('7', EnumSuits.DIAMONDS));
+        caravan.addCard(new Card('5', 'Diamonds'));
+        caravan.addCard(new Card('7', 'Diamonds'));
 
         expect(caravan.direction).toEqual(Direction.ASCENDING);
     });
 
     it('should not change the direction when adding subsequent cards', () => {
-        const caravan = new Caravan([new Card('5', EnumSuits.DIAMONDS), new Card('7', EnumSuits.DIAMONDS)], Direction.ASCENDING, EnumSuits.DIAMONDS, 12);
-        caravan.addCard(new Card('8', EnumSuits.DIAMONDS));
+        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('7', 'Diamonds')], Direction.ASCENDING, 'Diamonds', 12);
+        caravan.addCard(new Card('8', 'Diamonds'));
 
         expect(caravan.direction).toEqual(Direction.ASCENDING);
     });
 
     it('should correctly update the bid when adding non-face cards', () => {
         const caravan = new Caravan();
-        caravan.addCard(new Card('5', EnumSuits.DIAMONDS));
+        caravan.addCard(new Card('5', 'Diamonds'));
 
         expect(caravan.bid).toEqual(5);
 
-        caravan.addCard(new Card('7', EnumSuits.DIAMONDS));
+        caravan.addCard(new Card('7', 'Diamonds'));
 
         expect(caravan.bid).toEqual(12);
     });
 
     // Attaching cards should be handled by the game logic perhaps
     // it('should correctly update the bid when adding a King', () => {
-    //     const caravan = new Caravan([new Card('5', EnumSuits.DIAMONDS)]);
-    //     caravan.addCard(new Card('King', EnumSuits.CLUBS)); // Assuming King doubles the last card value
+    //     const caravan = new Caravan([new Card('5', 'Diamonds')]);
+    //     caravan.addCard(new Card('King', 'Clubs')); // Assuming King doubles the last card value
 
     //     expect(caravan.bid).toEqual(10);
     // });
 
     // it('should correctly update the bid when adding a Jack', () => {
-    //     const caravan = new Caravan([new Card('5', EnumSuits.DIAMONDS), new Card('7', EnumSuits.CLUBS)]);
-    //     caravan.addCard(new Card('Jack', EnumSuits.HEARTS)); // Assuming Jack removes all the cards of the same suit
+    //     const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('7', 'Clubs')]);
+    //     caravan.addCard(new Card('Jack', 'Hearts')); // Assuming Jack removes all the cards of the same suit
 
     //     expect(caravan.bid).toEqual(5); // 7 removed by Jack
     // });
 
     it('should correctly update the suit and direction when adding a Queen', () => {
-        const caravan = new Caravan([new Card('5', EnumSuits.DIAMONDS), new Card('7', EnumSuits.CLUBS)], Direction.ASCENDING, EnumSuits.CLUBS, 12);
+        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('7', 'Clubs')], Direction.ASCENDING, 'Clubs', 12);
 
-        caravan.addCard(new Card('Queen', EnumSuits.HEARTS));
+        caravan.addCard(new Card('Queen', 'Hearts'));
 
-        expect(caravan.suit).toEqual(EnumSuits.HEARTS);
+        expect(caravan.suit).toEqual('Hearts');
         expect(caravan.direction).toBeNull();
     });
 });

@@ -1,4 +1,4 @@
-import { FACE_CARDS, SUITS, THEMES, VALUED_CARDS, VALUES } from "../constants/cardConstants";
+import { CardSuit, FACE_CARDS, SUITS, THEMES, VALUED_CARDS, VALUES } from "../constants/cardConstants";
 import { Card } from "../models/Card";
 
 export function getRandomValue() {
@@ -10,7 +10,7 @@ export function getRandomValueNonFace() {
 export function getRandomValueFace() {
   return FACE_CARDS[Math.floor(Math.random() * FACE_CARDS.length)];
 }
-export function getRandomSuit() {
+export function getRandomSuit(): CardSuit {
   return SUITS[Math.floor(Math.random() * SUITS.length)];
 }
 export function getRandomTheme() {

@@ -1,9 +1,8 @@
-import { CardValues } from "../../constants/cardConstants";
+import { CardSuit, CardValue } from "../../constants/cardConstants";
 
 export interface ICard {
-  value: CardValues;
-  // TODO: change to EnumSuits
-  suit: string;
+  value: CardValue;
+  suit: CardSuit;
   // Theme is location featuring on the back (can be Ultra-Luxe, Lucky 38, etc.)
   theme: string;
   attachedCards: ICard[]; // to store face cards stacked to this card

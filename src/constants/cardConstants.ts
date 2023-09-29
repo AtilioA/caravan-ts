@@ -1,5 +1,6 @@
-export type CardValues = 'Ace' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'Jack' | 'Queen' | 'King' | 'Joker';
-export const ValueMapping: Record<CardValues, number> = {
+export type CardValue = 'Ace' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'Jack' | 'Queen' | 'King' | 'Joker';
+export type CardSuit = 'Hearts' | 'Diamonds' | 'Clubs' | 'Spades';
+export const ValueMapping: Record<CardValue, number> = {
   "Ace": 1,
   "2": 2,
   "3": 3,
@@ -16,9 +17,9 @@ export const ValueMapping: Record<CardValues, number> = {
   "King": 0,
   "Joker": 0,
 };
-export const VALUES = Object.keys(ValueMapping) as CardValues[];
+export const VALUES = Object.keys(ValueMapping) as CardValue[];
 export const VALUED_CARDS = VALUES.filter((value) => !['Jack', 'Queen', 'King', 'Joker'].includes(value));
 export const FACE_CARDS = VALUES.filter((value) => ['Jack', 'Queen', 'King', 'Joker'].includes(value));
 
-export const SUITS = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+export const SUITS: CardSuit[] = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 export const THEMES = ['Default', 'Vault 21', 'Ultra-Luxe', 'Silver Rush', 'The Tops', 'Atomic Wrangler Casino', 'Lucky 38', 'Gomorrah', 'Bison Steve'];
