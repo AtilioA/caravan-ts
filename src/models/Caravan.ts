@@ -4,7 +4,17 @@ import { ICaravan } from './interfaces/ICaravan';
 import { ICard } from './interfaces/ICard';
 
 export class Caravan implements ICaravan {
-  constructor(public cards: ICard[] = [], public direction: Direction | null = null, public suit: CardSuit | null = null, public bid: number = 0) {}
+  cards: ICard[] = [];
+  direction: Direction | null = null;
+  suit: CardSuit | null = null;
+  bid: number = 0;
+
+  constructor(cards: ICard[] = [], direction: Direction | null = null, suit: CardSuit | null = null, bid: number = 0) {
+    this.cards = cards;
+    this.direction = direction;
+    this.suit = suit;
+    this.bid = bid;
+  }
 
   private _isValueInDirection(value: CardValue): boolean {
     const lastCardValue = ValueMapping[this.cards[this.cards.length - 1].value]

@@ -5,7 +5,12 @@ import { IPlayer } from "./interfaces/IPlayer";
 
 export class Player implements IPlayer {
   cardSet: IDeck = new Deck();
-  constructor(public hand: ICard[] = []) {}
+  hand: ICard[] = [];
+
+  constructor(cardSet: IDeck = new Deck(), hand: ICard[] = []) {
+    this.cardSet = cardSet;
+    this.hand = hand;
+  }
 
   private _addToHand(card: ICard): void {
     this.hand.push(card);

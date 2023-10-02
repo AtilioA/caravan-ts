@@ -5,7 +5,11 @@ import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
 
 export class Deck implements IDeck {
-  constructor(public cards: ICard[] = []) {}
+  cards: ICard[] = [];
+
+  constructor(cards: ICard[] = []) {
+    this.cards = cards;
+  }
 
   private _isCardUnique(value: CardValue, suit: string, theme: string): boolean {
     // Check if the card is unique before adding it to the deck (Caravan rules)
