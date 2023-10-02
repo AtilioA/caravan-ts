@@ -6,6 +6,7 @@ import { generateCards, getRandomCardFace, getRandomCardNonFace } from "../utils
 describe('Caravan', () => {
   it('should pass', () => {});
 
+  // SECTION: Caravan initialization
     it('should initialize a caravan with a direction, suit, and value', () => {
         const caravan = new Caravan();
         expect(caravan.direction).toBeNull();
@@ -23,6 +24,7 @@ describe('Caravan', () => {
         expect(isValid).toBe(true);
     });
 
+    // SECTION: Adding cards to the caravan
     it('should check if a card can be added to the caravan (differing suit)', () => {
         const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, 'Diamonds', 0);
 
@@ -61,17 +63,21 @@ describe('Caravan', () => {
         expect(isValid).toBe(false);
     });
 
-    it('should be able to be disbanded, resetting the caravan and returning the cards', () => {
-        const caravan = new Caravan(generateCards(10, false));
-        const caravanCards = caravan.cards;
+    it('should not allow a card to be added if it does not match the direction and suit', () => {
+        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('6', 'Spades')], Direction.ASCENDING, 'Diamonds', 11);
+        const isValid = caravan.canAddCard(new Card('4', 'Clubs'));
 
-        const discarded = caravan.disband();
+        expect(isValid).toBe(false);
+        expect(() => caravan.addCard(new Card('4', 'Clubs'))).toThrowError();
+    });
 
-        expect(discarded).toEqual(caravanCards);
-        expect(caravan.cards.length).toEqual(0);
-        expect(caravan.direction).toBeNull();
-        expect(caravan.suit).toBeNull();
-        expect(caravan.bid).toEqual(0);
+    it ('should not allow a card of equal value to the last one to be added, even if it matches the suit', () => {
+        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('6', 'Spades')], Direction.ASCENDING, 'Diamonds', 11);
+        const isValid = caravan.canAddCard(new Card('6', 'Clubs'));
+
+        expect(isValid).toBe(false);
+        expect(() => caravan.addCard(new Card('6', 'Clubs'))).toThrowError();
+
     });
 
     it('should set suit property to the suit of the first added card', () => {
@@ -139,5 +145,19 @@ describe('Caravan', () => {
 
         expect(caravan.suit).toEqual('Hearts');
         expect(caravan.direction).toBeNull();
+    });
+
+    // SECTION: Removing cards from the caravan
+    it('should be able to be disbanded, resetting the caravan and returning the cards', () => {
+        const caravan = new Caravan(generateCards(10, false));
+        const caravanCards = caravan.cards;
+
+        const discarded = caravan.disband();
+
+        expect(discarded).toEqual(caravanCards);
+        expect(caravan.cards.length).toEqual(0);
+        expect(caravan.direction).toBeNull();
+        expect(caravan.suit).toBeNull();
+        expect(caravan.bid).toEqual(0);
     });
 });
