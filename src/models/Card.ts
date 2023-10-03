@@ -1,4 +1,4 @@
-import { CardSuit, CardValue, SUITS, THEMES, VALUES } from '../constants/cardConstants';
+import { CardSuit, CardTheme, CardValue, SUITS, THEMES, VALUES } from '../constants/cardConstants';
 import { InvalidPlayError } from '../exceptions/GameExceptions';
 import { ICard } from './interfaces/ICard';
 
@@ -6,10 +6,10 @@ export class Card implements ICard {
   value: CardValue;
   suit: CardSuit;
   // TODO: replace with a theme type
-  theme: string = "Default";
+  theme: CardTheme = "Default";
   attachedCards: ICard[] = [];
 
-  constructor(value: CardValue, suit: CardSuit, theme: string = "Default", attachedCards: ICard[] = []) {
+  constructor(value: CardValue, suit: CardSuit, theme: CardTheme = "Default", attachedCards: ICard[] = []) {
     this.value = value;
     this.suit = suit;
     this.theme = theme;

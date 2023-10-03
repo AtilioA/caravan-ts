@@ -1,4 +1,4 @@
-import { CardValue } from "../constants/cardConstants";
+import { CardTheme, CardValue } from "../constants/cardConstants";
 import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { getRandomSuit, getRandomValue } from "../utils/card";
 import { Card } from "./Card";
@@ -12,7 +12,7 @@ export class Deck implements IDeck {
     this.cards = cards;
   }
 
-  private _isCardUnique(value: CardValue, suit: string, theme: string): boolean {
+  private _isCardUnique(value: CardValue, suit: string, theme: CardTheme): boolean {
     // Check if the card is unique before adding it to the deck (Caravan rules)
     return this.cards.some(card => card.suit === suit && card.value === value && card.theme === theme);
   }

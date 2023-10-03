@@ -9,9 +9,9 @@ describe('Card', () => {
         expect(card.suit).toBe('Spades');
     });
 
+    // Invalid values are not tested because we already have type enforcement with CardValue, CardSuit, and CardTheme
     it('should only allow valid values and suits', () => {
         expect(() => new Card('Ace', 'Spades')).not.toThrowError(InvalidPlayError);
-        // Invalid values are not tested because we already have type enforcement with CardValue and CardSuit
     });
 
     it('should allow any value and suit from cardConstants', () => {
@@ -24,10 +24,6 @@ describe('Card', () => {
         // Use random values from THEMES from cardConstants.ts
         const card = getRandomCard();
         expect(card.theme).toBeDefined();
-    });
-
-    it('should not allow a theme that is not in cardConstants', () => {
-        expect(() => new Card(getRandomValue(), getRandomSuit(), 'Gun Runners')).toThrowError(InvalidPlayError);
     });
 
     it('should allow attaching face cards', () => {

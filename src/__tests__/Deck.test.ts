@@ -1,4 +1,4 @@
-import { THEMES } from "../constants/cardConstants";
+import { CardTheme, THEMES } from "../constants/cardConstants";
 import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
@@ -41,7 +41,7 @@ describe('Deck', () => {
   it('should allow duplicate cards with different themes', () => {
     const deck = new Deck();
 
-    const sampleThemes = (arr: string[], n: number) => arr.sort(() => 0.5 - Math.random()).slice(0, n);
+    const sampleThemes = (arr: CardTheme[], n: number) => arr.sort(() => 0.5 - Math.random()).slice(0, n);
     const [theme1, theme2] = sampleThemes(THEMES, 2);
 
     deck.addCard(new Card('Ace', 'Spades', theme1));
