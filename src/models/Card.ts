@@ -3,7 +3,18 @@ import { InvalidPlayError } from '../exceptions/GameExceptions';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
-  constructor(public value: CardValue, public suit: CardSuit, public theme: string = "Default", public attachedCards: ICard[] = []) {
+  value: CardValue;
+  suit: CardSuit;
+  // TODO: replace with a theme type
+  theme: string = "Default";
+  attachedCards: ICard[] = [];
+
+  constructor(value: CardValue, suit: CardSuit, theme: string = "Default", attachedCards: ICard[] = []) {
+    this.value = value;
+    this.suit = suit;
+    this.theme = theme;
+    this.attachedCards = attachedCards;
+
     // Check if the value and suit are valid
     if (!VALUES.includes(value) || !SUITS.includes(suit)) {
       throw new InvalidPlayError('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
