@@ -1,4 +1,5 @@
 import { THEMES } from "../constants/cardConstants";
+import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
 
@@ -71,7 +72,7 @@ describe('Deck', () => {
 
   it('should not allow drawing from an empty deck', () => {
     const deck = new Deck();
-    expect(() => deck.drawCard()).toThrowError();
+    expect(() => deck.drawCard()).toThrowError(InvalidPlayError);
   });
 
   it('should shuffle the deck of cards', () => {

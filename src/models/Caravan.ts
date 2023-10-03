@@ -1,5 +1,6 @@
 import { CardSuit, CardValue, ValueMapping } from '../constants/cardConstants';
 import { Direction } from '../enums/directions';
+import { InvalidPlayError } from '../exceptions/GameExceptions';
 import { ICaravan } from './interfaces/ICaravan';
 import { ICard } from './interfaces/ICard';
 
@@ -58,7 +59,7 @@ export class Caravan implements ICaravan {
 
   addCard(card: ICard): void {
     if (!this.canAddCard(card)) {
-      throw new Error("Cannot add this card to the caravan.");
+      throw new InvalidPlayError("Cannot add this card to the caravan.");
     }
     // For the first card, set the suit of the Caravan.
     if (this.cards.length === 0) {
@@ -73,7 +74,7 @@ export class Caravan implements ICaravan {
       } else if (ValueMapping[card.value] < lastCardValue) {
         this.direction = Direction.DESCENDING;
       } else {
-        throw new Error("Equal card values are not allowed.");
+        throw new InvalidPlayError("Equal card values are not allowed.");
       }
     }
 

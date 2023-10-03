@@ -1,3 +1,4 @@
+import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { Card } from "../models/Card";
 import { getRandomCard, getRandomSuit, getRandomValue, getRandomValueNonFace } from "../utils/card";
 
@@ -9,7 +10,7 @@ describe('Card', () => {
     });
 
     it('should only allow valid values and suits', () => {
-        expect(() => new Card('Ace', 'Spades')).not.toThrow();
+        expect(() => new Card('Ace', 'Spades')).not.toThrowError(InvalidPlayError);
         // Invalid values are not tested because we already have type enforcement with CardValue and CardSuit
     });
 
@@ -26,7 +27,7 @@ describe('Card', () => {
     });
 
     it('should not allow a theme that is not in cardConstants', () => {
-        expect(() => new Card(getRandomValue(), getRandomSuit(), 'Gun Runners')).toThrow();
+        expect(() => new Card(getRandomValue(), getRandomSuit(), 'Gun Runners')).toThrowError(InvalidPlayError);
     });
 
     it('should allow attaching face cards', () => {

@@ -1,4 +1,5 @@
 import { CardValue } from "../constants/cardConstants";
+import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { getRandomSuit, getRandomValue } from "../utils/card";
 import { Card } from "./Card";
 import { ICard } from "./interfaces/ICard";
@@ -32,7 +33,7 @@ export class Deck implements IDeck {
     if (card) {
       return card;
     } else {
-      throw new Error("Cannot draw from an empty deck")
+      throw new InvalidPlayError("Cannot draw a card from an empty deck");
     }
   }
 

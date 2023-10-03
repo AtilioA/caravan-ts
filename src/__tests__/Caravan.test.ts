@@ -1,12 +1,13 @@
+// TODO: modularize into smaller describe blocks, use beforeEach to create instances
+
 import { Direction } from "../enums/directions";
+import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { Caravan } from "../models/Caravan";
 import { Card } from "../models/Card";
 import { generateCards, getRandomCardFace, getRandomCardNonFace } from "../utils/card";
 
 describe('Caravan', () => {
-  it('should pass', () => {});
-
-  // SECTION: Caravan initialization
+     // SECTION: Caravan initialization
     it('should initialize a caravan with a direction, suit, and value', () => {
         const caravan = new Caravan();
         expect(caravan.direction).toBeNull();
@@ -68,7 +69,7 @@ describe('Caravan', () => {
         const isValid = caravan.canAddCard(new Card('4', 'Clubs'));
 
         expect(isValid).toBe(false);
-        expect(() => caravan.addCard(new Card('4', 'Clubs'))).toThrowError();
+        expect(() => caravan.addCard(new Card('4', 'Clubs'))).toThrowError(InvalidPlayError);
     });
 
     it ('should not allow a card of equal value to the last one to be added, even if it matches the suit', () => {
@@ -76,7 +77,7 @@ describe('Caravan', () => {
         const isValid = caravan.canAddCard(new Card('6', 'Clubs'));
 
         expect(isValid).toBe(false);
-        expect(() => caravan.addCard(new Card('6', 'Clubs'))).toThrowError();
+        expect(() => caravan.addCard(new Card('6', 'Clubs'))).toThrowError(InvalidPlayError);
 
     });
 

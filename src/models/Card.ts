@@ -1,15 +1,16 @@
 import { CardSuit, CardValue, SUITS, THEMES, VALUES } from '../constants/cardConstants';
+import { InvalidPlayError } from '../exceptions/GameExceptions';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
   constructor(public value: CardValue, public suit: CardSuit, public theme: string = "Default", public attachedCards: ICard[] = []) {
     // Check if the value and suit are valid
     if (!VALUES.includes(value) || !SUITS.includes(suit)) {
-      throw new Error('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
+      throw new InvalidPlayError('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
     }
     // Check if the theme is valid
     if (!THEMES.includes(this.theme)) {
-      throw new Error('Invalid card theme. Must be one of the following: ' + THEMES.join(', '));
+      throw new InvalidPlayError('Invalid card theme. Must be one of the following: ' + THEMES.join(', '));
     }
   }
 

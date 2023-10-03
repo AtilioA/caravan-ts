@@ -1,7 +1,11 @@
+// TODO: modularize into smaller describe blocks, use beforeEach to create instances
+
+import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { Caravan } from "../models/Caravan";
 import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
 import { Player } from "../models/Player";
+import { generateCards } from "../utils/card";
 
 describe('Player', () => {
     it('should create a player with an empty set of cards', () => {
@@ -51,7 +55,7 @@ describe('Player', () => {
     it('should not draw a card if cardSet is empty', () => {
         const player = new Player();
 
-        expect(() => player.drawCard()).toThrow();
+        expect(() => player.drawCard()).toThrowError(InvalidPlayError);
         expect(player.hand.length).toEqual(0);
     });
 
@@ -78,7 +82,7 @@ describe('Player', () => {
         const cardNotInHand = new Card('10', 'Diamonds');
         // TODO: add Caravan to the Player object
         const caravan = new Caravan();
-        expect(() => player.playCard(cardNotInHand, caravan)).toThrow();
+        expect(() => player.playCard(cardNotInHand, caravan)).toThrowError(InvalidPlayError);
     });
 
     it('should be able to draw a card from the cardSet and add it to the player’s hand.', () => {
@@ -124,6 +128,5 @@ describe('Player', () => {
 
         expect(() => player.playCardToOpponentCaravan(notFaceCard, caravan)).toThrow();
     });
-
-    // REVIEW: Should not play a card to an invalid caravan.?
+    // REVIEW: Should not play a card to an invalid caravan?
 });
