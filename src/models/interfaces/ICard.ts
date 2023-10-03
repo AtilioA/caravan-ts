@@ -9,6 +9,6 @@ export interface ICard {
   attachedCards: ICard[]; // to store face cards stacked to this card
 
   isFaceCard(): boolean;
-  attachFaceCard(card: ICard): void;
+  attachFaceCard(card: ICard): boolean;
   computeValue(): number;
 }

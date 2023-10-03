@@ -59,18 +59,14 @@ describe('Player', () => {
         expect(player.hand.length).toEqual(0);
     });
 
-    it('should play a card from hand to a caravan and not have it in hand anymore', () => {
-        const playerDeck = new Deck();
-        playerDeck.generate(40);
-        const player = new Player(playerDeck);
+    it('should play a valued card from hand to a caravan and not have it in hand anymore', () => {
+        const playerValuedDeck = new Deck(generateCards(40, false));
+        const player = new Player(playerValuedDeck);
         player.drawHand(5);
 
         const cardToPlay = player.hand[0];
 
-        // TODO: add Caravan to the Player object
-        const caravan = new Caravan();
-
-        player.playCard(cardToPlay, caravan);
+        player.playCard(cardToPlay, player.caravans[0]);
         expect(player.hand).not.toContain(cardToPlay);
     });
 
@@ -101,32 +97,32 @@ describe('Player', () => {
         // const opponent = new Player(playerDeck);
         // const caravan = new Caravan();
         // // Create or get an opponent's caravan object here.
-        // expect(player.determineOpponentCaravan(opponent)).toEqual(caravan); // assuming determineOpponentCaravan returns the opponent's caravan
+        // expect(player.isOpponentCaravan(opponent)).toEqual(caravan); // assuming isOpponentCaravan returns the opponent's caravan
     });
 
-    it('should play a card to the opponent’s caravan if it’s a face card.', () => {
+    it('should be able to play a face card to an opponent’s caravan’s card.', () => {
         const player = new Player();
         const faceCard = new Card('King', 'Diamonds');
         player.hand.push(faceCard);
 
-        const opponent = new Player();
-        const caravan = new Caravan(); // Create or get an opponent's caravan object here.
+        const caravan = new Caravan();
 
-        player.playCardToOpponentCaravan(faceCard, caravan);
+        caravan.cards = generateCards(2, false);
+        const enemyCard = caravan.cards[0];
 
-        expect(caravan.cards).toContain(faceCard);
+        player.playCardToOpponentCaravan(faceCard, enemyCard);
+        expect(enemyCard.attachedCards).toContain(faceCard);
         expect(player.hand).not.toContain(faceCard);
     });
 
-    it('should not play a card to the opponent’s caravan if it’s not a face card.', () => {
+    it('should not be able to play a card to the opponent’s caravan if it’s not a face card.', () => {
         const player = new Player();
         const notFaceCard = new Card('10', 'Diamonds');
         player.hand.push(notFaceCard);
 
-        const opponent = new Player();
-        const caravan = new Caravan(); // Create or get an opponent's caravan object here.
+        const opponent = new Player(new Deck(), [], [new Caravan(generateCards(4, false)), new Caravan(generateCards(4, false)), new Caravan(generateCards(4, false))]);
 
-        expect(() => player.playCardToOpponentCaravan(notFaceCard, caravan)).toThrow();
+        expect(() => player.playCardToOpponentCaravan(notFaceCard, opponent.caravans[0].cards[0])).toThrowError(InvalidPlayError);
     });
     // REVIEW: Should not play a card to an invalid caravan?
 });

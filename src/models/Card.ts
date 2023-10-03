@@ -19,10 +19,14 @@ export class Card implements ICard {
     return ['Jack', 'Queen', 'King', 'Joker'].includes(this.value);
   }
 
-  attachFaceCard(card: ICard): void {
+  attachFaceCard(card: ICard): boolean {
     // Queens are not attached, but added to the bottom of the caravan instead
     if (card.isFaceCard() && card.value !== 'Queen') {
       this.attachedCards.push(card);
+      return true;
+    }
+    else {
+      throw new InvalidPlayError('Cannot attach a non-face card to another card');
     }
   }
 

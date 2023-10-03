@@ -45,7 +45,7 @@ describe('Card', () => {
         const card = new Card('Ace', 'Spades');
         expect(card.attachedCards.length).toBe(0);
 
-        card.attachFaceCard(new Card('Queen', 'Diamonds'));
+        expect(() => card.attachFaceCard(new Card('Queen', 'Diamonds'))).toThrowError(InvalidPlayError);
         expect(card.attachedCards.length).toBe(0);
     });
 
@@ -54,7 +54,8 @@ describe('Card', () => {
         expect(card.attachedCards.length).toBe(0);
 
         const valuedCard = new Card(getRandomValueNonFace(), getRandomSuit());
-        card.attachFaceCard(valuedCard);
+
+        expect(() => card.attachFaceCard(valuedCard)).toThrowError(InvalidPlayError);
         expect(card.attachedCards.length).toBe(0);
     });
 

@@ -13,6 +13,6 @@ export interface IPlayer {
   playCard(card: ICard, caravan: ICaravan): void;
   discardCard(card: ICard): void;
 
-  determineOpponentCaravan(caravan: ICaravan): void;
-  playCardToOpponentCaravan(card: ICard, enemyCaravan: ICaravan): void;
+  isOpponentCaravan(caravan: ICaravan): boolean;
+  playCardToOpponentCaravan(faceCard: ICard, enemyCard: ICard): boolean;
 }
