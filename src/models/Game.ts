@@ -5,11 +5,9 @@ import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
   players: IPlayer[];
-  discardPile: IDeck;
 
-  constructor(players: IPlayer[] = [], discardPile: IDeck = new Deck()) {
+  constructor(players: IPlayer[] = []) {
     this.players = players;
-    this.discardPile = discardPile;
   }
 
   start() {

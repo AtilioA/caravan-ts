@@ -11,11 +11,13 @@ export class Player implements IPlayer {
   cardSet: IDeck = new Deck();
   hand: ICard[] = [];
   caravans: ICaravan[] = [new Caravan(), new Caravan(), new Caravan()];
+  discardPile: IDeck = new Deck();
 
-  constructor(cardSet: IDeck = new Deck(), hand: ICard[] = [], caravans: ICaravan[] = [new Caravan(), new Caravan(), new Caravan()]) {
+  constructor(cardSet: IDeck = new Deck(), hand: ICard[] = [], caravans: ICaravan[] = [new Caravan(), new Caravan(), new Caravan()], discardPile: IDeck = new Deck()) {
     this.cardSet = cardSet;
     this.hand = hand;
     this.caravans = caravans;
+    this.discardPile = discardPile;
   }
 
   private _addToHand(card: ICard): void {

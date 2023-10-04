@@ -5,6 +5,7 @@ import { IDeck } from './IDeck';
 export interface IPlayer {
   hand: ICard[];
   cardSet: IDeck;
+  discardPile: IDeck;
   // TODO: add a general pile of cards from which to create the player's deck
 
   drawCard(): void;
