@@ -16,12 +16,21 @@ describe('Deck', () => {
     expect(deck.cards.length).toEqual(40);
   });
 
-  it('should be initialized with at least 30 cards.', () => {
+  it('should be able to be initialized with at least 30 cards', () => {
     const deck = new Deck();
     // Generate between 30 and 60 cards
     deck.generate(Math.floor(Math.random() * 30) + 30);
     expect(deck.cards.length).toBeGreaterThanOrEqual(30);
   });
+
+
+  // NOTE: this is not a valid deck for playing, but this behavior should be allowed by the Deck class
+  it('should be able to be initialized with more than least 216 cards', () => {
+    const deck = new Deck();
+    deck.generate(217);
+    expect(deck.cards.length).toEqual(217);
+  });
+
 
   // Card addition
   it('should add a card to the deck', () => {
