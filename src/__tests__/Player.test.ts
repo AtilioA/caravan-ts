@@ -13,6 +13,11 @@ describe('Player', () => {
         expect(player.cardSet.getSize()).toEqual(0);
     });
 
+    it('should create a player with an empty discard pile', () => {
+        const player = new Player();
+        expect(player.discardPile.getSize()).toEqual(0);
+    });
+
     it('should create a player with a set of cards', () => {
         const playerDeck = new Deck();
         playerDeck.generate(40);
@@ -39,10 +44,11 @@ describe('Player', () => {
         expect(player.cardSet.getSize()).toEqual(deckSize - handSize);
     });
 
-    it('should discard a card from the hand', () => {
+    it('should be able to discard a card from the hand', () => {
         const playerDeck = new Deck();
         playerDeck.generate(40);
         const player = new Player(playerDeck);
+        expect(player.discardPile.getSize()).toEqual(0);
 
         player.drawHand(5);
         const discardedCard = player.hand[0];
@@ -50,6 +56,8 @@ describe('Player', () => {
 
         expect(player.hand.length).toEqual(4);
         expect(player.hand).not.toContain(discardedCard);
+        expect(player.discardPile.getSize()).toEqual(1);
+        expect(player.discardPile.cards).toContain(discardedCard);
     });
 
     it('should not draw a card if cardSet is empty', () => {
