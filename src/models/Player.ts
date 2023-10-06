@@ -24,7 +24,7 @@ export class Player implements IPlayer {
     this.hand.push(card);
   }
 
-  private removeFromHand(card: ICard): ICard | null {
+  private _removeFromHand(card: ICard): ICard | null {
     return removeItemFromArray(this.hand, card);
   };
 
@@ -51,16 +51,24 @@ export class Player implements IPlayer {
       throw new InvalidPlayError("Cannot play a valued card to an opponent's caravan");
     }
 
-    this.removeFromHand(card)
+    this._removeFromHand(card)
     caravan.addCard(card);
   }
 
+  playCardOpeningRound(card: ICard, caravan: ICaravan): void {
+    if (card.isFaceCard()) {
+      throw new InvalidPlayError("Cannot play a face card in the opening round");
+    }
+
+    return this.playCard(card, caravan);
+  }
+
   discardCard(card: ICard): void {
-    this.removeFromHand(card);
+    this.discardPile.addCard(card);
+    this._removeFromHand(card);
   }
 
   isOpponentCaravan(caravan: ICaravan): boolean {
-    // Should be enough, since Array.prototype.includes method uses strict equality (===) to determine if an element exists in the array.
     return !this.caravans.includes(caravan);
   }
 
@@ -68,11 +76,16 @@ export class Player implements IPlayer {
     return !this.hand.includes(card);
   }
 
+  // FIXME: this does not consider playing queens to opponent's caravans
   playCardToOpponentCaravan(faceCard: ICard, enemyCard: ICard): boolean {
-    // Should be enough, since Array.prototype.includes method uses strict equality (===) to determine if an element exists in the array.
     if (this.isOpponentCard(enemyCard)) {
-      this.removeFromHand(faceCard);
+      this._removeFromHand(faceCard);
+      if (faceCard.value === 'Queen') {
+        // return enemyCaravan.addCard(faceCard);
+        return enemyCard.attachFaceCard(faceCard);
+      } else {
       return enemyCard.attachFaceCard(faceCard);
+      }
     }
     else {
       throw new InvalidPlayError("Cannot play a face card to an opponent's caravan's card");
