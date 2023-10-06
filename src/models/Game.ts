@@ -1,12 +1,25 @@
-import { InvalidGameState } from "../exceptions/GameExceptions";
+import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
+import { isCaravan } from "../utils/caravan";
+import { ICaravan } from "./interfaces/ICaravan";
+import { ICard } from "./interfaces/ICard";
 import { IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
   players: IPlayer[];
+  currentPlayerIndex: number;
 
-  constructor(players: IPlayer[] = []) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0) {
     this.players = players;
+    this.currentPlayerIndex = currentPlayerIndex || 0;
+  }
+
+  getCurrentPlayer(): IPlayer {
+    return this.players[this.currentPlayerIndex];
+  }
+
+  moveToNextTurn(): void {
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
   }
 
   start() {
@@ -48,11 +61,48 @@ export class Game implements IGame {
     }
   }
 
-  playTurn(player: IPlayer, cardIndex: number, caravanIndex: number) {
-    // Implement the logic to play a turn
+  playTurn(card: ICard, target: ICard | ICaravan) {
+    let currentPlayer = this.getCurrentPlayer();
+
+    // Validate the move
+    if (this.validateMove(currentPlayer, card, target)) {
+      this.playCardToTarget(currentPlayer, card, target);
+
+      // Check for any game-winning conditions
+      this.checkForWinner();
+
+      // Move to the next player's turn
+      this.moveToNextTurn();
+    } else {
+      throw new InvalidPlayError('Unknown invalid move; please check the game rules or try a different move.');
+    }
   }
 
-  validateMove(player: IPlayer, cardIndex: number, caravanIndex: number): boolean {
+  private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan) {
+    if (!card.isFaceCard() && player.caravans.includes(caravan)) {
+      player.playCard(card, caravan);
+    } else if (card.isFaceCard() && card.value !== "Queen") {
+      throw new InvalidPlayError('Only a Queen can be used as face card to extend a caravan');
+    } else {
+      throw new InvalidPlayError('Cannot extend an opponent\'s caravan with a valued card');
+    }
+  }
+
+  private playCardToCard(player: IPlayer, card: ICard, target: ICard) {
+    if (card.isFaceCard()) {
+      target.attachFaceCard(card);
+    }
+  }
+
+  playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard) {
+    if (isCaravan(target)) {
+      this.playCardToCaravan(player, card, target);
+    } else {
+      this.playCardToCard(player, card, target);
+    }
+  }
+
+  validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean {
     // Validate if the move is legal according to game rules
     return true;
   }

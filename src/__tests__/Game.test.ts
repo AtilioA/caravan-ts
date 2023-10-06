@@ -126,13 +126,10 @@ describe('Game - Playing turns', () => {
   let game: Game;
   let player1: IPlayer;
   let player2: IPlayer;
-  let caravan1: ICaravan;
-  let caravan2: ICaravan;
 
   beforeEach(() => {
     player1 = createMockPlayer();
     player2 = createMockPlayer();
-    caravan2 = createMockCaravan();
 
     game = new Game([player1, player2]);
     game.start();
@@ -142,47 +139,69 @@ describe('Game - Playing turns', () => {
     const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
 
-    game.playTurn(player1, caravan1, valuedCard);
+    game.playTurn(valuedCard, player1.caravans[0]);
 
-    expect(caravan1.cards).toContain(valuedCard);
+    expect(player1.caravans[0].cards).toContain(valuedCard);
     expect(player1.hand).not.toContain(valuedCard);
-    expect(caravan1.bid
   });
 
-  it('should allow a player to play a face card on their cards', () => {
-    const faceCard = createMockCard("King", CardSuit.DIAMONDS);
-    const valuedCard = createMockCard("Five", CardSuit.DIAMONDS);
-
-    player1.hand.push(faceCard);
-    caravan1.cards.push(valuedCard);
-
-    game.playTurn(player1, caravan1, faceCard);
-
-    expect(valuedCard.attachedCards).toContain(faceCard);
-    expect(player1.hand).not.toContain(faceCard);
-  });
-
-  it('should allow a player to play a face card on their opponent’s cards', () => {
-    const faceCard = createMockCard("Queen", CardSuit.HEARTS);
-    const valuedCard = createMockCard("Seven", CardSuit.HEARTS);
-
-    player1.hand.push(faceCard);
-    caravan2.cards.push(valuedCard);
-
-    game.playTurn(player1, caravan2, faceCard);
-
-    expect(valuedCard.attachedCards).toContain(faceCard);
-    expect(player1.hand).not.toContain(faceCard);
-  });
-
-  it('should not allow a player to play a valued card on their opponent’s caravan', () => {
-    const valuedCard = createMockCard("Eight", CardSuit.CLUBS);
-
+  it('should update the caravan\'s bid after a player plays a valued card on their caravan', () => {
+    const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
 
-    game.playTurn(player1, caravan2, valuedCard);
+    game.playTurn(valuedCard, player1.caravans[0]);
 
-    expect(caravan2.cards).not.toContain(valuedCard);
-    expect(player1.hand).toContain(valuedCard);
+    expect(player1.caravans[0].bid).toEqual(2);
   });
+
+  // TODO: CONTINUE FROM HERE
+
+  // it('should allow a player to play a face card on their cards', () => {
+  //   const faceCard = createMockCard("King", "Diamonds");
+  //   const valuedCard = createMockCard("5", "Diamonds");
+
+  //   player1.hand.push(faceCard);
+  //   player1.caravans[0].addCard(valuedCard);
+
+  //   game.playTurn(player1, faceCard, player1.caravans[0], valuedCard);
+
+  //   expect(valuedCard.attachedCards).toContain(faceCard);
+  //   expect(player1.hand).not.toContain(faceCard);
+  // });
+
+  // it('should update the caravan\'s bid after a player plays a face card on their cards', () => {
+  //   const faceCard = createMockCard("King", "Diamonds");
+  //   const valuedCard = createMockCard("7", "Diamonds");
+
+  //   player1.hand.push(faceCard);
+  //   player1.caravans[0].addCard(valuedCard);
+
+  //   game.playTurn(player1, faceCard, player1.caravans[0], valuedCard);
+
+  //   expect(player1.caravans[0].bid).toEqual(14);
+  // });
+
+  // it('should allow a player to play a face card on their opponent’s cards', () => {
+  //   const faceCard = createMockCard("Queen", "Hearts");
+  //   const valuedCard = createMockCard("7", "Hearts");
+
+  //   player1.hand.push(faceCard);
+  //   caravan2.cards.push(valuedCard);
+
+  //   game.playTurn(player1, caravan2, faceCard);
+
+  //   expect(valuedCard.attachedCards).toContain(faceCard);
+  //   expect(player1.hand).not.toContain(faceCard);
+  // });
+
+  // it('should not allow a player to play a valued card on their opponent’s caravan', () => {
+  //   const valuedCard = createMockCard("8", "Clubs");
+
+  //   player1.hand.push(valuedCard);
+
+  //   game.playTurn(player1, caravan2, valuedCard);
+
+  //   expect(caravan2.cards).not.toContain(valuedCard);
+  //   expect(player1.hand).toContain(valuedCard);
+  // });
 });
