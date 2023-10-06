@@ -13,16 +13,18 @@
 import { InvalidGameState } from "../exceptions/GameExceptions";
 import { Deck } from "../models/Deck";
 import { Game } from "../models/Game";
+import { ICaravan } from "../models/interfaces/ICaravan";
+import { IPlayer } from "../models/interfaces/IPlayer";
 import { generateCards } from "../utils/card";
-import { createMockPlayer } from "./__mocks__/mockFactories";
+import { createMockCaravan, createMockCard, createMockPlayer } from "./__mocks__/mockFactories";
 
-// let drawHandCallCount = 0;
 
-// beforeEach(() => {
-//   drawHandCallCount = 0;
-// });
+describe('Game - Initialization', () => {
+  // let drawHandCallCount = 0;
 
-describe('Game', () => {
+  // beforeEach(() => {
+  //   drawHandCallCount = 0;
+  // });
   it('should initialize the game with the correct initial state', () => {
     const game = new Game();
     expect(game.players.length).toEqual(0);
@@ -68,6 +70,17 @@ describe('Game', () => {
     expect(mockPlayers[1].hand.length).toEqual(8);
   });
 
+    // it('should validate a player’s move correctly', () => {
+  //   const mockPlayers = [createMockPlayer(), createMockPlayer()]
+  //   const game = new Game(mockPlayers);
+  //   game.start();
+
+  //   const cardIndex = 0; // or any valid index
+  //   const caravanIndex = 0; // or any valid index
+
+  //   expect(game.validateMove(mockPlayers[0], cardIndex, caravanIndex)).toBe(true);
+  // });
+
   // it('should reshuffle a player deck if they do not have at least three valued cards, and draw eight new cards', () => {
   //   const mockPlayers = [new MockedPlayer(), new MockedPlayer()]
 
@@ -107,4 +120,69 @@ describe('Game', () => {
   //   // drawHandSpy1.mockRestore();
   //   // drawHandSpy2.mockRestore();
   // });
+});
+
+describe('Game - Playing turns', () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
+  let caravan1: ICaravan;
+  let caravan2: ICaravan;
+
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
+    caravan2 = createMockCaravan();
+
+    game = new Game([player1, player2]);
+    game.start();
+  });
+
+  it('should allow a player to play a valued card on their caravan', () => {
+    const valuedCard = createMockCard("2", "Diamonds");
+    player1.hand.push(valuedCard);
+
+    game.playTurn(player1, caravan1, valuedCard);
+
+    expect(caravan1.cards).toContain(valuedCard);
+    expect(player1.hand).not.toContain(valuedCard);
+    expect(caravan1.bid
+  });
+
+  it('should allow a player to play a face card on their cards', () => {
+    const faceCard = createMockCard("King", CardSuit.DIAMONDS);
+    const valuedCard = createMockCard("Five", CardSuit.DIAMONDS);
+
+    player1.hand.push(faceCard);
+    caravan1.cards.push(valuedCard);
+
+    game.playTurn(player1, caravan1, faceCard);
+
+    expect(valuedCard.attachedCards).toContain(faceCard);
+    expect(player1.hand).not.toContain(faceCard);
+  });
+
+  it('should allow a player to play a face card on their opponent’s cards', () => {
+    const faceCard = createMockCard("Queen", CardSuit.HEARTS);
+    const valuedCard = createMockCard("Seven", CardSuit.HEARTS);
+
+    player1.hand.push(faceCard);
+    caravan2.cards.push(valuedCard);
+
+    game.playTurn(player1, caravan2, faceCard);
+
+    expect(valuedCard.attachedCards).toContain(faceCard);
+    expect(player1.hand).not.toContain(faceCard);
+  });
+
+  it('should not allow a player to play a valued card on their opponent’s caravan', () => {
+    const valuedCard = createMockCard("Eight", CardSuit.CLUBS);
+
+    player1.hand.push(valuedCard);
+
+    game.playTurn(player1, caravan2, valuedCard);
+
+    expect(caravan2.cards).not.toContain(valuedCard);
+    expect(player1.hand).toContain(valuedCard);
+  });
 });
