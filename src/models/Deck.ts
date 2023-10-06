@@ -1,6 +1,6 @@
 import { CardTheme, CardValue } from "../constants/cardConstants";
 import { InvalidPlayError } from "../exceptions/GameExceptions";
-import { getRandomSuit, getRandomValue } from "../utils/card";
+import { getRandomSuit, getRandomTheme, getRandomValue } from "../utils/card";
 import { Card } from "./Card";
 import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
@@ -41,8 +41,9 @@ export class Deck implements IDeck {
     while(this.cards.length < quantity) {
       const randomValue = getRandomValue();
       const randomSuit = getRandomSuit();
+      const randomTheme = getRandomTheme();
 
-      this.addCard(new Card(randomValue, randomSuit));
+      this.addCard(new Card(randomValue, randomSuit, randomTheme));
     }
   }
 
