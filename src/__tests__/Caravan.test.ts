@@ -161,4 +161,18 @@ describe('Caravan', () => {
         expect(caravan.suit).toBeNull();
         expect(caravan.bid).toEqual(0);
     });
+
+    it('should know if it\'s sold', () => {
+        const caravan = new Caravan();
+        expect(caravan.isSold()).toBe(false);
+
+        caravan.bid = 20;
+        expect(caravan.isSold()).toBe(false);
+        caravan.bid = 21;
+        expect(caravan.isSold()).toBe(true);
+        caravan.bid = 26;
+        expect(caravan.isSold()).toBe(true);
+        caravan.bid = 27;
+        expect(caravan.isSold()).toBe(false);
+    });
 });

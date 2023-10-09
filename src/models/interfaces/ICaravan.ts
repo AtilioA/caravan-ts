@@ -13,6 +13,7 @@ export interface ICaravan {
 
   // Might not be needed (we'd just change the bid when cards are played)
   computeValue(): number;
+  isSold(): boolean;
 
   disband(): ICard[];
 }

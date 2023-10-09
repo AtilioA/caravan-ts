@@ -114,6 +114,10 @@ export class Caravan implements ICaravan {
     throw new Error("Method not implemented.");
   }
 
+  isSold(): boolean {
+    return this.bid >= 21 && this.bid <= 26;
+  }
+
   // Return the cards in the caravan and reset the caravan.
   disband(): ICard[] {
     const cards = this.cards;
