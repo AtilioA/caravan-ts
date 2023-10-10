@@ -142,6 +142,7 @@ describe('Game - Playing turns', () => {
     expect(player1.caravans[0].bid).toEqual(2);
   });
 
+  // TODO: Continue from here
   it('should allow a player to play a face card on their cards', () => {
     const faceCard = createMockCard("King", "Diamonds");
     const valuedCard = createMockCard("5", "Diamonds");
@@ -201,21 +202,27 @@ describe('Game - Playing turns', () => {
       expect(game.checkForWinner()).toBe(player1);  // Or player2
   });
 
-  // it('should handle special cards (like Joker) and their effects on the game state correctly', () => {
-  //     const jokerCard = createMockCard("Joker", "Diamonds")
-  //     player1.hand.push(jokerCard);
 
-  //     game.playTurn({type: 'PLAY_CARD', card: jokerCard, target: player1.caravans[0]});
-
-  //     // Validate effects of Joker here
-  // });
-
-  it('should not allow moves if it’s not the player’s turn', () => {
+  it('should not allow playing a card if it’s not the player’s turn', () => {
       // Assuming it's player1's turn now.
       const valuedCard = createMockCard("3", "Hearts");
       player2.hand.push(valuedCard);
 
       expect(() => game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player2.caravans[0]})).toThrow();
+  });
+
+  it('should not allow a player to discard and draw a card if it\'s not their turn', () => {
+    const valuedCard = createMockCard("3", "Hearts");
+    player2.hand.push(valuedCard);
+
+    expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
+  });
+
+  it('should not allow a player to disbanding a caravan if it\'s not their turn', () => {
+    const valuedCard = createMockCard("3", "Hearts");
+    player2.hand.push(valuedCard);
+
+    expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
   });
 
   it('should handle the end of the game correctly, allowing no more moves after the game ends', () => {
@@ -226,33 +233,6 @@ describe('Game - Playing turns', () => {
       player1.hand.push(valuedCard);
 
       expect(() => game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]})).toThrow();
-  });
-
-  it('should allow playing valued cards during the opening round', () => {
-      const valuedCard = createMockCard("3", "Hearts");
-      player1.hand.push(valuedCard);
-
-      game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]});
-
-      expect(player1.caravans[0].cards).toContain(valuedCard);
-      expect(player1.hand).not.toContain(valuedCard);
-  });
-
-  it('should not allow face cards during the opening round, even if there are cards in the caravans.', () => {
-      const kingCard = createMockCard("King", "Diamonds");
-      player1.hand.push(kingCard);
-
-      player2.caravans[0].addCard(createMockCard("5", "Diamonds"));
-
-      // Can't play face card during the opening round, even if there's cards in the caravans.
-      expect(() => game.playTurn({type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]})).toThrow();
-  });
-
-  it('should not allow discarding during the opening round', () => {
-      const valuedCard = createMockCard("5", "Diamonds");
-      player1.hand.push(valuedCard);
-
-      expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
   });
 
   it('should consider a caravan as sold only between a bid of 21-26', () => {
@@ -337,7 +317,48 @@ describe('Game - Playing turns', () => {
   });
 });
 
-describe('Game - end state', () => {
+// describe('Game - Opening rounds', () => {
+//   let game: Game;
+//   let player1: IPlayer;
+//   let player2: IPlayer;
+
+//   beforeEach(() => {
+//     player1 = createMockPlayer();
+//     player2 = createMockPlayer();
+
+//     game = new Game([player1, player2]);
+//     game.start();
+//   });
+
+//   it('should allow playing valued cards during the opening round', () => {
+//     const valuedCard = createMockCard("3", "Hearts");
+//     player1.hand.push(valuedCard);
+
+//     game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]});
+
+//     expect(player1.caravans[0].cards).toContain(valuedCard);
+//     expect(player1.hand).not.toContain(valuedCard);
+//   });
+
+//   it('should not allow face cards during the opening round, even if there are cards in the caravans.', () => {
+//     const kingCard = createMockCard("King", "Diamonds");
+//     player1.hand.push(kingCard);
+
+//     player2.caravans[0].addCard(createMockCard("5", "Diamonds"));
+
+//     // Can't play face card during the opening round, even if there's cards in the caravans.
+//     expect(() => game.playTurn({type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]})).toThrow();
+//   });
+
+//   it('should not allow discarding during the opening round', () => {
+//     const valuedCard = createMockCard("5", "Diamonds");
+//     player1.hand.push(valuedCard);
+
+//     expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
+//   });
+// });
+
+describe('Game - End state', () => {
   let game: Game;
   let player1: IPlayer;
   let player2: IPlayer;
@@ -409,3 +430,14 @@ describe('Game - end state', () => {
     expect(game.checkForWinner()).toBeNull();
   });
 });
+
+// describe('Game - Joker', () => {
+//     // it('should handle special cards (like Joker) and their effects on the game state correctly', () => {
+//   //     const jokerCard = createMockCard("Joker", "Diamonds")
+//   //     player1.hand.push(jokerCard);
+
+//   //     game.playTurn({type: 'PLAY_CARD', card: jokerCard, target: player1.caravans[0]});
+
+//   //     // Validate effects of Joker here
+//   // });
+// });
