@@ -120,14 +120,23 @@ export class Game implements IGame {
         throw new InvalidPlayError('Unknown action type; please check the game rules or try a different move.');
     }
 
+    this.updateBids();
     this.endCurrentTurn();
+  }
+
+  private updateBids(): void {
+    // Call compute value for each caravan of each player
+    for (let player of this.players) {
+      for (let caravan of player.caravans) {
+        caravan.bid = caravan.computeValue();
+      }
+    }
   }
 
   private endCurrentTurn(): void {
     // Check for any game-winning conditions
     const winner = this.checkForWinner();
     if (winner) {
-      console.log("Player with caravans " + winner.caravans + " won the game!")
       this.end();
     } else {
       // Move to the next turn

@@ -31,6 +31,13 @@ export class Caravan implements ICaravan {
     }
   }
 
+  private _queenLogic(queenCard: ICard): void {
+    // Changes the suit of the caravan to the suit of the Queen and reverses the direction of the caravan.
+    this.suit = queenCard.suit;
+    this.direction = this.direction === Direction.ASCENDING ? Direction.DESCENDING : Direction.ASCENDING;
+  }
+
+
   canAddCard(card: ICard): boolean {
     // If the caravan is empty and the card is a face card, return false.
     if (this.cards.length === 0) {
@@ -91,16 +98,13 @@ export class Caravan implements ICaravan {
       if (card.value === 'King') {
         this.bid += ValueMapping[this.cards[this.cards.length - 1].value];
       } else if (card.value === 'Jack') {
-        // Remove all cards of the same suit and recalculate the bid.
-        this.cards = this.cards.filter(c => c.suit !== card.suit);
-        this.bid = this.cards.reduce((acc, c) => acc + ValueMapping[c.value], 0);
       }
       */
       // Change suit and nullify direction for Queen.
       if (card.value === 'Queen') {
-        this.suit = card.suit;
-        this.direction = this.direction === Direction.ASCENDING ? Direction.DESCENDING : Direction.ASCENDING;
+        this._queenLogic(card,);
       }
+      // this.bid = this.computeValue();
     }
 
     // Finally, add the card to the caravan.
@@ -109,8 +113,8 @@ export class Caravan implements ICaravan {
 
   // Might not be needed (we'd just change the bid when cards are played)
   computeValue(): number {
-    // implementation here
-    throw new Error("Method not implemented.");
+    // Compute the value of the caravan. Iterate over the cards and add the computeValue result of each card.
+    return this.cards.reduce((total, card) => total + card.computeValue(), 0);
   }
 
   isSold(): boolean {
