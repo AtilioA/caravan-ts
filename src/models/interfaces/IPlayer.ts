@@ -7,7 +7,7 @@ export interface IPlayer {
   cardSet: IDeck;
   discardPile: IDeck;
   caravans: ICaravan[];
-  // TODO: add a general pile of cards from which to create the player's deck
+  // TODO: (future improvement) add a general pile of cards from which to create the player's deck
 
   drawCard(): void;
   drawHand(n: number): void;

@@ -58,7 +58,7 @@ export class Game implements IGame {
     for (let player of this.players) {
       let valuedCards = 0;
 
-      // Keep drawing until there are at least 3 valued cards in hand
+      // FIXME: Keep drawing until there are at least 3 valued cards in hand
       // while (valuedCards < 3) {
         // Return the cards from hand to cardSet
         while (player.hand.length > 0) {
@@ -188,7 +188,21 @@ export class Game implements IGame {
     return true;
   }
 
-  checkForWinner(): IPlayer | null {
+  private isPlayerOutOfCards(player: IPlayer): boolean {
+    return player.hand.length === 0 && player.cardSet.cards.length === 0;
+  }
+
+  private isAnyPlayerOutOfCards(): IPlayer | null {
+    if (this.isPlayerOutOfCards(this.players[0])) {
+      return this.players[1];
+    } else if (this.isPlayerOutOfCards(this.players[1])) {
+      return this.players[0];
+    }
+
+      return null;
+    }
+
+  private checkSoldCaravans(): IPlayer | null {
     let soldCaravans = {
       player1: 0,
       player2: 0
@@ -196,28 +210,27 @@ export class Game implements IGame {
     let tiedCaravansCount = 0;
 
     for (let i = 0; i < 3; i++) {
-        let caravanPlayer1 = this.players[0].caravans[i];
-        let caravanPlayer2 = this.players[1].caravans[i];
+      let caravanPlayer1 = this.players[0].caravans[i];
+      let caravanPlayer2 = this.players[1].caravans[i];
 
-        if (caravanPlayer1.isSold() && caravanPlayer2.isSold()) {
-            if (caravanPlayer1.bid === caravanPlayer2.bid) {
-                tiedCaravansCount++;
-            } else if (caravanPlayer1.bid > caravanPlayer2.bid) {
-                soldCaravans.player1++;
-            } else {
-                soldCaravans.player2++;
-            }
-        } else {
-            if (caravanPlayer1.isSold()) {
-                soldCaravans.player1++;
-            }
-            if (caravanPlayer2.isSold()) {
-                soldCaravans.player2++;
-            }
-        }
+      if (caravanPlayer1.isSold() && caravanPlayer2.isSold()) {
+          if (caravanPlayer1.bid === caravanPlayer2.bid) {
+              tiedCaravansCount++;
+          } else if (caravanPlayer1.bid > caravanPlayer2.bid) {
+              soldCaravans.player1++;
+          } else {
+              soldCaravans.player2++;
+          }
+      } else {
+          if (caravanPlayer1.isSold()) {
+              soldCaravans.player1++;
+          }
+          if (caravanPlayer2.isSold()) {
+              soldCaravans.player2++;
+          }
+      }
     }
 
-    // Check for ending condition based on sold caravans
     if (tiedCaravansCount == 0) {
         if (soldCaravans.player1 >= 2) {
             return this.players[0];
@@ -226,17 +239,19 @@ export class Game implements IGame {
         }
     }
 
+    return null;
+}
+
+  checkForWinner(): IPlayer | null {
+    const soldCaravanWinner = this.checkSoldCaravans();
+    if (soldCaravanWinner) {
+        return soldCaravanWinner;
+    }
+
     // Check for ending condition based on card availability.
     // Since this is done after checking for sold caravans, we can assume that there is no definite winner yet based on sold caravans.
     // NOTE: This might not be needed (i.e. handle this with an event or caught exception when drawing a card)
-    if (this.players[0].hand.length === 0 && this.players[0].cardSet.cards.length === 0) {
-        return this.players[1];
-    } else if (this.players[1].hand.length === 0 && this.players[1].cardSet.cards.length === 0) {
-        return this.players[0];
-    }
-
-    // Game hasn't ended yet
-    return null;
+    return this.isAnyPlayerOutOfCards();
   }
 
   end(): void {
