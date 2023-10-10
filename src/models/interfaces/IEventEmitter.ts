@@ -2,6 +2,7 @@ export type eventType =
   | 'startGame'
   | "drawInitialCards"
   | "reshuffleAndDraw"  // When reshuffling due to a lack of number cards
+  | "nextTurn"          // Includes details about the next player
   | "playCardOnCaravan" // Includes details about which caravan with which card
   | "playCardOnCard"    // Includes details about which card was targeted with which card
   | "discardCard"       // Includes details about the card discarded

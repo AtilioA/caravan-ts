@@ -99,7 +99,6 @@ export class Game implements IGame {
       // case 'DISCARD_DRAW':
       //   if (this.validateDiscardDraw(currentPlayer, action.card)) {
       //     currentPlayer.discardAndDraw(action.card);
-      //     this.moveToNextTurn();
       //   } else {
       //     throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
       //   }
@@ -109,10 +108,19 @@ export class Game implements IGame {
         throw new InvalidPlayError('Unknown action type; please check the game rules or try a different move.');
     }
 
+    this.endCurrentTurn();
+  }
+
+  private endCurrentTurn(): void {
     // Check for any game-winning conditions
     const winner = this.checkForWinner();
     if (winner) {
-      // Handle the game-winning logic, such as announcing the winner
+      console.log("Player with caravans " + winner.caravans + " won the game!")
+      this.end();
+    } else {
+      // Move to the next turn
+      this.moveToNextTurn();
+      this.events.emit('nextTurn', {currentPlayer: this.getCurrentPlayer()});
     }
   }
 
@@ -124,22 +132,20 @@ export class Game implements IGame {
     }
   }
 
-  private disbandCaravan(player: IPlayer, caravan: ICaravan) {
+  private disbandCaravan(player: IPlayer, caravan: ICaravan): void {
     player.disbandCaravan(caravan);
     // this.events.emit('disbandCaravan', this.getCurrentPlayer(), caravan);
-    this.moveToNextTurn();
   }
 
-  private playCard(card: ICard, target: ICard | ICaravan) {
+  private playCard(card: ICard, target: ICard | ICaravan): void {
     if (this.validateMove(this.getCurrentPlayer(), card, target)) {
       this.playCardToTarget(this.getCurrentPlayer(), card, target);
-      this.moveToNextTurn();
     } else {
       throw new InvalidPlayError('Invalid card play; please check the game rules or try a different move.');
     }
   }
 
-  private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard) {
+  private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard): void {
     if (isCaravan(target)) {
       this.events.emit('playCardOnCaravan', player, card, target);
     } else {
@@ -148,7 +154,7 @@ export class Game implements IGame {
     }
   }
 
-  private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan) {
+  private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
     if (!card.isFaceCard() && player.caravans.includes(caravan)) {
       player.playCard(card, caravan);
     } else if (card.isFaceCard() && card.value !== "Queen") {
@@ -160,7 +166,7 @@ export class Game implements IGame {
     }
   }
 
-  private playCardToCard(player: IPlayer, card: ICard, target: ICard) {
+  private playCardToCard(player: IPlayer, card: ICard, target: ICard): void {
     if (card.isFaceCard() && card.value !== "Queen") {
       target.attachFaceCard(card);
       if (card.value === "Jack") {
@@ -254,7 +260,8 @@ export class Game implements IGame {
     return this.isAnyPlayerOutOfCards();
   }
 
+  // End the Caravan match
   end(): void {
-    // Handle the game ending logic, such as announcing the winner
+    this.events.emit('gameOver', {winner: this.checkForWinner()});
   }
 }
