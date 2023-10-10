@@ -22,6 +22,7 @@ export class Game implements IGame {
 
   private registerEventListeners() {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
+    this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
     // ...
   }
 
@@ -80,20 +81,21 @@ export class Game implements IGame {
   }
 
   playTurn(action: PlayerAction) {
+    const currentPlayer = this.getCurrentPlayer();
     switch(action.type) {
       case 'PLAY_CARD':
         this.playCard(action.card, action.target);
         break;
 
-      // case 'DISBAND_CARAVAN':
-      //   if (this.validateDisband(currentPlayer, action.caravan)) {
-      //     currentPlayer.disbandCaravan(action.caravan);
-      //     this.moveToNextTurn();
-      //   } else {
-      //     throw new InvalidPlayError('Invalid caravan disbanding; please check the game rules or try a different move.');
-      //   }
-      //   break;
+      case 'DISBAND_CARAVAN':
+        if (this.validateCaravanDisband(currentPlayer, action.caravan)) {
+          this.disbandCaravan(currentPlayer, action.caravan)
+        } else {
+          throw new InvalidPlayError('Invalid caravan disbanding; please check the game rules or try a different move.');
+        }
+        break;
 
+      // TODO: Continue from here
       // case 'DISCARD_DRAW':
       //   if (this.validateDiscardDraw(currentPlayer, action.card)) {
       //     currentPlayer.discardAndDraw(action.card);
@@ -112,6 +114,20 @@ export class Game implements IGame {
     if (winner) {
       // Handle the game-winning logic, such as announcing the winner
     }
+  }
+
+  private validateCaravanDisband(player: IPlayer, caravan: ICaravan): boolean {
+    if (player.caravans.includes(caravan) && caravan.cards.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private disbandCaravan(player: IPlayer, caravan: ICaravan) {
+    player.disbandCaravan(caravan);
+    // this.events.emit('disbandCaravan', this.getCurrentPlayer(), caravan);
+    this.moveToNextTurn();
   }
 
   private playCard(card: ICard, target: ICard | ICaravan) {
@@ -166,6 +182,7 @@ export class Game implements IGame {
     }
   }
 
+  // TODO: Continue from here
   validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean {
     // Validate if the move is legal according to game rules
     return true;
