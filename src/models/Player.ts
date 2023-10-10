@@ -61,15 +61,10 @@ export class Player implements IPlayer {
       throw new InvalidPlayError("Cannot play a face card that is not in the player's hand");
     }
 
-    // Verify if target card is in one of the player's caravans
-    if (!this.caravans.some(caravan => caravan.cards.includes(targetCard))) {
-      throw new InvalidPlayError("Cannot attach a face card to a card that does not belong to the player");
-    }
-
     // You cannot attach a Queen; it must be played to a caravan
     if (faceCard.isFaceCard() && faceCard.value !== "Queen") {
       targetCard.attachFaceCard(faceCard);
-      
+
       this._removeFromHand(faceCard);
     } else {
       throw new InvalidPlayError("Can only attach Jacks, Kings, and Jokers to cards");
