@@ -73,8 +73,8 @@ describe('Caravan', () => {
     });
 
     it ('should not allow a card of equal value to the last one to be added, even if it matches the suit', () => {
-        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('6', 'Spades')], Direction.ASCENDING, 'Diamonds', 11);
-        const isValid = caravan.canAddCard(new Card('6', 'Clubs'));
+        const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('6', 'Spades')], Direction.ASCENDING, 'Spades', 11);
+        const isValid = caravan.canAddCard(new Card('6', 'Spades'));
 
         expect(isValid).toBe(false);
         expect(() => caravan.addCard(new Card('6', 'Clubs'))).toThrowError(InvalidPlayError);

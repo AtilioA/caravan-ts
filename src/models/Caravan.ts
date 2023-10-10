@@ -46,7 +46,7 @@ export class Caravan implements ICaravan {
     }
 
     // If the caravan has a defined suit and the card's suit matches the caravan's suit, return true.
-    if (this?.suit === card.suit) {
+    if (this?.suit === card.suit && (this.cards[this.cards.length - 1].getNumericValue() !== card.getNumericValue())) {
         return true;
     }
 
@@ -55,7 +55,6 @@ export class Caravan implements ICaravan {
     }
     return true;
   }
-
 
   addCard(card: ICard): void {
     if (!this.canAddCard(card)) {
