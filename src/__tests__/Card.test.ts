@@ -63,9 +63,9 @@ describe('Card', () => {
         // Count the number of kings and multiply the value by 2 to the power of the number of kings.
         const kings = card.attachedCards.filter((card) => card.value === 'King').length;
         if (kings > 0) {
-            expect(card.computeValue()).toBe(Number(card.value) * Math.pow(2, kings));
+            expect(card.computeValue()).toBe(Number(card.getNumericValue()) * Math.pow(2, kings));
         } else {
-                expect(card.computeValue()).toBe(Number(card.value));
+                expect(card.computeValue()).toBe(Number(card.getNumericValue()));
         }
     });
 

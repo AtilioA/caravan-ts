@@ -18,7 +18,7 @@ export class Caravan implements ICaravan {
   }
 
   private _isValueInDirection(value: CardValue): boolean {
-    const lastCardValue = ValueMapping[this.cards[this.cards.length - 1].value]
+    const lastCardValue = this.cards[this.cards.length - 1].getNumericValue();
 
     switch (this.direction) {
       case Direction.ASCENDING:
@@ -68,10 +68,10 @@ export class Caravan implements ICaravan {
 
     // Set or validate the direction with the second card.
     if (this.cards.length === 1) {
-      const lastCardValue = ValueMapping[this.cards[0].value];
-      if (ValueMapping[card.value] > lastCardValue) {
+      const lastCardValue = this.cards[0].getNumericValue();
+      if (card.getNumericValue() > lastCardValue) {
         this.direction = Direction.ASCENDING;
-      } else if (ValueMapping[card.value] < lastCardValue) {
+      } else if (card.getNumericValue() < lastCardValue) {
         this.direction = Direction.DESCENDING;
       } else {
         throw new InvalidPlayError("Equal card values are not allowed.");
@@ -85,7 +85,7 @@ export class Caravan implements ICaravan {
 
     // Update bid for non-face cards.
     if (!card.isFaceCard()) {
-      this.bid += ValueMapping[card.value];
+      this.bid += card.getNumericValue();
     } else {
       // Because of Joker, we might need to handle this within the game logic (we need to view every other caravan in order to determine the outcome of playing a Joker).
       /*

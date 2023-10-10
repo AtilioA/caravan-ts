@@ -1,11 +1,10 @@
-import { CardSuit, CardTheme, CardValue, SUITS, THEMES, VALUES } from '../constants/cardConstants';
+import { CardSuit, CardTheme, CardValue, SUITS, THEMES, VALUES, ValueMapping } from '../constants/cardConstants';
 import { InvalidPlayError } from '../exceptions/GameExceptions';
 import { ICard } from './interfaces/ICard';
 
 export class Card implements ICard {
   value: CardValue;
   suit: CardSuit;
-  // TODO: replace with a theme type
   theme: CardTheme = "Default";
   attachedCards: ICard[] = [];
 
@@ -41,13 +40,16 @@ export class Card implements ICard {
     }
   }
 
+  getNumericValue(): number {
+    return ValueMapping[this.value];
+  }
+
   computeValue(): number {
     const nKingsAttached = this.attachedCards.filter((card) => card.value === 'King').length;
     if (nKingsAttached > 0) {
-      // FIXME: Handle 'ace' value afterwards (use enum)
-      return Number(this.value) * Math.pow(2, nKingsAttached);
+      return Number(this.getNumericValue()) * Math.pow(2, nKingsAttached);
     } else {
-      return Number(this.value)
+      return Number(this.getNumericValue())
     }
   }
 }
