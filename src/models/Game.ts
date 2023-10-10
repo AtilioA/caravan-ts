@@ -183,7 +183,7 @@ export class Game implements IGame {
   }
 
   private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
-    if (!card.isFaceCard() && player.caravans.includes(caravan)) {
+    if ((!card.isFaceCard() || card.value === "Queen") && player.caravans.includes(caravan)) {
       player.playCard(card, caravan);
     } else if (card.isFaceCard() && card.value !== "Queen") {
       this.events.emit('invalidPlay', {player, card, caravan});
@@ -210,6 +210,7 @@ export class Game implements IGame {
       }
     } else if (card.value === "Queen") {
       this.events.emit('playQueen', {player, card, targetCard});
+      throw new InvalidPlayError('Cannot play a Queen on a card');
     }
     else {
       this.events.emit('invalidPlay', {player, card, targetCard});
