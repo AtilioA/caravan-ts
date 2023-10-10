@@ -101,14 +101,13 @@ export class Game implements IGame {
         }
         break;
 
-      // TODO: Continue from here
-      // case 'DISCARD_DRAW':
-      //   if (this.validateDiscardDraw(currentPlayer, action.card)) {
-      //     currentPlayer.discardAndDraw(action.card);
-      //   } else {
-      //     throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
-      //   }
-      //   break;
+      case 'DISCARD_DRAW':
+        if (this.validateDiscardDraw(currentPlayer, play.action.card)) {
+          currentPlayer.discardCard(play.action.card);
+        } else {
+          throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
+        }
+        break;
 
       default:
         throw new InvalidPlayError('Unknown action type; please check the game rules or try a different move.');
@@ -127,6 +126,14 @@ export class Game implements IGame {
       // Move to the next turn
       this.moveToNextTurn();
       this.events.emit('nextTurn', {currentPlayer: this.getCurrentPlayer()});
+    }
+  }
+
+  private validateDiscardDraw(player: IPlayer, card: ICard): boolean {
+    if (player.hand.includes(card)) {
+      return true;
+    } else {
+      return false;
     }
   }
 
