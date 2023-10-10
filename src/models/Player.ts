@@ -63,6 +63,17 @@ export class Player implements IPlayer {
     return this.playCard(card, caravan);
   }
 
+  disbandCaravan(caravan: ICaravan): void {
+    if (!this.caravans.includes(caravan)) {
+      throw new InvalidPlayError("Cannot disband a caravan that does not belong to the player");
+    }
+    if (caravan.cards.length === 0) {
+      throw new InvalidPlayError("Cannot disband an empty caravan");
+    }
+
+    this.discardPile.addCards(caravan.disband());
+  }
+
   discardCard(card: ICard): void {
     this.discardPile.addCard(card);
     this._removeFromHand(card);
