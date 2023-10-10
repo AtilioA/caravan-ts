@@ -336,3 +336,76 @@ describe('Game - Playing turns', () => {
     expect(player2.discardPile.cards.length).toEqual(0); // Two cards + Jack
   });
 });
+
+describe('Game - end state', () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
+
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
+
+    game = new Game([player1, player2]);
+    game.start();
+  });
+
+  const setCaravanBids = (player: IPlayer, bids: number[]) => {
+    player.caravans.forEach((caravan, index) => caravan.bid = bids[index]);
+  };
+
+  it('should end the game when a player has an empty hand with no cards left in their deck', () => {
+    // Play final turns, then check the winner.
+    player1.hand = [];
+    player1.cardSet = new Deck([]);
+
+    expect(game.checkForWinner()).toBe(player2);
+});
+
+  it('should end the game when a player has sold all three caravans', () => {
+    setCaravanBids(player1, [22, 24, 26]);
+    setCaravanBids(player2, [18, 20, 20]);
+    expect(game.checkForWinner()).toBe(player1);
+  });
+
+  it('should end the game when a player has sold two caravans and another one has sold only one', () => {
+    setCaravanBids(player1, [21, 21, 0]);
+    setCaravanBids(player2, [0, 0, 26]);
+    expect(game.checkForWinner()).toBe(player1);
+  });
+
+  it('should end the game when a player has sold all three caravans (outbiding)', () => {
+    setCaravanBids(player2, [22, 24, 26]);
+    setCaravanBids(player1, [21, 22, 25]);
+    expect(game.checkForWinner()).toBe(player2);
+  });
+
+  it('should end the game if a player has sold two caravans and there is no tie', () => {
+    setCaravanBids(player1, [22, 0, 23]);
+    setCaravanBids(player2, [21, 0, 20]);
+    expect(game.checkForWinner()).toBe(player1);
+  });
+
+  it('should not end the game if only one player has sold all caravans but there is a tie', () => {
+    setCaravanBids(player1, [22, 24, 23]);
+    setCaravanBids(player2, [22, 0, 0]);
+    expect(game.checkForWinner()).toBeNull();
+
+    setCaravanBids(player2, [0, 24, 0]);
+    expect(game.checkForWinner()).toBeNull();
+    setCaravanBids(player2, [0, 0, 23]);
+    expect(game.checkForWinner()).toBeNull();
+  });
+
+  it('should not end the game if a player has outsold two caravans and there is a tie', () => {
+    setCaravanBids(player1, [22, 23, 25]);
+    setCaravanBids(player2, [21, 21, 25]);
+    expect(game.checkForWinner()).toBeNull();
+  });
+
+  it('should not end the game if all three caravans are tied, even at selling point', () => {
+    setCaravanBids(player1, [22, 23, 25]);
+    setCaravanBids(player2, [22, 23, 25]);
+    expect(game.checkForWinner()).toBeNull();
+  });
+});
