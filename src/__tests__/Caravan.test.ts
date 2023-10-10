@@ -145,7 +145,7 @@ describe('Caravan', () => {
         caravan.addCard(new Card('Queen', 'Hearts'));
 
         expect(caravan.suit).toEqual('Hearts');
-        expect(caravan.direction).toBeNull();
+        expect(caravan.direction).toBe(Direction.DESCENDING);
     });
 
     // SECTION: Removing cards from the caravan

@@ -100,7 +100,7 @@ export class Caravan implements ICaravan {
       // Change suit and nullify direction for Queen.
       if (card.value === 'Queen') {
         this.suit = card.suit;
-        this.direction = null;
+        this.direction = this.direction === Direction.ASCENDING ? Direction.DESCENDING : Direction.ASCENDING;
       }
     }
 

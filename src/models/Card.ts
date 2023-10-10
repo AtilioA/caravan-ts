@@ -36,7 +36,7 @@ export class Card implements ICard {
       return true;
     }
     else {
-      throw new InvalidPlayError('Cannot attach a non-face card to another card');
+      throw new InvalidPlayError('Cannot attach a Queen or any non-face card to another card');
     }
   }
 
