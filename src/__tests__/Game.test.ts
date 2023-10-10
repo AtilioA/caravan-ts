@@ -7,6 +7,9 @@ import { IPlayer } from "../models/interfaces/IPlayer";
 import { generateCards } from "../utils/card";
 import { createMockCaravan, createMockCard, createMockPlayer } from "./__mocks__/mockFactories";
 
+const setCaravanBids = (player: IPlayer, bids: number[]) => {
+  player.caravans.forEach((caravan, index) => caravan.bid = bids[index]);
+};
 
 describe('Game - Initialization', () => {
   // let drawHandCallCount = 0;
@@ -234,8 +237,10 @@ describe('Game - Playing turns', () => {
   });
 
   it('should determine the winner correctly based on the game\'s rules', () => {
-      // Mock the game state to be near the end, with clearly defined winning conditions.
-      // ...
+      setCaravanBids(player1, [20, 21, 10]);
+      setCaravanBids(player2, [20, 20, 20]);
+
+      player1.hand[0] = createMockCard("Ace", "Hearts");
 
       // Play final turns, then check the winner.
       game.playTurn({
@@ -312,9 +317,7 @@ describe('Game - Playing turns', () => {
 
   it('should consider a caravan as sold only between a bid of 21-26', () => {
       const caravan = player1.caravans[0];
-      player1.hand.push(createMockCard("10", "Diamonds"));
-      player1.hand.push(createMockCard("9", "Diamonds"));
-      player1.hand.push(createMockCard("7", "Diamonds"));
+      player1.hand = [createMockCard("10", "Diamonds"), createMockCard("9", "Diamonds"), createMockCard("7", "Diamonds")];
 
       game.playTurn({
         player: player1,
@@ -327,22 +330,24 @@ describe('Game - Playing turns', () => {
       // Bid is 10
       expect(caravan.isSold()).toBe(false);
 
+      game.currentPlayerIndex = 0;
       game.playTurn({
         player: player1,
         action: {
           type: 'PLAY_CARD',
-          card: player1.hand[1],
+          card: player1.hand[0],
           target: caravan
         }
       });
       // Bid is 19
       expect(caravan.isSold()).toBe(false);
 
+      game.currentPlayerIndex = 0;
       game.playTurn({
         player: player1,
         action: {
           type: 'PLAY_CARD',
-          card: player1.hand[2],
+          card: player1.hand[0],
           target: caravan
         }
       });
@@ -498,10 +503,6 @@ describe('Game - End state', () => {
     game = new Game([player1, player2]);
     game.start();
   });
-
-  const setCaravanBids = (player: IPlayer, bids: number[]) => {
-    player.caravans.forEach((caravan, index) => caravan.bid = bids[index]);
-  };
 
   it('should end the game when a player has an empty hand with no cards left in their deck', () => {
     // Play final turns, then check the winner.
