@@ -6,6 +6,7 @@ export interface IDeck {
   getSize(): number;
 
   addCard(card: ICard): void;
+  addCards(card: ICard[]): void;
   generate(quantity: number): void;
 
   shuffle(): void;
