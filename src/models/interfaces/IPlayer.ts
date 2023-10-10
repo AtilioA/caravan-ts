@@ -13,6 +13,7 @@ export interface IPlayer {
   drawHand(n: number): void;
 
   playCard(card: ICard, caravan: ICaravan): void;
+  attachFaceCard(faceCard: ICard, targetCard: ICard): void;
   discardCard(card: ICard): void;
   disbandCaravan(caravan: ICaravan): void;
 

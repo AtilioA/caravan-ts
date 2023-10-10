@@ -132,5 +132,32 @@ describe('Player', () => {
 
         expect(() => player.playCardToOpponentCaravan(notFaceCard, opponent.caravans[0].cards[0])).toThrowError(InvalidPlayError);
     });
-    // REVIEW: Should not play a card to an invalid caravan?
+
+    it('should be able to attach a face card to a card in the player’s caravan.', () => {
+        const player = new Player();
+        const faceCard = new Card('King', 'Diamonds');
+        player.hand.push(faceCard);
+
+        player.caravans[0] = new Caravan();
+        player.caravans[0].cards = generateCards(2, false);
+        const targetCard = player.caravans[0].cards[0];
+
+        player.attachFaceCard(faceCard, targetCard);
+        expect(targetCard.attachedCards).toContain(faceCard);
+        expect(player.hand).not.toContain(faceCard);
+    });
+
+    it('should not allow attaching a Queen to a card in the player’s caravan.', () => {
+        const player = new Player();
+        const queen = new Card('Queen', 'Diamonds');
+        player.hand.push(queen);
+
+        player.caravans[0] = new Caravan();
+        player.caravans[0].cards = generateCards(2, false);
+        const targetCard = player.caravans[0].cards[0];
+
+        expect(() => player.attachFaceCard(queen, targetCard)).toThrowError(InvalidPlayError);
+        expect(targetCard.attachedCards).not.toContain(queen);
+        expect(player.hand).toContain(queen);
+    });
 });
