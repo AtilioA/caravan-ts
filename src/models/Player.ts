@@ -69,6 +69,7 @@ export class Player implements IPlayer {
     // You cannot attach a Queen; it must be played to a caravan
     if (faceCard.isFaceCard() && faceCard.value !== "Queen") {
       targetCard.attachFaceCard(faceCard);
+      
       this._removeFromHand(faceCard);
     } else {
       throw new InvalidPlayError("Can only attach Jacks, Kings, and Jokers to cards");

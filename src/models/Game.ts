@@ -8,14 +8,16 @@ import { GameAction, IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
+  isOver: boolean = false;
   players: IPlayer[];
   currentPlayerIndex: number;
   events: IEventEmitter;
 
-  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter()) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false) {
     this.players = players;
     this.currentPlayerIndex = currentPlayerIndex || 0;
     this.events = events;
+    this.isOver = isOver;
 
     this.registerEventListeners();
   }
@@ -81,6 +83,10 @@ export class Game implements IGame {
   }
 
   playTurn(play: GameAction) {
+    if (this.isOver) {
+      throw new InvalidGameState('Cannot play a turn on a match that is already over.');
+    }
+
     const currentPlayer = this.getCurrentPlayer();
     const player = play.player;
 
@@ -276,5 +282,6 @@ export class Game implements IGame {
   // End the Caravan match
   end(): void {
     this.events.emit('gameOver', {winner: this.checkForWinner()});
+    this.isOver = true;
   }
 }

@@ -14,6 +14,7 @@ export interface GameAction {
 }
 
 export interface IGame {
+  isOver: boolean;
   players: IPlayer[];
   currentPlayerIndex: number;
   events: EventEmitter;
