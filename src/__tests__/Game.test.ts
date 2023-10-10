@@ -223,14 +223,14 @@ describe('Game - Playing turns', () => {
     player1.hand.push(valuedCard);
 
     expect(() => {
-    game.playTurn({
-      player: player1,
-      action: {
-        type: 'PLAY_CARD',
-        card: valuedCard,
-        target: player2.caravans[0]
-      }
-    });
+        game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: valuedCard,
+          target: player2.caravans[0]
+        }
+      });
     }).toThrowError(InvalidPlayError);
 
     expect(player1.caravans[1].cards).not.toContain(valuedCard);
@@ -453,6 +453,112 @@ describe('Game - Playing turns', () => {
     // 5 of Diamonds and King of Diamonds should be in Player 1's discard pile; 6 of Diamonds should remain in the caravan
     expect(player1.discardPile.cards.length).toEqual(3); // Two cards + Jack
     expect(player2.discardPile.cards.length).toEqual(0); // Two cards + Jack
+  });
+});
+
+describe('Game - valid/invalid moves', () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
+
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
+
+    game = new Game([player1, player2]);
+    game.start();
+  });
+
+  it('should not allow playing a number card out of sequence on the same caravan', () => {
+    player1.hand = [createMockCard("3", "Diamonds"), createMockCard("8", "Hearts"), createMockCard("6", "Clubs")];
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]}});
+    game.currentPlayerIndex = 0
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]}});
+    game.currentPlayerIndex = 0
+    // Last card was 8 and direction is ascending, so 6 is not allowed.
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]}})).toThrowError(InvalidPlayError);
+  });
+
+  it('should not allow playing a number card of the same value on the caravan', () => {
+    const card8a = createMockCard("8", "Diamonds");
+    const card8b = createMockCard("8", "Diamonds");
+
+    player1.hand.push(card8a);
+    player1.caravans[0].addCard(card8b);
+
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: card8a, target: player1.caravans[0]}})).toThrowError(InvalidPlayError);
+  });
+
+  it('should allow changing the sequence direction with a matching suit', () => {
+    const card3 = createMockCard("3", "Diamonds");
+    const card8 = createMockCard("8", "Diamonds");
+    const card6 = createMockCard("6", "Diamonds");
+
+    player1.hand.push(card3, card6);
+    player1.caravans[0].addCard(card8);
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: card6, target: player1.caravans[0]}});
+    game.currentPlayerIndex = 0
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: card3, target: player1.caravans[0]}});
+
+    expect(player1.caravans[0].cards).toEqual([card8, card6, card3]);
+    expect(player1.caravans[0].direction).toEqual(Direction.DESCENDING);
+  });
+
+  it('should not allow playing a Queen anywhere other than extending a caravan', () => {
+    const queen = createMockCard("Queen", "Diamonds");
+    const card7 = createMockCard("7", "Diamonds");
+
+    player1.hand.push(queen);
+    player1.caravans[0].addCard(card7);
+
+    // Queens are used to extend caravans, not to be played on other cards.
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: card7}})).toThrowError(InvalidPlayError);
+    game.currentPlayerIndex = 0
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: player1.caravans[0]}})).not.toThrow();
+  });
+
+  it('should reverse the numerical sequence direction of a caravan when a Queen is played', () => {
+    const queen = createMockCard("Queen", "Diamonds");
+    const card3 = createMockCard("3", "Diamonds");
+    const card8 = createMockCard("8", "Diamonds");
+
+    player1.hand.push(queen, card3);
+    player1.caravans[0].addCard(card8);
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: player1.caravans[0]}});
+    game.currentPlayerIndex = 0
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: card3, target: player1.caravans[0]}});
+
+    expect(player1.caravans[0].cards).toEqual([card8, queen, card3]);
+  });
+
+  it('should change suit of a caravan when a Queen is played', () => {
+    const queen = createMockCard("Queen", "Hearts");
+    const card3 = createMockCard("3", "Diamonds");
+
+    player1.hand.push(queen, card3);
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: card3, target: player1.caravans[0]}});
+    expect(player1.caravans[0].suit).toEqual("Diamonds");
+
+    game.currentPlayerIndex = 0
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: player1.caravans[0]}});
+
+    expect(player1.caravans[0].suit).toEqual("Hearts");
+  });
+
+  it('should allow playing a King on another King', () => {
+    const king1 = createMockCard("King", "Diamonds");
+    const king2 = createMockCard("King", "Hearts");
+    const card7 = createMockCard("7", "Diamonds");
+
+    player1.hand.push(king2);
+    player1.caravans[0].addCard(card7);
+    player1.caravans[0].cards[0].attachFaceCard(king1);
+
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: king2, target: king1}})).not.toThrow();
   });
 });
 
