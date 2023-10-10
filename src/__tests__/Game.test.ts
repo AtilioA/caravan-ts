@@ -2,10 +2,9 @@ import { Direction } from "../enums/directions";
 import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
 import { Deck } from "../models/Deck";
 import { Game } from "../models/Game";
-import { ICaravan } from "../models/interfaces/ICaravan";
 import { IPlayer } from "../models/interfaces/IPlayer";
 import { generateCards } from "../utils/card";
-import { createMockCaravan, createMockCard, createMockPlayer } from "./__mocks__/mockFactories";
+import { createMockCard, createMockPlayer } from "./__mocks__/mockFactories";
 
 const setCaravanBids = (player: IPlayer, bids: number[]) => {
   player.caravans.forEach((caravan, index) => caravan.bid = bids[index]);
@@ -199,7 +198,7 @@ describe('Game - Playing turns', () => {
   });
 
   it('should allow a player to play a face card on their opponent’s cards', () => {
-    const faceCard = createMockCard("Queen", "Hearts");
+    const faceCard = createMockCard("King", "Hearts");
     const valuedCard = createMockCard("7", "Hearts");
 
     player1.hand.push(faceCard);
@@ -223,6 +222,7 @@ describe('Game - Playing turns', () => {
 
     player1.hand.push(valuedCard);
 
+    expect(() => {
     game.playTurn({
       player: player1,
       action: {
@@ -231,14 +231,20 @@ describe('Game - Playing turns', () => {
         target: player2.caravans[0]
       }
     });
+    }).toThrowError(InvalidPlayError);
 
     expect(player1.caravans[1].cards).not.toContain(valuedCard);
     expect(player1.hand).toContain(valuedCard);
   });
 
   it('should determine the winner correctly based on the game\'s rules', () => {
-      setCaravanBids(player1, [20, 21, 10]);
-      setCaravanBids(player2, [20, 20, 20]);
+      player1.caravans[0].cards = [createMockCard("10", "Diamonds"), createMockCard("8", "Diamonds"), createMockCard("2", "Diamonds")];
+      player1.caravans[1].cards = [createMockCard("10", "Diamonds"), createMockCard("9", "Diamonds"), createMockCard("2", "Diamonds")];
+      player1.caravans[2].cards = [];
+
+      player2.caravans[0].cards = [createMockCard("10", "Diamonds"), createMockCard("8", "Diamonds"), createMockCard("2", "Diamonds")];
+      player2.caravans[1].cards = [createMockCard("10", "Diamonds"), createMockCard("8", "Diamonds"), createMockCard("2", "Diamonds")];
+      player2.caravans[2].cards = [createMockCard("10", "Diamonds"), createMockCard("8", "Diamonds"), createMockCard("2", "Diamonds")];
 
       player1.hand[0] = createMockCard("Ace", "Hearts");
 
@@ -252,7 +258,7 @@ describe('Game - Playing turns', () => {
         }
       });
 
-      expect(game.checkForWinner()).toBe(player1);  // Or player2
+      expect(game.checkForWinner()).toBe(player1);
   });
 
   it('should not allow playing a card if it’s not the player’s turn', () => {
