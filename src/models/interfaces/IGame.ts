@@ -8,6 +8,11 @@ export type PlayerAction =
 | { type: 'DISBAND_CARAVAN', caravan: ICaravan }
 | { type: 'DISCARD_DRAW', card: ICard };
 
+export interface GameAction {
+  player: IPlayer;
+  action: PlayerAction;
+}
+
 export interface IGame {
   players: IPlayer[];
   currentPlayerIndex: number;
@@ -15,7 +20,7 @@ export interface IGame {
 
   start(): void;
   end(): void;
-  playTurn(action: PlayerAction): void;
+  playTurn(action: GameAction): void;
   validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean;
   checkForWinner(): IPlayer | null;
 }

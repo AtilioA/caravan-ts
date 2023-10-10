@@ -1,4 +1,5 @@
-import { InvalidGameState } from "../exceptions/GameExceptions";
+import { Direction } from "../enums/directions";
+import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
 import { Deck } from "../models/Deck";
 import { Game } from "../models/Game";
 import { ICaravan } from "../models/interfaces/ICaravan";
@@ -122,12 +123,18 @@ describe('Game - Playing turns', () => {
     game = new Game([player1, player2]);
     game.start();
   });
-
   it('should allow a player to play a valued card on their caravan', () => {
     const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCard,
+        target: player1.caravans[0]
+      }
+    });
 
     expect(player1.caravans[0].cards).toContain(valuedCard);
     expect(player1.hand).not.toContain(valuedCard);
@@ -137,12 +144,18 @@ describe('Game - Playing turns', () => {
     const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCard,
+        target: player1.caravans[0]
+      }
+    });
 
     expect(player1.caravans[0].bid).toEqual(2);
   });
 
-  // TODO: Continue from here
   it('should allow a player to play a face card on their cards', () => {
     const faceCard = createMockCard("King", "Diamonds");
     const valuedCard = createMockCard("5", "Diamonds");
@@ -150,7 +163,14 @@ describe('Game - Playing turns', () => {
     player1.hand.push(faceCard);
     player1.caravans[0].addCard(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: faceCard, target: valuedCard});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: faceCard,
+        target: valuedCard
+      }
+    });
 
     expect(valuedCard.attachedCards).toContain(faceCard);
     expect(player1.hand).not.toContain(faceCard);
@@ -163,7 +183,14 @@ describe('Game - Playing turns', () => {
     player1.hand.push(faceCard);
     player1.caravans[0].addCard(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: faceCard, target: valuedCard});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: faceCard,
+        target: valuedCard
+      }
+    });
 
     expect(player1.caravans[0].bid).toEqual(14);
   });
@@ -175,7 +202,14 @@ describe('Game - Playing turns', () => {
     player1.hand.push(faceCard);
     player2.caravans[1].cards.push(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: faceCard, target: valuedCard});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: faceCard,
+        target: valuedCard
+      }
+    });
 
     expect(valuedCard.attachedCards).toContain(faceCard);
     expect(player1.hand).not.toContain(faceCard);
@@ -186,7 +220,14 @@ describe('Game - Playing turns', () => {
 
     player1.hand.push(valuedCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player2.caravans[0]});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCard,
+        target: player2.caravans[0]
+      }
+    });
 
     expect(player1.caravans[1].cards).not.toContain(valuedCard);
     expect(player1.hand).toContain(valuedCard);
@@ -197,32 +238,59 @@ describe('Game - Playing turns', () => {
       // ...
 
       // Play final turns, then check the winner.
-      game.playTurn({type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: player1.hand[0],
+          target: player1.caravans[0]
+        }
+      });
 
       expect(game.checkForWinner()).toBe(player1);  // Or player2
   });
-
 
   it('should not allow playing a card if it’s not the player’s turn', () => {
       // Assuming it's player1's turn now.
       const valuedCard = createMockCard("3", "Hearts");
       player2.hand.push(valuedCard);
 
-      expect(() => game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player2.caravans[0]})).toThrow();
+      expect(() => game.playTurn({
+        player: player2,
+        action: {
+          type: 'PLAY_CARD',
+          card: valuedCard,
+          target: player2.caravans[0]
+        }
+      })).toThrowError(InvalidPlayError);
   });
 
   it('should not allow a player to discard and draw a card if it\'s not their turn', () => {
+    // Assuming it's player1's turn now.
     const valuedCard = createMockCard("3", "Hearts");
     player2.hand.push(valuedCard);
 
-    expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
+    expect(() => game.playTurn({
+      player: player2,
+      action: {
+        type: 'DISCARD_DRAW',
+        card: valuedCard
+      }
+    })).toThrowError(InvalidPlayError);
   });
 
-  it('should not allow a player to disbanding a caravan if it\'s not their turn', () => {
+  it('should not allow a player to disband a caravan if it\'s not their turn', () => {
+    // Assuming it's player1's turn now.
     const valuedCard = createMockCard("3", "Hearts");
     player2.hand.push(valuedCard);
 
-    expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
+    expect(() => game.playTurn({
+      player: player2,
+      action: {
+        type: 'DISBAND_CARAVAN',
+        caravan: player2.caravans[0]
+      }
+    })).toThrowError(InvalidPlayError);
   });
 
   it('should handle the end of the game correctly, allowing no more moves after the game ends', () => {
@@ -232,7 +300,14 @@ describe('Game - Playing turns', () => {
       const valuedCard = createMockCard("3", "Hearts");
       player1.hand.push(valuedCard);
 
-      expect(() => game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]})).toThrow();
+      expect(() => game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: valuedCard,
+          target: player1.caravans[0]
+        }
+      })).toThrow();
   });
 
   it('should consider a caravan as sold only between a bid of 21-26', () => {
@@ -241,15 +316,36 @@ describe('Game - Playing turns', () => {
       player1.hand.push(createMockCard("9", "Diamonds"));
       player1.hand.push(createMockCard("7", "Diamonds"));
 
-      game.playTurn({type: 'PLAY_CARD', card: player1.hand[0], target: caravan});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: player1.hand[0],
+          target: caravan
+        }
+      });
       // Bid is 10
       expect(caravan.isSold()).toBe(false);
 
-      game.playTurn({type: 'PLAY_CARD', card: player1.hand[1], target: caravan});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: player1.hand[1],
+          target: caravan
+        }
+      });
       // Bid is 19
       expect(caravan.isSold()).toBe(false);
 
-      game.playTurn({type: 'PLAY_CARD', card: player1.hand[2], target: caravan});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: player1.hand[2],
+          target: caravan
+        }
+      });
       // Bid is 26, caravan is sold
       expect(caravan.isSold()).toBe(true);
   });
@@ -258,7 +354,13 @@ describe('Game - Playing turns', () => {
       const caravan = player1.caravans[0];
       caravan.addCard(createMockCard("5", "Diamonds"));
 
-      game.playTurn({type: 'DISBAND_CARAVAN', caravan: caravan});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'DISBAND_CARAVAN',
+          caravan: caravan
+        }
+      });
 
       expect(caravan.cards.length).toEqual(0);
       expect(caravan.bid).toEqual(0);
@@ -267,7 +369,13 @@ describe('Game - Playing turns', () => {
   it('should not allow a player to disband one of their caravans if it has no cards', () => {
       const caravan = player1.caravans[0];
 
-      expect(() => game.playTurn({type: 'DISBAND_CARAVAN', caravan: caravan})).toThrow();
+      expect(() => game.playTurn({
+        player: player1,
+        action: {
+          type: 'DISBAND_CARAVAN',
+          caravan: caravan
+        }
+      })).toThrow();
   });
 
   it('should add cards to the player\'s discard pile after a caravan is discarded', () => {
@@ -275,7 +383,13 @@ describe('Game - Playing turns', () => {
       caravan.addCard(createMockCard("5", "Diamonds"));
       caravan.addCard(createMockCard("6", "Diamonds"));
 
-      game.playTurn({type: 'DISBAND_CARAVAN', caravan: caravan});
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'DISBAND_CARAVAN',
+          caravan: caravan
+        }
+      });
 
       expect(player1.discardPile.cards.length).toEqual(2);
   });
@@ -291,7 +405,14 @@ describe('Game - Playing turns', () => {
 
     player1.hand.push(jackCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: jackCard, target: caravan.cards[0]});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: jackCard,
+        target: caravan.cards[0]
+      }
+    });
 
     // 5 of Diamonds and King of Diamonds should be in Player 2's discard pile; 6 of Diamonds should remain in the caravan
     expect(player2.discardPile.cards.length).toEqual(2);
@@ -309,7 +430,14 @@ describe('Game - Playing turns', () => {
 
     player1.hand.push(jackCard);
 
-    game.playTurn({type: 'PLAY_CARD', card: jackCard, target: caravan.cards[0]});
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: jackCard,
+        target: caravan.cards[0]
+      }
+    });
 
     // 5 of Diamonds and King of Diamonds should be in Player 1's discard pile; 6 of Diamonds should remain in the caravan
     expect(player1.discardPile.cards.length).toEqual(3); // Two cards + Jack
@@ -440,4 +568,15 @@ describe('Game - End state', () => {
 
 //   //     // Validate effects of Joker here
 //   // });
+  // it('should not allow playing a Joker on a Face Card', () => {
+  //   const joker = createMockCard("Joker", "Diamonds");
+  //   const king = createMockCard("King", "Diamonds");
+  //   const card7 = createMockCard("7", "Diamonds");
+
+  //   player1.hand.push(joker);
+  //   player1.caravans[0].addCard(card7);
+  //   player1.caravans[0].cards[0].attachFaceCard(king);
+
+  //   expect(() => game.playTurn({type: 'PLAY_CARD', card: joker, target: king})).toThrow();
+  // });
 // });

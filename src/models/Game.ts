@@ -4,7 +4,7 @@ import { EventEmitter } from "./EventEmitter";
 import { ICaravan } from "./interfaces/ICaravan";
 import { ICard } from "./interfaces/ICard";
 import { IEventEmitter } from "./interfaces/IEventEmitter";
-import { IGame, PlayerAction } from "./interfaces/IGame";
+import { GameAction, IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
@@ -80,16 +80,22 @@ export class Game implements IGame {
     this.events.emit('startGame', {currentPlayer: this.getCurrentPlayer()});
   }
 
-  playTurn(action: PlayerAction) {
+  playTurn(play: GameAction) {
     const currentPlayer = this.getCurrentPlayer();
-    switch(action.type) {
+    const player = play.player;
+
+    if (currentPlayer !== player) {
+      throw new InvalidPlayError('Cannot play a turn for a player that is not the current player.');
+    }
+
+    switch (play.action.type) {
       case 'PLAY_CARD':
-        this.playCard(action.card, action.target);
+        this.playCard(play.action.card, play.action.target);
         break;
 
       case 'DISBAND_CARAVAN':
-        if (this.validateCaravanDisband(currentPlayer, action.caravan)) {
-          this.disbandCaravan(currentPlayer, action.caravan)
+        if (this.validateCaravanDisband(currentPlayer, play.action.caravan)) {
+          this.disbandCaravan(currentPlayer, play.action.caravan)
         } else {
           throw new InvalidPlayError('Invalid caravan disbanding; please check the game rules or try a different move.');
         }
