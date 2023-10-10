@@ -24,6 +24,7 @@ export class Game implements IGame {
 
   private registerEventListeners() {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
+    this.events.on('playCardOnCard', this.playCardToCard.bind(this));
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
     // ...
   }
@@ -168,8 +169,7 @@ export class Game implements IGame {
     if (isCaravan(target)) {
       this.events.emit('playCardOnCaravan', player, card, target);
     } else {
-      this.playCardToCard(player, card, target);
-      this.events.emit('playCardOnCard', {player, card, target});
+      this.events.emit('playCardOnCard', player, card, target);
     }
   }
 
@@ -185,25 +185,25 @@ export class Game implements IGame {
     }
   }
 
-  private playCardToCard(player: IPlayer, card: ICard, target: ICard): void {
+  private playCardToCard(player: IPlayer, card: ICard, targetCard: ICard): void {
     if (card.isFaceCard() && card.value !== "Queen") {
-      target.attachFaceCard(card);
+      player.attachFaceCard(card, targetCard);
       if (card.value === "Jack") {
-        this.events.emit('playJack', {player, card, target});
+        this.events.emit('playJack', {player, card, targetCard});
       } else if (card.value === "King") {
-        this.events.emit('playKing', {player, card, target});
+        this.events.emit('playKing', {player, card, targetCard});
       } else if (card.value === "Joker") {
-        if (target.value === "Ace") {
-          this.events.emit('playJokerOnAce', {player, card, target});
+        if (targetCard.value === "Ace") {
+          this.events.emit('playJokerOnAce', {player, card, targetCard});
         } else {
-          this.events.emit('playJokerOnNumber', {player, card, target});
+          this.events.emit('playJokerOnNumber', {player, card, targetCard});
         }
       }
     } else if (card.value === "Queen") {
-      this.events.emit('playQueen', {player, card, target});
+      this.events.emit('playQueen', {player, card, targetCard});
     }
     else {
-      this.events.emit('invalidPlay', {player, card, target});
+      this.events.emit('invalidPlay', {player, card, targetCard});
     }
   }
 
