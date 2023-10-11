@@ -290,6 +290,54 @@ describe('Game - Playing turns', () => {
     })).toThrowError(InvalidPlayError);
   });
 
+  it('should allow a player to discard and draw a card if it\'s their turn', () => {
+    // Assuming it's player1's turn now.
+    const valuedCard = createMockCard("3", "Hearts");
+    player1.hand.push(valuedCard);
+    const deckSize = player1.cardSet.getSize();
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'DISCARD_DRAW',
+        card: valuedCard
+      }
+    });
+
+    // Card was discarded and moved to the discard pile.
+    expect(player1.hand).not.toContain(valuedCard);
+    expect(player1.discardPile.cards.length).toEqual(1);
+    expect(player1.discardPile.cards).toContain(valuedCard);
+
+    // New card was drawn from the player deck.
+    expect(player1.hand.length).toEqual(9); // We pushed 1 beyond the initial 8
+    expect(player1.cardSet.getSize()).toEqual(deckSize - 1); // We removed 1 from the deck
+
+  });
+
+  it('should not allow a player to discard a card if it\'s not in their hand', () => {
+    // Assuming it's player1's turn now.
+    const valuedCard = createMockCard("3", "Hearts");
+    const deckSize = player1.cardSet.getSize();
+
+    expect(() => game.playTurn({
+      player: player1,
+      action: {
+        type: 'DISCARD_DRAW',
+        card: valuedCard
+      }
+    })).toThrowError(InvalidPlayError);
+
+    // Card was not discarded, not moved to the discard pile, and the player's hand and deck were not modified.
+    expect(player1.hand).not.toContain(valuedCard);
+    expect(player1.discardPile.cards.length).toEqual(0);
+    expect(player1.discardPile.cards).not.toContain(valuedCard);
+
+    // New card was not drawn from the player deck.
+    expect(player1.hand.length).toEqual(8);
+    expect(player1.cardSet.getSize()).toEqual(deckSize);
+  });
+
   it('should not allow a player to disband a caravan if it\'s not their turn', () => {
     // Assuming it's player1's turn now.
     const valuedCard = createMockCard("3", "Hearts");
