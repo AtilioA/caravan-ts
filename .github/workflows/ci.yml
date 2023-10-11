@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18.x, 20.x]
 
     # 'steps' represent a sequence of tasks that will be executed as part of the job.
     steps:
@@ -35,13 +35,6 @@ jobs:
       # Allow tests to fail
       run: npm run test:coverage || echo "Tests failed, continuing..."
       continue-on-error: true
-
-    - name: List directory contents
-      run: |
-        echo "List all files in the project directory:"
-        ls -R
-        echo "List all files in the coverage directory:"
-        ls ./coverage
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
