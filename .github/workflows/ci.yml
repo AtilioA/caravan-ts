@@ -17,15 +17,18 @@ jobs:
       matrix:
         node-version: [18.x, 20.x]
 
+    # 'steps' represent a sequence of tasks that will be executed as part of the job.
     steps:
-    - uses: actions/checkout@v2
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
+    - uses: actions/checkout@v3
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
+      # Designed for automated environments like CI. It uses 'package-lock.json'.
       run: npm ci
 
     - name: Run tests
@@ -37,3 +40,7 @@ jobs:
       uses: codecov/codecov-action@v3
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./coverage
+        files: ./coverage/clover.xml
+        flags: tests #
+        name: codecov-umbrella # Optional: Custom name for the upload displayed on Codecov
