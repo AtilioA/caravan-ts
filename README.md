@@ -2,6 +2,8 @@
 
 [![Node.js testing CI](https://github.com/AtilioA/caravan-ts/actions/workflows/ci.yml/badge.svg)](https://github.com/AtilioA/caravan-ts/actions/workflows/ci.yml)
 
+[![codecov](https://codecov.io/gh/AtilioA/caravan-ts/graph/badge.svg?token=I3D616S25M)](https://codecov.io/gh/AtilioA/caravan-ts)
+
 ### Disclaimer and Acknowledgements
 
 This project is a fan-made representation of the "Caravan" mini-game as featured in Bethesda Softworks' Fallout: New Vegas. It is created out of admiration and respect for the original game and its creators.
