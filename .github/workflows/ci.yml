@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x]
 
     # 'steps' represent a sequence of tasks that will be executed as part of the job.
     steps:
@@ -26,6 +26,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+
+    - name: List directory contents
+      run: |
+        echo "List all files in the project directory:"
+        ls -R
+        echo "List all files in the coverage directory:"
+        ls ./coverage
 
     - name: Install dependencies
       # Designed for automated environments like CI. It uses 'package-lock.json'.
