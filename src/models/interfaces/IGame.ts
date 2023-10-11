@@ -22,6 +22,6 @@ export interface IGame {
   start(): void;
   end(): void;
   playTurn(action: GameAction): void;
-  validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean;
+  // validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean;
   checkForWinner(): IPlayer | null;
 }

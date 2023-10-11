@@ -26,5 +26,5 @@ export interface IEventEmitter {
 
   on(event: eventType, listener: Function): void;
   emit(event: eventType, ...args: any[]): void;
-  removeListener(event: eventType, listener: Function): void;
+  // removeListener(event: eventType, listener: Function): void;
 }

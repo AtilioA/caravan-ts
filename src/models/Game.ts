@@ -29,11 +29,6 @@ export class Game implements IGame {
     // ...
   }
 
-  // Event handlers
-  private handleCardPlayed(data: any) {
-    // Handle the logic for when a card is played.
-  }
-
   getCurrentPlayer(): IPlayer {
     return this.players[this.currentPlayerIndex];
   }
@@ -167,11 +162,11 @@ export class Game implements IGame {
   }
 
   private playCard(card: ICard, target: ICard | ICaravan): void {
-    if (this.validateMove(this.getCurrentPlayer(), card, target)) {
+    // if (this.validateMove(this.getCurrentPlayer(), card, target)) {
       this.playCardToTarget(this.getCurrentPlayer(), card, target);
-    } else {
-      throw new InvalidPlayError('Invalid card play; please check the game rules or try a different move.');
-    }
+    // } else {
+      // throw new InvalidPlayError('Invalid card play; please check the game rules or try a different move.');
+    // }
   }
 
   private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard): void {
@@ -201,12 +196,12 @@ export class Game implements IGame {
         this.events.emit('playJack', {player, card, targetCard});
       } else if (card.value === "King") {
         this.events.emit('playKing', {player, card, targetCard});
-      } else if (card.value === "Joker") {
-        if (targetCard.value === "Ace") {
-          this.events.emit('playJokerOnAce', {player, card, targetCard});
-        } else {
-          this.events.emit('playJokerOnNumber', {player, card, targetCard});
-        }
+      // } else if (card.value === "Joker") {
+      //   if (targetCard.value === "Ace") {
+      //     this.events.emit('playJokerOnAce', {player, card, targetCard});
+      //   } else {
+      //     this.events.emit('playJokerOnNumber', {player, card, targetCard});
+      //   }
       }
     } else if (card.value === "Queen") {
       this.events.emit('playQueen', {player, card, targetCard});
@@ -218,10 +213,10 @@ export class Game implements IGame {
   }
 
   // TODO: Continue from here
-  validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean {
-    // Validate if the move is legal according to game rules
-    return true;
-  }
+  // validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean {
+  //   // Validate if the move is legal according to game rules
+  //   return true;
+  // }
 
   private isPlayerOutOfCards(player: IPlayer): boolean {
     return player.hand.length === 0 && player.cardSet.cards.length === 0;

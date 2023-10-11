@@ -28,15 +28,15 @@ export class EventEmitter implements IEventEmitter {
     }
   }
 
-  // Removes the given listener from the given event.
-  // If the listener is not registered for the given event, this method does nothing.
-  removeListener(event: eventType, listener: Function): void {
-    const listeners = this.events[event];
-    if (listeners) {
-      const index = listeners.indexOf(listener);
-      if (index !== -1) {
-        listeners.splice(index, 1);
-      }
-    }
-  }
+  // // Removes the given listener from the given event.
+  // // If the listener is not registered for the given event, this method does nothing.
+  // removeListener(event: eventType, listener: Function): void {
+  //   const listeners = this.events[event];
+  //   if (listeners) {
+  //     const index = listeners.indexOf(listener);
+  //     if (index !== -1) {
+  //       listeners.splice(index, 1);
+  //     }
+  //   }
+  // }
 }
