@@ -13,15 +13,6 @@ export class Card implements ICard {
     this.suit = suit;
     this.theme = theme;
     this.attachedCards = attachedCards;
-
-    // Check if the value and suit are valid
-    if (!VALUES.includes(value) || !SUITS.includes(suit)) {
-      throw new InvalidPlayError('Invalid card value or suit. Must be one of the following: ' + VALUES.join(', ') + ' and ' + SUITS.join(', '));
-    }
-    // Check if the theme is valid
-    if (!THEMES.includes(this.theme)) {
-      throw new InvalidPlayError('Invalid card theme. Must be one of the following: ' + THEMES.join(', '));
-    }
   }
 
   // Subclassing would probably be overkill (alternative would be using a Factory)
