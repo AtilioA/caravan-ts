@@ -84,16 +84,19 @@ describe('Player', () => {
         playerDeck.generate(40);
         const player = new Player(playerDeck);
         const cardNotInHand = new Card('10', 'Diamonds');
-        // TODO: add Caravan to the Player object
-        const caravan = new Caravan();
-        expect(() => player.playCard(cardNotInHand, caravan)).toThrowError(InvalidPlayError);
+
+        // For this test, it doesn't actually matter if the caravan is from the player or opponent
+        player.caravans[0] = new Caravan();
+        expect(() => player.playCard(cardNotInHand, player.caravans[0])).toThrowError(InvalidPlayError);
     });
 
     it('should be able to draw a card from the cardSet and add it to the player’s hand.', () => {
-                const playerDeck = new Deck();
+        const playerDeck = new Deck();
         playerDeck.generate(40);
+
         const player = new Player(playerDeck);
         player.drawCard();
+
         expect(player.hand.length).toEqual(1);
         expect(player.cardSet.getSize()).toEqual(39); // 40 - 1
     });
