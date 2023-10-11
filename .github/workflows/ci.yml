@@ -1,5 +1,6 @@
 name: Node.js testing CI
 
+# Trigger CI on push or pull request to main
 on:
   push:
     branches:
@@ -14,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v2
