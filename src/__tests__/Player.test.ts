@@ -6,6 +6,7 @@ import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
 import { Player } from "../models/Player";
 import { generateCards } from "../utils/card";
+import { createMockPlayer } from "./__mocks__/mockFactories";
 
 describe('Player', () => {
     it('should create a player with an empty set of cards', () => {
@@ -102,13 +103,13 @@ describe('Player', () => {
     });
 
     it('should be able to determine an opponent’s caravan.', () => {
-        //         const playerDeck = new Deck();
-        // playerDeck.generate(40);
-        // const player = new Player(playerDeck);
-        // const opponent = new Player(playerDeck);
-        // const caravan = new Caravan();
-        // // Create or get an opponent's caravan object here.
-        // expect(player.isOpponentCaravan(opponent)).toEqual(caravan); // assuming isOpponentCaravan returns the opponent's caravan
+        const player = new Player();
+
+        const opponent = new Player();
+        const caravan = new Caravan();
+        opponent.caravans[0] = caravan;
+
+        expect(player.isOpponentCaravan(caravan)).toBe(true); // assuming isOpponentCaravan returns the opponent's caravan
     });
 
     it('should be able to play a face card to an opponent’s caravan’s card.', () => {
@@ -126,7 +127,17 @@ describe('Player', () => {
         expect(player.hand).not.toContain(faceCard);
     });
 
-    it('should not be able to play a card to the opponent’s caravan if it’s not a face card.', () => {
+    it('should not be able to play a card to the opponent’s caravan if it’s not a face card (playCard).', () => {
+        const player = new Player();
+        const notFaceCard = new Card('10', 'Diamonds');
+        player.hand.push(notFaceCard);
+
+        const opponent = new Player(new Deck(), [], [new Caravan(generateCards(4, false)), new Caravan(generateCards(4, false)), new Caravan(generateCards(4, false))]);
+
+        expect(() => player.playCard(notFaceCard, opponent.caravans[0])).toThrowError(InvalidPlayError);
+    });
+
+    it('should not be able to play a card to the opponent’s caravan if it’s not a face card (playCardToOpponentCaravan).', () => {
         const player = new Player();
         const notFaceCard = new Card('10', 'Diamonds');
         player.hand.push(notFaceCard);
@@ -150,6 +161,33 @@ describe('Player', () => {
         expect(player.hand).not.toContain(faceCard);
     });
 
+    it('should be able to attach a face card to a card in the player’s caravan.', () => {
+        const player = new Player();
+        const faceCard = new Card('King', 'Diamonds');
+        player.hand.push(faceCard);
+
+        player.caravans[0] = new Caravan();
+        player.caravans[0].cards = generateCards(2, false);
+        const targetCard = player.caravans[0].cards[0];
+
+        player.attachFaceCard(faceCard, targetCard);
+        expect(targetCard.attachedCards).toContain(faceCard);
+        expect(player.hand).not.toContain(faceCard);
+    });
+
+    it('should not be able to attach a face card not in the player\'s hand to a card.', () => {
+        const player = new Player();
+        const faceCard = new Card('King', 'Diamonds');
+
+        player.caravans[0] = new Caravan();
+        player.caravans[0].cards = generateCards(2, false);
+        const targetCard = player.caravans[0].cards[0];
+
+        expect(() => player.attachFaceCard(faceCard, targetCard)).toThrowError(InvalidPlayError);
+        expect(targetCard.attachedCards).not.toContain(faceCard);
+        expect(player.hand).not.toContain(faceCard);
+    });
+
     it('should not allow attaching a Queen to a card in the player’s caravan.', () => {
         const player = new Player();
         const queen = new Card('Queen', 'Diamonds');
@@ -162,5 +200,20 @@ describe('Player', () => {
         expect(() => player.attachFaceCard(queen, targetCard)).toThrowError(InvalidPlayError);
         expect(targetCard.attachedCards).not.toContain(queen);
         expect(player.hand).toContain(queen);
+    });
+
+    it('should not allow disbanding a caravan that is not from the player.', () => {
+        const player = createMockPlayer();
+        const opponent = createMockPlayer();
+
+        expect(player.isOpponentCaravan(opponent.caravans[0])).toBe(true);
+        expect(() => player.disbandCaravan(opponent.caravans[0])).toThrowError(InvalidPlayError);
+    });
+
+    it('should not allow disbanding an empty caravan.', () => {
+        const player = createMockPlayer();
+
+        expect(player.caravans[0].cards.length).toEqual(0);
+        expect(() => player.disbandCaravan(player.caravans[0])).toThrowError(InvalidPlayError);
     });
 });
