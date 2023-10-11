@@ -111,9 +111,6 @@ export class Game implements IGame {
           throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
         }
         break;
-
-      default:
-        throw new InvalidPlayError('Unknown action type; please check the game rules or try a different move.');
     }
 
     this.updateBids();

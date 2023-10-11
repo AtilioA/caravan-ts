@@ -43,6 +43,7 @@ export class Player implements IPlayer {
     }
   }
 
+  // Should be named playCardToCaravan instead
   playCard(card: ICard, caravan: ICaravan): void {
     if (!this.hand.includes(card)) {
       throw new InvalidPlayError("Cannot play a card that is not in the player's hand");
@@ -71,13 +72,14 @@ export class Player implements IPlayer {
     }
   }
 
-  playCardOpeningRound(card: ICard, caravan: ICaravan): void {
-    if (card.isFaceCard()) {
-      throw new InvalidPlayError("Cannot play a face card in the opening round");
-    }
+  // This needs to be handled by the Game entity instead (needs knowledge of the match state)
+  // playCardOpeningRound(card: ICard, caravan: ICaravan): void {
+  //   if (card.isFaceCard()) {
+  //     throw new InvalidPlayError("Cannot play a face card in the opening round");
+  //   }
 
-    return this.playCard(card, caravan);
-  }
+  //   return this.playCard(card, caravan);
+  // }
 
   disbandCaravan(caravan: ICaravan): void {
     if (!this.caravans.includes(caravan)) {
@@ -107,15 +109,15 @@ export class Player implements IPlayer {
   playCardToOpponentCaravan(faceCard: ICard, enemyCard: ICard): boolean {
     if (this.isOpponentCard(enemyCard)) {
       this._removeFromHand(faceCard);
-      if (faceCard.value === 'Queen') {
-        // return enemyCaravan.addCard(faceCard);
-        return enemyCard.attachFaceCard(faceCard);
-      } else {
+      // if (faceCard.value === 'Queen') {
+      //   // return enemyCaravan.addCard(faceCard);
+      //   return enemyCard.attachFaceCard(faceCard);
+      // } else {
       return enemyCard.attachFaceCard(faceCard);
-      }
+      // }
     }
-    else {
-      throw new InvalidPlayError("Cannot play a face card to an opponent's caravan's card");
-    }
+    // throw new Error("This method should only be called when playing a card to an opponent's caravan");
+    /* istanbul ignore next */
+    return false;
   }
 }

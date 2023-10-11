@@ -25,18 +25,30 @@ export class Caravan implements ICaravan {
         return ValueMapping[value] > lastCardValue;
       case Direction.DESCENDING:
         return ValueMapping[value] < lastCardValue;
+      /* istanbul ignore next */
       default:
         // NOTE: throw an error since the direction should always be defined at this point?
         return false;
     }
   }
 
+  // private _jackLogic(target: ICard, jackCard: ICard): void {
+  //   // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
+
+  // }
+
+
+  // private _kingLogic(target: ICard, kingCard: ICard): void {
+  //   // Doubles the value of the card the king is played on. Stacks with other kings, e.g.: 2 kings on a 5 = 20.
+  //   // Add to the bid the value of the card the king is played on.
+  //   // this.bid += target.computeValue();
+  // }
+
   private _queenLogic(queenCard: ICard): void {
     // Changes the suit of the caravan to the suit of the Queen and reverses the direction of the caravan.
     this.suit = queenCard.suit;
     this.direction = this.direction === Direction.ASCENDING ? Direction.DESCENDING : Direction.ASCENDING;
   }
-
 
   canAddCard(card: ICard): boolean {
     // If the caravan is empty and the card is a face card, return false.
