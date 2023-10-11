@@ -33,7 +33,7 @@ jobs:
 
     - name: Run tests
       # Allow tests to fail
-      run: npm test --coverage || echo "Tests failed, continuing..."
+      run: npm run test:coverage || echo "Tests failed, continuing..."
       continue-on-error: true
 
     - name: List directory contents

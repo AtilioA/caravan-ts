@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest --coverage",
+    "test:coverage": "jest --coverage",
     "build": "tsc",
     "start": "node ./dist/index.js",
     "doc": "typedoc"
