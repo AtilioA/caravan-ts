@@ -27,13 +27,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: List directory contents
-      run: |
-        echo "List all files in the project directory:"
-        ls -R
-        echo "List all files in the coverage directory:"
-        ls ./coverage
-
     - name: Install dependencies
       # Designed for automated environments like CI. It uses 'package-lock.json'.
       run: npm ci
@@ -42,6 +35,13 @@ jobs:
       # Allow tests to fail
       run: npm test --coverage || echo "Tests failed, continuing..."
       continue-on-error: true
+
+    - name: List directory contents
+      run: |
+        echo "List all files in the project directory:"
+        ls -R
+        echo "List all files in the coverage directory:"
+        ls ./coverage
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
