@@ -616,13 +616,21 @@ describe('Game - End state', () => {
     game.start();
   });
 
-  it('should end the game when a player has an empty hand with no cards left in their deck', () => {
+  it('should end the game when player 1 has an empty hand with no cards left in their deck', () => {
     // Play final turns, then check the winner.
     player1.hand = [];
     player1.cardSet = new Deck([]);
 
     expect(game.checkForWinner()).toBe(player2);
-});
+  });
+
+  it('should end the game when player 2 has an empty hand with no cards left in their deck', () => {
+    // Play final turns, then check the winner.
+    player2.hand = [];
+    player2.cardSet = new Deck([]);
+
+    expect(game.checkForWinner()).toBe(player1);
+  });
 
   it('should end the game when a player has sold all three caravans', () => {
     setCaravanBids(player1, [22, 24, 26]);
