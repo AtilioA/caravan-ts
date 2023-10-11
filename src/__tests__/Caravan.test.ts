@@ -27,12 +27,12 @@ describe('Caravan', () => {
 
     // SECTION: Adding cards to the caravan
     it('should check if a card can be added to the caravan (differing suit)', () => {
-        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.ASCENDING, 'Diamonds', 0);
+        const caravan = new Caravan([new Card('5', 'Diamonds')], Direction.DESCENDING, 'Diamonds', 0);
 
-        let isValid = caravan.canAddCard(new Card('2', 'Clubs'));
+        let isValid = caravan.canAddCard(new Card('10', 'Clubs'));
         expect(isValid).toBe(false);
 
-        isValid = caravan.canAddCard(new Card('10', 'Clubs'));
+        isValid = caravan.canAddCard(new Card('2', 'Clubs'));
         expect(isValid).toBe(true);
     });
 
