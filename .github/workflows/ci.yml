@@ -41,6 +41,6 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: ./coverage
-        files: ./coverage/clover.xml
+        files: ./coverage/lcov.info
         flags: tests
         name: codecov-umbrella # Optional: Custom name for the upload displayed on Codecov
