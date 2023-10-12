@@ -1,23 +1,26 @@
 import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
 import { isCaravan } from "../utils/caravan";
 import { EventEmitter } from "./EventEmitter";
+import { AIStrategy } from "./interfaces/AIStrategy";
 import { ICaravan } from "./interfaces/ICaravan";
 import { ICard } from "./interfaces/ICard";
 import { IEventEmitter } from "./interfaces/IEventEmitter";
-import { GameAction, IGame } from "./interfaces/IGame";
+import { GameAction, GameState, IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
   isOver: boolean = false;
   players: IPlayer[];
   currentPlayerIndex: number;
+  currentAIStrategy: AIStrategy | null;
   events: IEventEmitter;
 
-  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false, currentAIStrategy = null) {
     this.players = players;
     this.currentPlayerIndex = currentPlayerIndex || 0;
     this.events = events;
     this.isOver = isOver;
+    this.currentAIStrategy = currentAIStrategy;
 
     this.registerEventListeners();
   }
@@ -28,6 +31,24 @@ export class Game implements IGame {
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
     // ...
   }
+
+  nextAIMove(): void {
+    if (!this.currentAIStrategy) {
+      throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
+    } else {
+    const move = this.currentAIStrategy.makeMove(this.getCurrentGameState());
+    this.playTurn(move);
+    }
+  }
+
+  private getCurrentGameState(): GameState {
+    return {
+      human: this.players[0],
+      AI: this.players[1],
+      currentPlayerIndex: this.currentPlayerIndex
+    }
+  }
+
 
   getCurrentPlayer(): IPlayer {
     return this.players[this.currentPlayerIndex];
@@ -54,24 +75,24 @@ export class Game implements IGame {
     // Initialize game, deal cards to players, etc.
     // NOTE: this is a naive approach to convey what would happen in real life
     for (let player of this.players) {
-      let valuedCards = 0;
+      // let valuedCards = 0;
 
       // FIXME: Keep drawing until there are at least 3 valued cards in hand
       // while (valuedCards < 3) {
         // Return the cards from hand to cardSet
-        while (player.hand.length > 0) {
-            const card = player.hand.pop();
-            if (card) {
-                player.cardSet.addCard(card);
-            }
-        }
+        // while (player.hand.length > 0) {
+        //     const card = player.hand.pop();
+        //     if (card) {
+        //         player.cardSet.addCard(card);
+        //     }
+        // }
 
         // Reshuffle the deck and draw 8 new cards
         player.cardSet.shuffle();
         player.drawHand(8);
 
         // Check how many valued cards are in hand; if less than 3, repeat
-        // valuedCards = player.hand.filter(card => !card.isFaceCard()).length;
+        // valuedCards = player.getValuedCards().length;
       // }
     }
 

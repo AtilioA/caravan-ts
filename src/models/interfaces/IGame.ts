@@ -1,4 +1,5 @@
 import { EventEmitter } from "../EventEmitter";
+import { AIStrategy } from "./AIStrategy";
 import { ICaravan } from "./ICaravan";
 import { ICard } from "./ICard";
 import { IPlayer } from "./IPlayer";
@@ -13,10 +14,17 @@ export interface GameAction {
   action: PlayerAction;
 }
 
+export interface GameState {
+  human: IPlayer;
+  AI: IPlayer;
+  currentPlayerIndex: number;
+}
+
 export interface IGame {
   isOver: boolean;
   players: IPlayer[];
   currentPlayerIndex: number;
+  currentAIStrategy: AIStrategy | null;
   events: EventEmitter;
 
   start(): void;

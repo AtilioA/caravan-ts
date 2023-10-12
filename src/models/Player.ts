@@ -5,6 +5,7 @@ import { Deck } from "./Deck";
 import { ICaravan } from "./interfaces/ICaravan";
 import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
+import { GameAction } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Player implements IPlayer {
@@ -123,5 +124,9 @@ export class Player implements IPlayer {
     // throw new Error("This method should only be called when playing a card to an opponent's caravan");
     /* istanbul ignore next */
     return false;
+  }
+
+  generatePossibleMoves(): GameAction[] {
+    return []
   }
 }
