@@ -18,7 +18,9 @@ export class Caravan implements ICaravan {
   }
 
   private _isValueInDirection(value: CardValue): boolean {
-    const lastCardValue = this.cards[this.cards.length - 1].getNumericValue();
+    // Don't allow face cards to be considered for the direction (e.g: when using a Queen to change the direction of the caravan)
+    const filteredCards = this.cards.filter(card => !card.isFaceCard());
+    const lastCardValue = filteredCards[filteredCards.length - 1].getNumericValue();
 
     switch (this.direction) {
       case Direction.ASCENDING:
@@ -69,10 +71,10 @@ export class Caravan implements ICaravan {
         return true;
     }
 
-    if (this.direction) { // Check if there is a defined direction
+    if (this.direction !== null) {
       return this._isValueInDirection(card.value);
     }
-    
+
     return true;
   }
 
