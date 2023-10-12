@@ -358,6 +358,50 @@ describe('Game - Playing turns', () => {
     })).toThrowError(InvalidPlayError);
   });
 
+  it('should allow a player to disband one of their caravans if it has any cards', () => {
+    const caravan = player1.caravans[0];
+    caravan.addCard(createMockCard("5", "Diamonds"));
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'DISBAND_CARAVAN',
+        caravan: caravan
+      }
+    });
+
+    expect(caravan.cards.length).toEqual(0);
+    expect(caravan.bid).toEqual(0);
+  });
+
+  it('should not allow a player to disband one of their caravans if it has no cards', () => {
+      const caravan = player1.caravans[0];
+
+      expect(() => game.playTurn({
+        player: player1,
+        action: {
+          type: 'DISBAND_CARAVAN',
+          caravan: caravan
+        }
+      })).toThrow();
+  });
+
+  it('should add cards to the player\'s discard pile after a caravan is disbanded', () => {
+    const caravan = player1.caravans[0];
+    caravan.addCard(createMockCard("5", "Diamonds"));
+    caravan.addCard(createMockCard("6", "Diamonds"));
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'DISBAND_CARAVAN',
+        caravan: caravan
+      }
+    });
+
+    expect(player1.discardPile.cards.length).toEqual(2);
+  });
+
   it('should handle the end of the game correctly, allowing no more moves after the game ends', () => {
       // Mock the game to be at an end state.
       game.end();
@@ -415,48 +459,77 @@ describe('Game - Playing turns', () => {
       expect(caravan.isSold()).toBe(true);
   });
 
-  it('should allow a player to disband one of their caravans if it has any cards', () => {
-      const caravan = player1.caravans[0];
-      caravan.addCard(createMockCard("5", "Diamonds"));
+  it('should be able to play a King on a valued card and have it double the card\'s value', () => {
+    const kingCard = createMockCard("King", "Diamonds");
+    // Get a valued card from the player's hand
+    const valuedCard = player1.getValuedCards()[0];
 
-      game.playTurn({
-        player: player1,
-        action: {
-          type: 'DISBAND_CARAVAN',
-          caravan: caravan
-        }
-      });
+    player1.hand.push(kingCard);
 
-      expect(caravan.cards.length).toEqual(0);
-      expect(caravan.bid).toEqual(0);
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCard,
+        target: player1.caravans[0]
+      }
+    });
+    game.currentPlayerIndex = 0
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: kingCard,
+        target: valuedCard
+      }
+    });
+
+    expect(valuedCard.attachedCards).toContain(kingCard);
+    expect(player1.hand).not.toContain(kingCard);
+    expect(player1.caravans[0].bid).toEqual(valuedCard.getNumericValue() * 2);
   });
 
-  it('should not allow a player to disband one of their caravans if it has no cards', () => {
-      const caravan = player1.caravans[0];
+  // NOTE: it is not possible to double the caravan's bid coincidentally because no two cards of the same value can be played on the same caravan.
+  it('should be able to play a King on a valued card and not double the caravan\'s bid', () => {
+    const kingCard = createMockCard("King", "Diamonds");
+    player1.hand.push(kingCard);
 
-      expect(() => game.playTurn({
-        player: player1,
-        action: {
-          type: 'DISBAND_CARAVAN',
-          caravan: caravan
-        }
-      })).toThrow();
-  });
+    const valuedCards = player1.getValuedCards();
 
-  it('should add cards to the player\'s discard pile after a caravan is discarded', () => {
-      const caravan = player1.caravans[0];
-      caravan.addCard(createMockCard("5", "Diamonds"));
-      caravan.addCard(createMockCard("6", "Diamonds"));
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCards[0],
+        target: player1.caravans[0]
+      }
+    });
+    game.currentPlayerIndex = 0
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCards[1],
+        target: player1.caravans[0]
+      }
+    });
 
-      game.playTurn({
-        player: player1,
-        action: {
-          type: 'DISBAND_CARAVAN',
-          caravan: caravan
-        }
-      });
+    const caravanBidWithoutKing = player1.caravans[0].bid;
 
-      expect(player1.discardPile.cards.length).toEqual(2);
+    game.currentPlayerIndex = 0
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: kingCard,
+        target: valuedCards[1]
+      }
+    });
+
+    expect(valuedCards[1].attachedCards).toContain(kingCard);
+    expect(player1.hand).not.toContain(kingCard);
+    expect(player1.caravans[0].bid).toEqual(valuedCards[0].getNumericValue() + valuedCards[1].getNumericValue() * 2);
+    expect(player1.caravans[0].bid).not.toEqual(caravanBidWithoutKing * 2);
   });
 
   it('should add cards to the player\'s discard pile after a Jack is played (opponent)', () => {
