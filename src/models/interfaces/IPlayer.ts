@@ -11,6 +11,7 @@ export interface IPlayer {
 
   drawCard(): void;
   drawHand(n: number): void;
+  getValuedCards(): ICard[];
 
   playCard(card: ICard, caravan: ICaravan): void;
   attachFaceCard(faceCard: ICard, targetCard: ICard): void;

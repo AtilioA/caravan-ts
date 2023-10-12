@@ -28,6 +28,10 @@ export class Player implements IPlayer {
     return removeItemFromArray(this.hand, card);
   };
 
+  getValuedCards(): ICard[] {
+    return this.hand.filter(card => !card.isFaceCard());
+  }
+
   drawCard(): void {
     // Draw a card from the deck and add it to the player's hand
     if (this.cardSet.getSize() === 0) {

@@ -216,4 +216,14 @@ describe('Player', () => {
         expect(player.caravans[0].cards.length).toEqual(0);
         expect(() => player.disbandCaravan(player.caravans[0])).toThrowError(InvalidPlayError);
     });
+
+    it('should be able to get only valued cards from the player’s hand.', () => {
+        const player = createMockPlayer();
+        const valuedCards = player.getValuedCards();
+
+        // Iterate over the 'value' attribute of valuedCards and check for isFaceCard
+        valuedCards.forEach(card => {
+            expect(card.isFaceCard()).toBe(false);
+        });
+    })
 });
