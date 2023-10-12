@@ -5,6 +5,6 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ["json", "lcov", "text", "clover"],
   collectCoverageFrom: [
-    'src/**/*.test.{ts,tsx}', '!src/**/*.test.d.ts',
+    'src/**/*.ts', '!src/**/*.d.ts',
   ],
 };
