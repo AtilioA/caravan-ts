@@ -29,7 +29,7 @@ describe('Game - Initialization', () => {
     expect(game.players.length).toEqual(0);
   });
 
-  it('should not start the game with the more than two players', () => {
+  it('should not start the game with more than two players', () => {
     const mockPlayers = [createMockPlayer(), createMockPlayer(), createMockPlayer()]
     const game = new Game(mockPlayers);
 
@@ -52,7 +52,7 @@ describe('Game - Initialization', () => {
     expect(() => game.start()).toThrowError(InvalidGameState);
   });
 
-  it('should start the game, dealing 8 cards to each player', () => {
+  it('should be able to start the game, dealing 8 cards to each player', () => {
     const mockPlayers = [createMockPlayer(), createMockPlayer()]
     const game = new Game(mockPlayers);
     game.start();
@@ -61,16 +61,21 @@ describe('Game - Initialization', () => {
     expect(mockPlayers[1].hand.length).toEqual(8);
   });
 
-    // it('should validate a player’s move correctly', () => {
-  //   const mockPlayers = [createMockPlayer(), createMockPlayer()]
-  //   const game = new Game(mockPlayers);
-  //   game.start();
+  it('should be able to start the game, dealing 8 cards to each player; these cards must come from their decks', () => {
+    const mockPlayers = [createMockPlayer(), createMockPlayer()]
+    const game = new Game(mockPlayers);
 
-  //   const cardIndex = 0; // or any valid index
-  //   const caravanIndex = 0; // or any valid index
+    const player1DeckSize = mockPlayers[0].cardSet.getSize();
+    const player2DeckSize = mockPlayers[1].cardSet.getSize();
 
-  //   expect(game.validateMove(mockPlayers[0], cardIndex, caravanIndex)).toBe(true);
-  // });
+    game.start();
+
+    // Deck has 8 less cards now.
+    expect(mockPlayers[0].cardSet.getSize()).toEqual(player1DeckSize - 8);
+    expect(mockPlayers[1].cardSet.getSize()).toEqual(player2DeckSize - 8);
+
+    // NOTE: Won't test if the cards are the same because of randomness, and because the underlying functions are tested elsewhere.
+  });
 
   // it('should reshuffle a player deck if they do not have at least three valued cards, and draw eight new cards', () => {
   //   const mockPlayers = [new MockedPlayer(), new MockedPlayer()]
@@ -125,6 +130,7 @@ describe('Game - Playing turns', () => {
     game = new Game([player1, player2]);
     game.start();
   });
+
   it('should allow a player to play a valued card on their caravan', () => {
     const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
@@ -158,7 +164,7 @@ describe('Game - Playing turns', () => {
     expect(player1.caravans[0].bid).toEqual(2);
   });
 
-  it('should allow a player to play a face card on their cards', () => {
+  it('should allow a player to play/attach a face card on their cards', () => {
     const faceCard = createMockCard("King", "Diamonds");
     const valuedCard = createMockCard("5", "Diamonds");
 
