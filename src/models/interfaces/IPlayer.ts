@@ -19,7 +19,7 @@ export interface IPlayer {
   discardCard(card: ICard): void;
   disbandCaravan(caravan: ICaravan): void;
 
-  isOpponentCaravan(caravan: ICaravan): boolean;
+  isNotOwnCaravan(caravan: ICaravan): boolean;
   playCardToOpponentCaravan(faceCard: ICard, enemyCard: ICard): boolean;
 
   generatePossibleMoves(): GameAction[];

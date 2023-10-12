@@ -109,7 +109,7 @@ describe('Player', () => {
         const caravan = new Caravan();
         opponent.caravans[0] = caravan;
 
-        expect(player.isOpponentCaravan(caravan)).toBe(true); // assuming isOpponentCaravan returns the opponent's caravan
+        expect(player.isNotOwnCaravan(caravan)).toBe(true);
     });
 
     it('should be able to play a face card to an opponent’s caravan’s card.', () => {
@@ -206,7 +206,7 @@ describe('Player', () => {
         const player = createMockPlayer();
         const opponent = createMockPlayer();
 
-        expect(player.isOpponentCaravan(opponent.caravans[0])).toBe(true);
+        expect(player.isNotOwnCaravan(opponent.caravans[0])).toBe(true);
         expect(() => player.disbandCaravan(opponent.caravans[0])).toThrowError(InvalidPlayError);
     });
 

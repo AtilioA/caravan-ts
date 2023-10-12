@@ -72,6 +72,7 @@ export class Caravan implements ICaravan {
     if (this.direction) { // Check if there is a defined direction
       return this._isValueInDirection(card.value);
     }
+    
     return true;
   }
 

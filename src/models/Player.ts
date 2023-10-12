@@ -53,7 +53,7 @@ export class Player implements IPlayer {
     if (!this.hand.includes(card)) {
       throw new InvalidPlayError("Cannot play a card that is not in the player's hand");
     }
-    if (this.isOpponentCaravan(caravan) && !card.isFaceCard()) {
+    if (this.isNotOwnCaravan(caravan) && !card.isFaceCard()) {
       throw new InvalidPlayError("Cannot play a valued card to an opponent's caravan");
     }
 
@@ -102,7 +102,7 @@ export class Player implements IPlayer {
     this._removeFromHand(card);
   }
 
-  isOpponentCaravan(caravan: ICaravan): boolean {
+  isNotOwnCaravan(caravan: ICaravan): boolean {
     return !this.caravans.includes(caravan);
   }
 
