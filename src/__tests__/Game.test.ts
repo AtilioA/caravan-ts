@@ -148,6 +148,24 @@ describe('Game - Playing turns', () => {
     expect(player1.hand).not.toContain(valuedCard);
   });
 
+  it('should allow a player to play a valued card on their caravan and draw another one', () => {
+    const valuedCard = createMockCard("2", "Diamonds");
+    player1.hand.push(valuedCard);
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: valuedCard,
+        target: player1.caravans[0]
+      }
+    });
+
+    expect(player1.caravans[0].cards).toContain(valuedCard);
+    expect(player1.hand).not.toContain(valuedCard);
+    expect(player1.hand.length).toEqual(9); // 9 because we pushed 1 beyond the initial 8
+  });
+
   it('should update the caravan\'s bid after a player plays a valued card on their caravan', () => {
     const valuedCard = createMockCard("2", "Diamonds");
     player1.hand.push(valuedCard);
@@ -693,7 +711,8 @@ describe('Game - General valid/invalid moves', () => {
     game.currentPlayerIndex = 0
     game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]}});
     game.currentPlayerIndex = 0
-    // Last card was 8 and direction is ascending, so 6 is not allowed.
+
+    // Last card was 8 and direction is ascending (suits don't match either), so 6 is not allowed
     expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: player1.hand[0], target: player1.caravans[0]}})).toThrowError(InvalidPlayError);
   });
 

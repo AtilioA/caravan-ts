@@ -57,7 +57,11 @@ export class Player implements IPlayer {
       throw new InvalidPlayError("Cannot play a valued card to an opponent's caravan");
     }
 
-    this._removeFromHand(card)
+    // 'Useless' check, but it's here for clarity
+    if (caravan.canAddCard(card)) {
+      this._removeFromHand(card)
+      this.drawCard();
+    }
     caravan.addCard(card);
   }
 
