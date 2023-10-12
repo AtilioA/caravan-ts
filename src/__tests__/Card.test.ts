@@ -37,6 +37,23 @@ describe('Card', () => {
         expect(card.attachedCards.length).toBe(2);
     });
 
+    it('should not allow attaching more than 3 face cards', () => {
+        const card = new Card('Ace', 'Spades');
+        expect(card.attachedCards.length).toBe(0);
+
+        card.attachFaceCard(new Card('King', 'Diamonds'));
+        expect(card.attachedCards.length).toBe(1);
+
+        card.attachFaceCard(new Card('King', 'Spades'));
+        expect(card.attachedCards.length).toBe(2);
+
+        card.attachFaceCard(new Card('King', 'Hearts'));
+        expect(card.attachedCards.length).toBe(3);
+
+        expect(() => card.attachFaceCard(new Card('Queen', 'Diamonds'))).toThrowError(InvalidPlayError);
+        expect(card.attachedCards.length).toBe(3);
+    });
+
     it('should not allow attaching a face card that is a Queen', () => {
         const card = new Card('Ace', 'Spades');
         expect(card.attachedCards.length).toBe(0);
