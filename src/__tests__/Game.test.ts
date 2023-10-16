@@ -868,19 +868,19 @@ describe('Game - End state', () => {
     expect(game.checkForWinner()).toBe(player1);
   });
 
-  it('should end the game when a player has sold all three caravans', () => {
+  it('should end the game when a player has sold all three caravans (no outbiding needed)', () => {
     setCaravanBids(player1, [22, 24, 26]);
     setCaravanBids(player2, [18, 20, 20]);
     expect(game.checkForWinner()).toBe(player1);
   });
 
-  it('should end the game when a player has sold two caravans and another one has sold only one', () => {
+  it('should end the game when a player has sold two caravans and the other player has sold a different one', () => {
     setCaravanBids(player1, [21, 21, 0]);
     setCaravanBids(player2, [0, 0, 26]);
     expect(game.checkForWinner()).toBe(player1);
   });
 
-  it('should end the game when a player has sold all three caravans (outbiding)', () => {
+  it('should end the game when a player has sold all three caravans (outbiding needed)', () => {
     setCaravanBids(player2, [22, 24, 26]);
     setCaravanBids(player1, [21, 22, 25]);
     expect(game.checkForWinner()).toBe(player2);
@@ -905,6 +905,12 @@ describe('Game - End state', () => {
 
   it('should not end the game if a player has outsold two caravans and there is a tie', () => {
     setCaravanBids(player1, [22, 23, 25]);
+    setCaravanBids(player2, [21, 21, 25]);
+    expect(game.checkForWinner()).toBeNull();
+  });
+
+  it('should not end the game if a player has outsold two caravans and is losing another', () => {
+    setCaravanBids(player1, [26, 26, 20]);
     setCaravanBids(player2, [21, 21, 25]);
     expect(game.checkForWinner()).toBeNull();
   });

@@ -256,6 +256,10 @@ export class Game implements IGame {
       player1: 0,
       player2: 0
     };
+    let outBidCaravans = {
+      player1: 0,
+      player2: 0
+    };
     let tiedCaravansCount = 0;
 
     for (let i = 0; i < 3; i++) {
@@ -266,9 +270,9 @@ export class Game implements IGame {
           if (caravanPlayer1.bid === caravanPlayer2.bid) {
               tiedCaravansCount++;
           } else if (caravanPlayer1.bid > caravanPlayer2.bid) {
-              soldCaravans.player1++;
+              outBidCaravans.player1++;
           } else {
-              soldCaravans.player2++;
+              outBidCaravans.player2++;
           }
       } else {
           if (caravanPlayer1.isSold()) {
@@ -281,15 +285,22 @@ export class Game implements IGame {
     }
 
     if (tiedCaravansCount == 0) {
-        if (soldCaravans.player1 >= 2) {
-            return this.players[0];
-        } else if (soldCaravans.player2 >= 2) {
-            return this.players[1];
-        }
+      // Remember, all these conditions assume no ties
+      // Check outright winners
+      if (soldCaravans.player1 >= 2) {
+          return this.players[0];
+      } else if (soldCaravans.player2 >= 2) {
+          return this.players[1];
+      // Check for majority winners (having at least 2 more caravans outbid or sold than the other player)
+      } else if ((outBidCaravans.player1 + soldCaravans.player1) - (outBidCaravans.player2 + soldCaravans.player2) >= 2) {
+          return this.players[0];
+      } else if ((outBidCaravans.player2 + soldCaravans.player2) - (outBidCaravans.player1 + soldCaravans.player1) >= 2) {
+          return this.players[1];
+      }
     }
 
     return null;
-}
+  }
 
   checkForWinner(): IPlayer | null {
     const soldCaravanWinner = this.checkSoldCaravans();
