@@ -226,4 +226,12 @@ describe('Player', () => {
             expect(card.isFaceCard()).toBe(false);
         });
     })
+
+    it('should be able to generate an array of possible actions.', () => {
+        const player = createMockPlayer();
+        const possibleActions = player.generatePossibleMoves();
+
+        // Caravans are empty and the player has valued cards, so they can at least play or discard cards
+        expect(possibleActions.length).toBeGreaterThan(8);
+    });
 });
