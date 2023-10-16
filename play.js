@@ -44,8 +44,6 @@ function logGameState() {
 }
 
 function promptUser() {
-  logGameState();
-
   rl.question('Choose an action: (play, disband, discard, quit) ', (action) => {
     switch (action) {
       case 'play':
@@ -167,25 +165,28 @@ function promptDiscardCard() {
 function handleTurn() {
   if (game.currentPlayerIndex === 0) {
     // Human player's turn
+    logGameState();
     promptUser();
   } else {
     // AI's turn
     game.nextAIMove();
     // After AI move, check game status or switch to human's turn
-    checkGameStatus();
+    // Not needed because of events
+    // checkGameStatus();
   }
 }
 
 function checkGameStatus() {
-  if (game.isOver) {
-    const winner = game.getWinner();
-    console.log(chalk.bold(`Game over! The winner is: ${winner === 0 ? 'Human' : 'AI'}`));
-    rl.close();
-    exit();
-  } else {
+  // Not needed because of events
+  // if (game.isOver) {
+  //   const winner = game.getWinner();
+  //   console.log(chalk.bold(`Game over! The winner is: ${winner === 0 ? 'Human' : 'AI'}`));
+  //   rl.close();
+  //   exit();
+  // } else {
     // If the game is not over, proceed to the next turn
     handleTurn();
-  }
+  // }
 }
 
 function startGame() {
@@ -200,7 +201,8 @@ function startGame() {
   });
 
   game.events.on('gameOver', ({ winner }) => {
-    console.log(chalk.bold(`Game over! The winner is: ${winner}`));
+    const gameState = game.getCurrentGameState();
+    console.log(chalk.bold(`Game over! The winner is the ${gameState.human === winner ? 'human' : 'AI'}!`));
     rl.close();
     exit();
   });
