@@ -3,6 +3,7 @@ const chalk = require('chalk');
 const { Game } = require('./dist/models/Game');
 const { Player } = require('./dist/models/Player');
 const { Deck } = require('./dist/models/Deck');
+const { EasyStrategy } = require('./dist/models/AI/EasyStrategy');
 const { generateCards } = require('./dist/utils/card');
 const { exit } = require('process');
 
@@ -163,13 +164,42 @@ function promptDiscardCard() {
   });
 }
 
+function handleTurn() {
+  if (game.currentPlayerIndex === 0) {
+    // Human player's turn
+    promptUser();
+  } else {
+    // AI's turn
+    game.nextAIMove();
+    // After AI move, check game status or switch to human's turn
+    checkGameStatus();
+  }
+}
+
+function checkGameStatus() {
+  if (game.isOver) {
+    const winner = game.getWinner();
+    console.log(chalk.bold(`Game over! The winner is: ${winner === 0 ? 'Human' : 'AI'}`));
+    rl.close();
+    exit();
+  } else {
+    // If the game is not over, proceed to the next turn
+    handleTurn();
+  }
+}
+
 function startGame() {
-  const player1 = new Player(new Deck(generateCards(30)));
-  const player2 = new Player(new Deck(generateCards(30)));
+  const humanPlayer = new Player(new Deck(generateCards(30)));
+  const aiPlayer = new Player(new Deck(generateCards(30)));
 
-  game = new Game([player1, player2]);
+  game = new Game([humanPlayer, aiPlayer]);
+  game.setAIStrategy(new EasyStrategy())
 
-  game.events.on('\ngameOver', ({ winner }) => {
+  game.events.on('nextTurn', () => {
+    checkGameStatus(); // Proceed to next turn or end the game if over
+  });
+
+  game.events.on('gameOver', ({ winner }) => {
     console.log(chalk.bold(`Game over! The winner is: ${winner}`));
     rl.close();
     exit();
@@ -177,7 +207,8 @@ function startGame() {
 
   game.start();
 
-  promptUser();
+  // Begin the first turn
+  handleTurn();
 }
 
 startGame();
