@@ -87,8 +87,9 @@ export class Caravan implements ICaravan {
       this.suit = card.suit;
     }
 
+    // REFACTOR: This is a bit messy, but it works for now.
     // Set or validate the direction with the second card.
-    if (this.cards.length === 1) {
+    if (!card.isFaceCard() && this.cards.length === 1) {
       const lastCardValue = this.cards[0].getNumericValue();
       if (card.getNumericValue() > lastCardValue) {
         this.direction = Direction.ASCENDING;
