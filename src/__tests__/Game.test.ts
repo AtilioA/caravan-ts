@@ -513,13 +513,20 @@ describe('Game - Playing turns', () => {
     const kingCard = createMockCard("King", "Diamonds");
     player1.hand.push(kingCard);
 
+    // Get only valued cards from the player's hand
     const valuedCards = player1.getValuedCards();
+    // Sort valued cards by value so that we can play in ascending order
+    valuedCards.sort((a, b) => a.getNumericValue() - b.getNumericValue());
+    // Remove duplicate valued cards (getNumericValue() cannot be the same for any given card)
+    const uniqueValuedCards = valuedCards.filter((card, index, self) => index === self.findIndex((t) => t.getNumericValue() === card.getNumericValue()));
+
+    console.log(player1.caravans[0], uniqueValuedCards);
 
     game.playTurn({
       player: player1,
       action: {
         type: 'PLAY_CARD',
-        card: valuedCards[0],
+        card: uniqueValuedCards[0],
         target: player1.caravans[0]
       }
     });
@@ -528,7 +535,7 @@ describe('Game - Playing turns', () => {
       player: player1,
       action: {
         type: 'PLAY_CARD',
-        card: valuedCards[1],
+        card: uniqueValuedCards[1],
         target: player1.caravans[0]
       }
     });
@@ -541,13 +548,13 @@ describe('Game - Playing turns', () => {
       action: {
         type: 'PLAY_CARD',
         card: kingCard,
-        target: valuedCards[1]
+        target: uniqueValuedCards[1]
       }
     });
 
-    expect(valuedCards[1].attachedCards).toContain(kingCard);
+    expect(uniqueValuedCards[1].attachedCards).toContain(kingCard);
     expect(player1.hand).not.toContain(kingCard);
-    expect(player1.caravans[0].bid).toEqual(valuedCards[0].getNumericValue() + valuedCards[1].getNumericValue() * 2);
+    expect(player1.caravans[0].bid).toEqual(uniqueValuedCards[0].getNumericValue() + uniqueValuedCards[1].getNumericValue() * 2);
     expect(player1.caravans[0].bid).not.toEqual(caravanBidWithoutKing * 2);
   });
 });
