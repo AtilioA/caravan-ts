@@ -131,6 +131,23 @@ export class Player implements IPlayer {
   }
 
   generatePossibleMoves(): GameAction[] {
-    return []
+    // Generate a DISCARD_DRAW GameAction for each card in the hand
+    const possibleActions: GameAction[] = [];
+
+    for (const card of this.hand) {
+      possibleActions.push({
+        player: this,
+        action: {
+          type: "DISCARD_DRAW",
+          card,
+        }
+      });
+    }
+
+    // TODO: Generate a PLAY_CARD GameAction for each valued card in the hand for each caravan where the card can be played
+
+    // TODO: Generate a DISBAND_CARAVAN GameAction for each caravan that can be disbanded
+
+    return possibleActions;
   }
 }

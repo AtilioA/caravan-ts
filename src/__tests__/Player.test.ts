@@ -227,11 +227,14 @@ describe('Player', () => {
         });
     })
 
-    it('should be able to generate an array of possible actions.', () => {
+    it('should be able to generate an array of possible actions for discarding all cards in hand.', () => {
         const player = createMockPlayer();
+        player.drawHand(8);
+
         const possibleActions = player.generatePossibleMoves();
 
-        // Caravans are empty and the player has valued cards, so they can at least play or discard cards
-        expect(possibleActions.length).toBeGreaterThan(8);
+        // Caravans are empty and the player has 8 cards, so they can at least discard 8 cards
+        // (this disregards the game rule for having at least 3 valued cards)
+        expect(possibleActions.length).toBeGreaterThan(7);
     });
 });
