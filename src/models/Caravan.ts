@@ -17,10 +17,14 @@ export class Caravan implements ICaravan {
     this.bid = bid;
   }
 
+  getLastValuedCard(): ICard {
+    const filteredCards = this.cards.filter(card => !card.isFaceCard());
+    return filteredCards[filteredCards.length - 1];
+  }
+
   private _isValueInDirection(value: CardValue): boolean {
     // Don't allow face cards to be considered for the direction (e.g: when using a Queen to change the direction of the caravan)
-    const filteredCards = this.cards.filter(card => !card.isFaceCard());
-    const lastCardValue = filteredCards[filteredCards.length - 1].getNumericValue();
+    const lastCardValue = this.getLastValuedCard().getNumericValue()
 
     switch (this.direction) {
       case Direction.ASCENDING:
@@ -36,9 +40,7 @@ export class Caravan implements ICaravan {
 
   // private _jackLogic(target: ICard, jackCard: ICard): void {
   //   // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
-
   // }
-
 
   // private _kingLogic(target: ICard, kingCard: ICard): void {
   //   // Doubles the value of the card the king is played on. Stacks with other kings, e.g.: 2 kings on a 5 = 20.
@@ -60,14 +62,18 @@ export class Caravan implements ICaravan {
       } else {
         return true;
       }
+    } else if (this.getLastValuedCard().getNumericValue() === card.getNumericValue()) {
+      // Do not allow equal card values to be added to the caravan.
+      return false;
     }
 
+    // If caravan is not empty, it is valid to add a face card.
     if (card.isFaceCard()) {
       return true;
     }
 
     // If the caravan has a defined suit and the card's suit matches the caravan's suit, return true.
-    if (this?.suit === card.suit && (this.cards[this.cards.length - 1].getNumericValue() !== card.getNumericValue())) {
+    if (this.suit && this.suit === card.suit) {
         return true;
     }
 
@@ -95,8 +101,6 @@ export class Caravan implements ICaravan {
         this.direction = Direction.ASCENDING;
       } else if (card.getNumericValue() < lastCardValue) {
         this.direction = Direction.DESCENDING;
-      } else {
-        throw new InvalidPlayError("Equal card values are not allowed.");
       }
     }
 

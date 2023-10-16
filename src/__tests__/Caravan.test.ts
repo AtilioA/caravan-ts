@@ -78,7 +78,6 @@ describe('Caravan', () => {
 
         expect(isValid).toBe(false);
         expect(() => caravan.addCard(new Card('6', 'Clubs'))).toThrowError(InvalidPlayError);
-
     });
 
     it('should set suit property to the suit of the first added card', () => {
