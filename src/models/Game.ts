@@ -32,15 +32,6 @@ export class Game implements IGame {
     // ...
   }
 
-  nextAIMove(): void {
-    if (!this.currentAIStrategy) {
-      throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
-    } else {
-    const move = this.currentAIStrategy.makeMove(this.getCurrentGameState());
-    this.playTurn(move);
-    }
-  }
-
   private getCurrentGameState(): GameState {
     return {
       human: this.players[0],
@@ -49,6 +40,19 @@ export class Game implements IGame {
     }
   }
 
+  setAIStrategy(strategy: AIStrategy): void {
+    this.currentAIStrategy = strategy;
+  }
+
+  nextAIMove(): void {
+    if (!this.currentAIStrategy) {
+      throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
+    } else {
+      console.log(this.currentAIStrategy);
+      const move = this.currentAIStrategy.makeMove(this.getCurrentGameState());
+      this.playTurn(move);
+    }
+  }
 
   getCurrentPlayer(): IPlayer {
     return this.players[this.currentPlayerIndex];

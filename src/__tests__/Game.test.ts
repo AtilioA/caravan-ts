@@ -1,5 +1,6 @@
 import { Direction } from "../enums/directions";
 import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
+import { EasyStrategy } from "../models/AI/EasyStrategy";
 import { Deck } from "../models/Deck";
 import { Game } from "../models/Game";
 import { IPlayer } from "../models/interfaces/IPlayer";
@@ -949,3 +950,38 @@ describe('Game - End state', () => {
   //   expect(() => game.playTurn({type: 'PLAY_CARD', card: joker, target: king})).toThrow();
   // });
 // });
+
+describe('AI initialization', () => {
+  let game: Game;
+
+  beforeEach(() => {
+    game = new Game([createMockPlayer(), createMockPlayer()]);
+  });
+
+  it('should have no AI strategy by default', () => {
+    expect(game.currentAIStrategy).toBeNull();
+  });
+
+  it('should be able to set an AI strategy', () => {
+    expect(game.currentAIStrategy).toBeNull();
+
+    game.setAIStrategy(new EasyStrategy());
+
+    expect(game.currentAIStrategy).not.toBeNull();
+    expect(game.currentAIStrategy).toBeInstanceOf(EasyStrategy);
+  });
+
+  it('should throw if calling for AI move without setting an AI strategy', () => {
+    expect(() => game.nextAIMove()).toThrowError(InvalidGameState);
+  });
+
+  it('should provide a valid AI move when an AI strategy is set', () => {
+    game.setAIStrategy(new EasyStrategy());
+    game.start();
+
+    // AI player index
+    game.currentPlayerIndex = 1;
+
+    expect(() => game.nextAIMove()).not.toThrow();
+  });
+});
