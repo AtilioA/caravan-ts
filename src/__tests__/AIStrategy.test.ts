@@ -3,8 +3,8 @@ import { GameAction, GameState } from '../models/interfaces/IGame';
 import { IPlayer } from '../models/interfaces/IPlayer';
 import { ICard } from '../models/interfaces/ICard';
 import { ICaravan } from '../models/interfaces/ICaravan';
-import { RandomStrategy } from '../models/AI/DrunkStrategy';
 import { EasyStrategy } from '../models/AI/EasyStrategy';
+import { RandomStrategy } from '../models/AI/RandomStrategy';
 
 describe('AI Strategies', () => {
   let gameState: GameState;
