@@ -6,7 +6,7 @@ import { Card } from "../models/Card";
 import { Deck } from "../models/Deck";
 import { Player } from "../models/Player";
 import { generateCards } from "../utils/card";
-import { createMockPlayer } from "./__mocks__/mockFactories";
+import { createMockCaravan, createMockPlayer } from "./__mocks__/mockFactories";
 
 describe('Player', () => {
     it('should create a player with an empty set of cards', () => {
@@ -236,5 +236,90 @@ describe('Player', () => {
         // Caravans are empty and the player has 8 cards, so they can at least discard 8 cards
         // (this disregards the game rule for having at least 3 valued cards)
         expect(possibleActions.length).toBeGreaterThan(7);
+    });
+
+    it('should be able to generate an array of possible actions for playing all cards in all caravans at the start of the game', () => {
+        const player = createMockPlayer();
+        player.hand = generateCards(8, false);
+
+        const possibleActions = player.generatePossibleMoves();
+
+        // Caravans are empty and the player has 8 cards, so they can at least discard 8 cards
+        // Also, they can play all cards in hand to any caravans
+        expect(possibleActions.length).toBeGreaterThanOrEqual(8 * 3 + 8);
+
+        // The possibleActions array should have an action for each card in hand for each caravan
+        for (const caravan of player.caravans) {
+            for (const card of player.hand) {
+                expect(possibleActions).toContainEqual({
+                    player,
+                    action: {
+                        type: "PLAY_CARD",
+                        card,
+                        target: caravan
+                    }
+                });
+            }
+        }
+    });
+
+    it('should be able to generate an array of possible actions for taking any actions in any caravan after the start of the game', () => {
+        const player = createMockPlayer();
+        player.hand = generateCards(8, false);
+
+        // 'Initialize' caravans with cards
+        player.caravans = [createMockCaravan(), createMockCaravan(), createMockCaravan()];
+        player.caravans[0].addCard(new Card('10', 'Diamonds'));
+        player.caravans[0].addCard(new Card('7', 'Diamonds'));
+        player.caravans[1].addCard(new Card('Ace', 'Spades'));
+        player.caravans[1].addCard(new Card('4', 'Hearts'));
+
+        const possibleActions = player.generatePossibleMoves();
+
+        // Player has 8 cards, so they can at least discard 8 cards
+        const discardableCards = player.hand.length
+        // Also, they can play cards in hand to caravans, and disband caravans
+        const playableCards = player.hand.filter(card => player.caravans.some(caravan => caravan.canAddCard(card))).length;
+        const disbandableCaravans = player.caravans.filter(caravan => player.canDisbandCaravan(caravan)).length;
+
+        expect(possibleActions.length).toBeGreaterThanOrEqual(discardableCards + disbandableCaravans + playableCards);
+
+        // Now, check for the actual actions
+        // The possibleActions array should have an action for each card in hand for each caravan
+        for (const caravan of player.caravans) {
+            for (const card of player.hand) {
+                if (caravan.canAddCard(card)) {
+                    expect(possibleActions).toContainEqual({
+                        player,
+                        action: {
+                            type: "PLAY_CARD",
+                            card,
+                            target: caravan
+                        }
+                    });
+                }
+            }
+            // Should have an action for disbanding each caravan, if possible
+            if (player.canDisbandCaravan(caravan)) {
+                expect(possibleActions).toContainEqual({
+                    player,
+                    action: {
+                        type: "DISBAND_CARAVAN",
+                        caravan
+                    }
+                });
+           }
+        }
+
+        // Finally, should have an action for discarding each card in hand (any card can be discarded)
+        for (const card of player.hand) {
+            expect(possibleActions).toContainEqual({
+                player,
+                action: {
+                    type: "DISCARD_DRAW",
+                    card,
+                }
+            });
+        }
     });
 });
