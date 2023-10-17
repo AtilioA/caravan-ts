@@ -33,12 +33,16 @@ export class Player implements IPlayer {
     return this.hand.filter(card => !card.isFaceCard());
   }
 
+  canDrawCard(): boolean {
+    return this.cardSet.getSize() > 0;
+  }
+
   drawCard(): void {
     // Draw a card from the deck and add it to the player's hand
-    if (this.cardSet.getSize() === 0) {
-      throw new InvalidPlayError("Cannot draw a card from an empty deck");
+    if (this.canDrawCard()) {
+      this._addToHand(this.cardSet.drawCard());
     } else {
-    this._addToHand(this.cardSet.drawCard());
+      throw new InvalidPlayError("Cannot draw a card from an empty deck");
     }
   }
   drawHand(n: number): void {
@@ -169,7 +173,7 @@ export class Player implements IPlayer {
             }
           });
         }
-        
+
         // FIXME: in the Game entity, also check if the card can be played to the opponent's caravans
         for (const caravanCard of caravan.cards) {
           // For each face card in the hand that can be attached to a valued card in a caravan

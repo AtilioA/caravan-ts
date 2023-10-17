@@ -10,6 +10,7 @@ export interface IPlayer {
   caravans: ICaravan[];
   // TODO: (future improvement) add a general pile of cards from which to create the player's deck
 
+  canDrawCard(): boolean;
   drawCard(): void;
   drawHand(n: number): void;
   getValuedCards(): ICard[];

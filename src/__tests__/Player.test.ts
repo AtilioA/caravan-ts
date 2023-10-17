@@ -68,6 +68,20 @@ describe('Player', () => {
         expect(player.hand.length).toEqual(0);
     });
 
+    it('should be able to draw a card if hand is empty but cardSet is not', () => {
+        const playerDeck = new Deck();
+        playerDeck.generate(40);
+        const player = new Player(playerDeck);
+
+        expect(player.hand.length).toEqual(0);
+        expect(player.cardSet.getSize()).toEqual(40);
+
+        player.drawCard();
+
+        expect(player.hand.length).toEqual(1);
+        expect(player.cardSet.getSize()).toEqual(39);
+    });
+
     it('should play a valued card from hand to a caravan and not have it in hand anymore', () => {
         const playerValuedDeck = new Deck(generateCards(40, false));
         const player = new Player(playerValuedDeck);
