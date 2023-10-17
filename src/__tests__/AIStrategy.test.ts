@@ -28,7 +28,7 @@ describe('AI Strategies', () => {
 
   describe('EasyStrategy', () => {
     it('should return a valid DISCARD_DRAW action', () => {
-      const action: GameAction = easyStrategy.makeMove(gameState);
+      const action: GameAction = easyStrategy.pickMove(gameState);
 
       // Check that the action is of type DISCARD_DRAW and involves the first card in the player's hand
       expect(action).toEqual({
@@ -41,7 +41,7 @@ describe('AI Strategies', () => {
   describe('RandomStrategy', () => {
     it('should return a valid action from possible moves', () => {
       gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
-      const action: GameAction = randomStrategy.makeMove(gameState);
+      const action: GameAction = randomStrategy.pickMove(gameState);
 
       const possibleMoves = gameState.AI.generatePossibleMoves();
 

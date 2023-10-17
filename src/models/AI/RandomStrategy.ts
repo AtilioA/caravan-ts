@@ -2,7 +2,7 @@ import { AIStrategy } from '../interfaces/AIStrategy';
 import { GameAction, GameState } from '../interfaces/IGame';
 
 export class RandomStrategy implements AIStrategy {
-  makeMove(gameState: GameState): GameAction {
+  pickMove(gameState: GameState): GameAction {
     const possibleMoves = gameState.AI.generatePossibleMoves();
 
     // Randomly select one move from all possible moves

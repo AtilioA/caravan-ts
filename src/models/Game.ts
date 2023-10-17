@@ -48,7 +48,7 @@ export class Game implements IGame {
     if (!this.currentAIStrategy) {
       throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
     } else {
-      const move = this.currentAIStrategy.makeMove(this.getCurrentGameState());
+      const move = this.currentAIStrategy.pickMove(this.getCurrentGameState());
       this.playTurn(move);
     }
   }
