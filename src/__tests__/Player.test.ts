@@ -265,7 +265,7 @@ describe('Player', () => {
 
     it('should be able to generate an array of possible actions for taking any actions in any caravan after the start of the game', () => {
         const player = createMockPlayer();
-        player.hand = generateCards(8, false);
+        player.hand = generateCards(8, true);
 
         // 'Initialize' caravans with cards
         player.caravans = [createMockCaravan(), createMockCaravan(), createMockCaravan()];
@@ -297,6 +297,20 @@ describe('Player', () => {
                             target: caravan
                         }
                     });
+                }
+
+                // Should have an action for attaching each face card in hand to each valued card in each caravan
+                for (const caravanCard of caravan.cards) {
+                    if (caravanCard.canAttachFaceCard(card)) {
+                        expect(possibleActions).toContainEqual({
+                            player,
+                            action: {
+                                type: "PLAY_CARD",
+                                card,
+                                target: caravanCard
+                            }
+                        });
+                    }
                 }
             }
             // Should have an action for disbanding each caravan, if possible

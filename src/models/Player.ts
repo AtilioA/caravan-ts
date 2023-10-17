@@ -169,6 +169,7 @@ export class Player implements IPlayer {
             }
           });
         }
+        
         // FIXME: in the Game entity, also check if the card can be played to the opponent's caravans
         for (const caravanCard of caravan.cards) {
           // For each face card in the hand that can be attached to a valued card in a caravan
