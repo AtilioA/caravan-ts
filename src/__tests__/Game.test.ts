@@ -665,6 +665,8 @@ describe('Game - General valid/invalid moves', () => {
 
     game = new Game([player1, player2]);
     game.start();
+    // Skip opening rounds
+    game.isOpeningRound = false;
   });
 
   it('should not allow playing a number card out of sequence on the same caravan', () => {

@@ -10,16 +10,20 @@ import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
   isOver: boolean = false;
+  isOpeningRound: boolean = true;
+  currentRound: number = 1;
   players: IPlayer[];
   currentPlayerIndex: number;
   currentAIStrategy: AIStrategy | null;
   events: IEventEmitter;
 
-  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false, currentAIStrategy = null) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false, isOpeningRound: boolean = true, currentRound: number = 1, currentAIStrategy = null) {
     this.players = players;
     this.currentPlayerIndex = currentPlayerIndex || 0;
     this.events = events;
     this.isOver = isOver;
+    this.isOpeningRound = isOpeningRound;
+    this.currentRound = currentRound;
     this.currentAIStrategy = currentAIStrategy;
 
     this.registerEventListeners();
@@ -29,14 +33,20 @@ export class Game implements IGame {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
     this.events.on('playCardOnCard', this.playCardToCard.bind(this));
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
+    this.events.on('startGame', this.setOpeningRound.bind(this));
     // ...
+  }
+
+  private setOpeningRound(openingRound: boolean = true): void {
+    this.isOpeningRound = openingRound;
   }
 
   private getCurrentGameState(): GameState {
     return {
       human: this.players[0],
       AI: this.players[1],
-      currentPlayerIndex: this.currentPlayerIndex
+      currentPlayerIndex: this.currentPlayerIndex,
+      isOpeningRound: this.isOpeningRound,
     }
   }
 
@@ -99,12 +109,45 @@ export class Game implements IGame {
       // }
     }
 
+    this.isOpeningRound = true;
     this.events.emit('startGame', {currentPlayer: this.getCurrentPlayer()});
+  }
+
+  private playOpeningTurn(play: GameAction) {
+    const currentPlayer = this.getCurrentPlayer();
+    const player = play.player;
+
+    if (currentPlayer !== player) {
+      throw new InvalidPlayError('Cannot play a turn for a player that is not the current player.');
+    }
+
+    switch (play.action.type) {
+      case 'PLAY_CARD':
+        // REVIEW: maybe this should be handled somewhere else? Well, this logic is related to the opening turn in the Game entity, so maybe it's fine here
+        if (play.action.card.isFaceCard()) {
+          throw new InvalidPlayError('Cannot play a face card on the opening turn.');
+        } else {
+          this.playCard(play.action.card, play.action.target);
+        }
+        break;
+
+      default:
+        throw new InvalidPlayError('Invalid opening turn; please check the game rules.');
+    }
+
+    this.updateBids();
+    this.endCurrentTurn();
   }
 
   playTurn(play: GameAction) {
     if (this.isOver) {
       throw new InvalidGameState('Cannot play a turn on a match that is already over.');
+    } else if (this.isOpeningRound) {
+      if (this.currentRound >= 6) {
+        this.setOpeningRound(false);
+      } else {
+      return this.playOpeningTurn(play);
+      }
     }
 
     const currentPlayer = this.getCurrentPlayer();
