@@ -153,9 +153,31 @@ export class Player implements IPlayer {
       });
     }
 
-    // TODO: Generate a PLAY_CARD GameAction for each valued card in the hand for each caravan where the card can be played
+    for (const caravan of this.caravans) {
+      for (const card of this.hand) {
+        if (caravan.canAddCard(card)) {
+          possibleActions.push({
+            player: this,
+            action: {
+              type: "PLAY_CARD",
+              card,
+              target: caravan
+            }
+          });
+        }
+      }
+    }
 
-    // TODO: Generate a DISBAND_CARAVAN GameAction for each caravan that can be disbanded
+    const disbandableCaravans = this.caravans.filter(caravan => this.canDisbandCaravan(caravan));
+    for (const caravan of disbandableCaravans) {
+      possibleActions.push({
+        player: this,
+        action: {
+          type: "DISBAND_CARAVAN",
+          caravan
+        }
+      });
+    }
 
     return possibleActions;
   }
