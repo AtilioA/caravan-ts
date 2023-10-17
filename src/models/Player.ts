@@ -64,7 +64,10 @@ export class Player implements IPlayer {
     // 'Useless' check, but it's here for clarity
     if (caravan.canAddCard(card)) {
       this._removeFromHand(card)
-      this.drawCard();
+      // REFACTOR: this is being checked twice
+      if (this.canDrawCard()) {
+        this.drawCard();
+      }
     }
     caravan.addCard(card);
   }

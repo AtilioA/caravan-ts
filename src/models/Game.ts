@@ -130,7 +130,9 @@ export class Game implements IGame {
       case 'DISCARD_DRAW':
         if (this.validateDiscardDraw(currentPlayer, play.action.card)) {
           currentPlayer.discardCard(play.action.card);
-          currentPlayer.drawCard();
+          if (currentPlayer.canDrawCard()) {
+            currentPlayer.drawCard();
+          }
         } else {
           throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
         }
