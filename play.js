@@ -21,22 +21,30 @@ function getCardString(card) {
 function logGameState() {
   const gameState = game.getCurrentGameState();
 
-  // console.log(chalk.bold('\nCurrent Player: Player ' + (game.currentPlayerIndex + 1)));
+  // You can create a helper function to pad strings for better alignment
+  const padString = (str, length) => str.padEnd(length, ' ');
 
-  let players = [gameState.human, gameState.AI]
+  // Define standard widths for certain fields
+  const cardWidth = 3; // The width of a card string (e.g., "4S", "10H"), adjust if necessary
+
+  let players = [gameState.human, gameState.AI];
   players.forEach((player, index) => {
-    if (index === game.currentPlayerIndex) {
-      console.log(chalk.bold.bgRedBright('\nPlayer ' + (index + 1) + ':'));
-    } else {
-      console.log(chalk.bold('\nPlayer ' + (index + 1) + ':'));
-    }
-    console.log('Hand:', player.hand.map((card, index) => `${index+1}:${chalk.bold.cyan(getCardString(card))}`).join(' '));
-
+    // Use background colors for player headers for better visibility
+    const playerHeader = index === game.currentPlayerIndex ? chalk.bold.bgRedBright : chalk.bold;
+    console.log(playerHeader('\nPlayer ' + (index + 1) + ':'));
     console.log('Deck size:', player.cardSet.getSize());
+
+    // Create a padded hand string
+    const handString = player.hand
+      .map((card, index) => `${index+1}:${chalk.bold.cyan(getCardString(card).padEnd(cardWidth, ' '))}`)
+      .join(' ');
+    console.log('Hand:    ', handString);
 
     console.log(chalk.bold('Caravans:'));
     player.caravans.forEach((caravan, caravanIndex) => {
-      console.log(`  Caravan ${caravanIndex + 1}:`, caravan.cards.map(card => getCardString(card)).join(' '), `Bid: ${caravan.bid}`);
+      // Create a padded caravan cards string
+      const caravanCards = caravan.cards.map(card => getCardString(card).padEnd(cardWidth, ' ')).join(' ');
+      console.log(`  Caravan ${caravanIndex + 1}:`, padString(caravanCards, cardWidth * 6), `Bid: ${caravan.bid}`); // Assume a max of 8 cards for padding, adjust if necessary
     });
   });
 
@@ -201,6 +209,7 @@ function startGame() {
   });
 
   game.events.on('gameOver', ({ winner }) => {
+    logGameState();
     const gameState = game.getCurrentGameState();
     console.log(chalk.bold(`Game over! The winner is the ${gameState.human === winner ? 'human' : 'AI'}!`));
     rl.close();
