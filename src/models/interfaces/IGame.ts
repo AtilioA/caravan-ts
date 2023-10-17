@@ -18,6 +18,7 @@ export interface GameState {
   human: IPlayer;
   AI: IPlayer;
   currentPlayerIndex: number;
+  isOpeningRound: boolean;
 }
 
 export interface IGame {

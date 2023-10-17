@@ -12,11 +12,6 @@ const setCaravanBids = (player: IPlayer, bids: number[]) => {
 };
 
 describe('Game - Initialization', () => {
-  // let drawHandCallCount = 0;
-
-  // beforeEach(() => {
-  //   drawHandCallCount = 0;
-  // });
   it('should initialize the game with the correct initial state', () => {
     const game = new Game();
     expect(game.players.length).toEqual(0);
@@ -77,46 +72,6 @@ describe('Game - Initialization', () => {
 
     // NOTE: Won't test if the cards are the same because of randomness, and because the underlying functions are tested elsewhere.
   });
-
-  // it('should reshuffle a player deck if they do not have at least three valued cards, and draw eight new cards', () => {
-  //   const mockPlayers = [new MockedPlayer(), new MockedPlayer()]
-
-  //   // mockPlayers[0].drawHand = jest.fn((n) => {
-  //   //     drawHandCallCount++;
-
-  //   //     if (drawHandCallCount === 1) {
-  //   //         mockPlayers[0].hand = [ getRandomCardFace(), getRandomCardFace(), getRandomCardFace(), getRandomCardFace(), getRandomCardFace(), getRandomCardFace(), getRandomCardFace(), getRandomCardFace() ];
-  //   //     } else {
-  //   //         mockPlayers[0].hand = generateCards(8, false);
-  //   //     }
-  //   // });
-
-  //   const game = new Game(mockPlayers);
-
-  //   // const mockHand = [...Array(8).keys()].map(_ => {
-  //   //   return { isFaceCard: jest.fn(() => true) } as unknown as ICard;
-  //   // });
-
-  //   // const drawHandSpy1 = jest.spyOn(mockPlayers[0], 'drawHand').mockImplementation((n: number) => {
-  //   //   mockPlayers[0].hand = mockHand;
-  //   // });
-
-  //   // const drawHandSpy2 = jest.spyOn(mockPlayers[1], 'drawHand').mockImplementation((n: number) => {
-  //   //   mockPlayers[1].hand = mockHand;
-  //   // });
-
-  //   game.start();
-
-  //   // Now, make the assertion
-  //   const valuedCardsPlayer1 = mockPlayers[0].hand.filter(card => !card.isFaceCard());
-  //   const valuedCardsPlayer2 = mockPlayers[1].hand.filter(card => !card.isFaceCard());
-
-  //   expect(valuedCardsPlayer1.length).toBeGreaterThanOrEqual(3);
-  //   expect(valuedCardsPlayer2.length).toBeGreaterThanOrEqual(3);
-
-  //   // drawHandSpy1.mockRestore();
-  //   // drawHandSpy2.mockRestore();
-  // });
 });
 
 describe('Game - Playing turns', () => {
@@ -130,6 +85,8 @@ describe('Game - Playing turns', () => {
 
     game = new Game([player1, player2]);
     game.start();
+    // Skip opening rounds
+    game.isOpeningRound = false;
   });
 
   it('should allow a player to play a valued card on their caravan', () => {
@@ -520,8 +477,6 @@ describe('Game - Playing turns', () => {
     // Remove duplicate valued cards (getNumericValue() cannot be the same for any given card)
     const uniqueValuedCards = valuedCards.filter((card, index, self) => index === self.findIndex((t) => t.getNumericValue() === card.getNumericValue()));
 
-    console.log(player1.caravans[0], uniqueValuedCards);
-
     game.playTurn({
       player: player1,
       action: {
@@ -806,46 +761,60 @@ describe('Game - General valid/invalid moves', () => {
   });
 });
 
-// describe('Game - Opening rounds', () => {
-//   let game: Game;
-//   let player1: IPlayer;
-//   let player2: IPlayer;
+describe('Game - Opening rounds', () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
 
-//   beforeEach(() => {
-//     player1 = createMockPlayer();
-//     player2 = createMockPlayer();
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
 
-//     game = new Game([player1, player2]);
-//     game.start();
-//   });
+    game = new Game([player1, player2]);
+    game.start();
+  });
 
-//   it('should allow playing valued cards during the opening round', () => {
-//     const valuedCard = createMockCard("3", "Hearts");
-//     player1.hand.push(valuedCard);
+  it('should allow playing valued cards during the opening round', () => {
+    const valuedCard = createMockCard("3", "Hearts");
+    player1.hand.push(valuedCard);
 
-//     game.playTurn({type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]});
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]}});
 
-//     expect(player1.caravans[0].cards).toContain(valuedCard);
-//     expect(player1.hand).not.toContain(valuedCard);
-//   });
+    expect(player1.caravans[0].cards).toContain(valuedCard);
+    expect(player1.hand).not.toContain(valuedCard);
+    expect(player1.caravans[0].bid).toEqual(3);
+    expect(player1.caravans[0].cards).toHaveLength(1);
+    expect(player1.caravans[0].cards).toContain(valuedCard);
+  });
 
-//   it('should not allow face cards during the opening round, even if there are cards in the caravans.', () => {
-//     const kingCard = createMockCard("King", "Diamonds");
-//     player1.hand.push(kingCard);
+  it('should not allow face cards during the opening round, even if there are cards in the caravans.', () => {
+    const kingCard = createMockCard("King", "Diamonds");
+    player1.hand.push(kingCard);
 
-//     player2.caravans[0].addCard(createMockCard("5", "Diamonds"));
+    player2.caravans[0].addCard(createMockCard("5", "Diamonds"));
 
-//     // Can't play face card during the opening round, even if there's cards in the caravans.
-//     expect(() => game.playTurn({type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]})).toThrow();
-//   });
+    // Can't play face card during the opening round, even if there's cards in the caravans.
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]}})).toThrow();
+  });
 
-//   it('should not allow discarding during the opening round', () => {
-//     const valuedCard = createMockCard("5", "Diamonds");
-//     player1.hand.push(valuedCard);
+  it('should not allow discarding during the opening round', () => {
+    const valuedCard = createMockCard("5", "Diamonds");
+    player1.hand.push(valuedCard);
 
-//     expect(() => game.playTurn({type: 'DISCARD_DRAW', card: valuedCard})).toThrow();
-//   });
-// });
+    expect(() => game.playTurn({player: player1, action: {type: 'DISCARD_DRAW', card: valuedCard}})).toThrow();
+  });
+
+  it('should not allow disbanding a caravan during the opening round', () => {
+    const valuedCard = createMockCard("5", "Diamonds");
+    player1.hand.push(valuedCard);
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]}});
+    game.currentPlayerIndex = 0;
+
+    // Can't disband even if there's cards in the caravan, since it's an opening round.
+    expect(() => game.playTurn({player: player1, action: {type: 'DISBAND_CARAVAN', caravan: player1.caravans[0]}})).toThrow();
+  });
+});
 
 describe('Game - End state', () => {
   let game: Game;
