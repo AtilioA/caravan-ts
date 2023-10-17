@@ -5,27 +5,19 @@ import { ICard } from '../models/interfaces/ICard';
 import { ICaravan } from '../models/interfaces/ICaravan';
 import { EasyStrategy } from '../models/AI/EasyStrategy';
 import { RandomStrategy } from '../models/AI/RandomStrategy';
+import { createMockCard, createMockPlayer } from './__mocks__/mockFactories';
 
 describe('AI Strategies', () => {
   let gameState: GameState;
-  let mockPlayer: MockProxy<IPlayer>;
   let mockCard: MockProxy<ICard>;
-  let mockCaravan: MockProxy<ICaravan>;
   let easyStrategy: EasyStrategy;
   let randomStrategy: RandomStrategy;
 
   beforeEach(() => {
-    // Create mocks for the player, card, and caravan
-    mockPlayer = mock<IPlayer>();
-    mockCard = mock<ICard>();
-    mockCaravan = mock<ICaravan>();
-
-    mockPlayer.hand = [mockCard]; // Assume the player has one card in hand
-
     // Set up a mock game state
     gameState = {
-      human: mockPlayer,
-      AI: mockPlayer, // Using the same mock for both human and AI for simplicity
+      human: createMockPlayer(),
+      AI: createMockPlayer(), // Using the same mock for both human and AI for simplicity
       currentPlayerIndex: 1, // Assume it's the AI's turn
     };
 
@@ -46,24 +38,16 @@ describe('AI Strategies', () => {
     });
   });
 
-  // describe('RandomStrategy', () => {
-  //   it('should return a valid action from possible moves', () => {
-  //     // Mock the implementation of generatePossibleMoves to return a predefined set of possible actions
-  //     mockPlayer.generatePossibleMoves = jest.fn().mockReturnValue([
-  //       { type: 'PLAY_CARD', card: mockCard, target: mockCaravan },
-  //       { type: 'DISCARD_DRAW', card: mockCard }
-  //     ]);
+  describe('RandomStrategy', () => {
+    it('should return a valid action from possible moves', () => {
+      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+      const action: GameAction = randomStrategy.makeMove(gameState);
 
-  //     const action: GameAction = randomStrategy.makeMove(gameState);
+      const possibleMoves = gameState.AI.generatePossibleMoves();
 
-  //     // Check that the action is one of the possible moves
-  //     expect([
-  //       { type: 'PLAY_CARD', card: mockCard, target: mockCaravan },
-  //       { type: 'DISCARD_DRAW', card: mockCard }
-  //       // ...other possible moves
-  //     ]).toContainEqual(action.action);
-  //   });
-  // });
+      expect(possibleMoves).toContainEqual(action);
+    });
+  });
 
   // ...additional tests for edge cases, invalid game states, etc.
 });
