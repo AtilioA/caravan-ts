@@ -90,15 +90,24 @@ export class Player implements IPlayer {
   //   return this.playCard(card, caravan);
   // }
 
-  disbandCaravan(caravan: ICaravan): void {
-    if (!this.caravans.includes(caravan)) {
-      throw new InvalidPlayError("Cannot disband a caravan that does not belong to the player");
+  canDisbandCaravan(caravan: ICaravan): boolean {
+    if (this.isNotOwnCaravan(caravan)) {
+      return false;
     }
-    if (caravan.cards.length === 0) {
-      throw new InvalidPlayError("Cannot disband an empty caravan");
+    else if (caravan.isEmpty()) {
+      return false;
     }
+    else {
+      return true;
+    }
+  }
 
-    this.discardPile.addCards(caravan.disband());
+  disbandCaravan(caravan: ICaravan): void {
+    if (this.canDisbandCaravan(caravan)) {
+      this.discardPile.addCards(caravan.disband());
+    } else {
+      throw new InvalidPlayError("Cannot disband this caravan; it is not owned by the player or it is empty");
+    }
   }
 
   discardCard(card: ICard): void {

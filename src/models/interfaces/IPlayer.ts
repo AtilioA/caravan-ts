@@ -17,10 +17,11 @@ export interface IPlayer {
   playCard(card: ICard, caravan: ICaravan): void;
   attachFaceCard(faceCard: ICard, targetCard: ICard): void;
   discardCard(card: ICard): void;
-  disbandCaravan(caravan: ICaravan): void;
 
-  isNotOwnCaravan(caravan: ICaravan): boolean;
   playCardToOpponentCaravan(faceCard: ICard, enemyCard: ICard): boolean;
+  isNotOwnCaravan(caravan: ICaravan): boolean;
+  canDisbandCaravan(caravan: ICaravan): boolean;
+  disbandCaravan(caravan: ICaravan): void;
 
   generatePossibleMoves(): GameAction[];
 }
