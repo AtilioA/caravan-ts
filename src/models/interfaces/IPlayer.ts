@@ -24,5 +24,6 @@ export interface IPlayer {
   canDisbandCaravan(caravan: ICaravan): boolean;
   disbandCaravan(caravan: ICaravan): void;
 
-  generatePossibleMoves(): GameAction[];
+  // REFACTOR: modularize this later on?
+  generatePossibleMoves(considerDiscard?: boolean, considerFaceCards?: boolean, considerDisbandCaravan?: boolean): GameAction[];
 }

@@ -148,18 +148,20 @@ export class Player implements IPlayer {
 
   // REFACTOR: this probably needs to be moved to the Game entity, since it needs visibility of the opponent's caravans
   // Fortunately, this will only adds more lines, and existing lines will not need to be changed
-  generatePossibleMoves(): GameAction[] {
+  generatePossibleMoves(considerDiscard: boolean = true, considerFaceCards: boolean = true, considerDisbandCaravan: boolean = true): GameAction[] {
     // Generate a DISCARD_DRAW GameAction for each card in the hand
     const possibleActions: GameAction[] = [];
 
-    for (const card of this.hand) {
-      possibleActions.push({
-        player: this,
-        action: {
-          type: "DISCARD_DRAW",
-          card,
-        }
-      });
+    if (considerDiscard) {
+      for (const card of this.hand) {
+        possibleActions.push({
+          player: this,
+          action: {
+            type: "DISCARD_DRAW",
+            card,
+          }
+        });
+      }
     }
 
     // Generate a PLAY_CARD GameAction
@@ -178,32 +180,36 @@ export class Player implements IPlayer {
         }
 
         // FIXME: in the Game entity, also check if the card can be played to the opponent's caravans
-        for (const caravanCard of caravan.cards) {
-          // For each face card in the hand that can be attached to a valued card in a caravan
-          if (caravanCard.canAttachFaceCard(card)) {
-            possibleActions.push({
-              player: this,
-              action: {
-                type: "PLAY_CARD",
-                card,
-                target: caravanCard
-              }
-            });
+        if (considerFaceCards) {
+          for (const caravanCard of caravan.cards) {
+            // For each face card in the hand that can be attached to a valued card in a caravan
+            if (caravanCard.canAttachFaceCard(card)) {
+              possibleActions.push({
+                player: this,
+                action: {
+                  type: "PLAY_CARD",
+                  card,
+                  target: caravanCard
+                }
+              });
+            }
           }
         }
       }
     }
 
     // Generate a DISBAND_CARAVAN GameAction for each caravan that can be disbanded
-    const disbandableCaravans = this.caravans.filter(caravan => this.canDisbandCaravan(caravan));
-    for (const caravan of disbandableCaravans) {
-      possibleActions.push({
-        player: this,
-        action: {
-          type: "DISBAND_CARAVAN",
-          caravan
-        }
-      });
+    if (considerDisbandCaravan) {
+      const disbandableCaravans = this.caravans.filter(caravan => this.canDisbandCaravan(caravan));
+      for (const caravan of disbandableCaravans) {
+        possibleActions.push({
+          player: this,
+          action: {
+            type: "DISBAND_CARAVAN",
+            caravan
+          }
+        });
+      }
     }
 
     return possibleActions;
