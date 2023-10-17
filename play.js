@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const { Game } = require('./dist/models/Game');
 const { Player } = require('./dist/models/Player');
 const { Deck } = require('./dist/models/Deck');
-const { EasyStrategy } = require('./dist/models/AI/EasyStrategy');
+const { RandomStrategy } = require('./dist/models/AI/RandomStrategy');
 const { generateCards } = require('./dist/utils/card');
 const { exit } = require('process');
 
@@ -194,7 +194,7 @@ function startGame() {
   const aiPlayer = new Player(new Deck(generateCards(30)));
 
   game = new Game([humanPlayer, aiPlayer]);
-  game.setAIStrategy(new EasyStrategy())
+  game.setAIStrategy(new RandomStrategy())
 
   game.events.on('nextTurn', () => {
     checkGameStatus(); // Proceed to next turn or end the game if over
