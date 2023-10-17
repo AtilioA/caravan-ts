@@ -17,11 +17,6 @@ export class Caravan implements ICaravan {
     this.bid = bid;
   }
 
-  getLastValuedCard(): ICard {
-    const filteredCards = this.cards.filter(card => !card.isFaceCard());
-    return filteredCards[filteredCards.length - 1];
-  }
-
   private _isValueInDirection(value: CardValue): boolean {
     // Don't allow face cards to be considered for the direction (e.g: when using a Queen to change the direction of the caravan)
     const lastCardValue = this.getLastValuedCard().getNumericValue()
@@ -36,6 +31,15 @@ export class Caravan implements ICaravan {
         // NOTE: throw an error since the direction should always be defined at this point?
         return false;
     }
+  }
+
+  getLastValuedCard(): ICard {
+    const filteredCards = this.cards.filter(card => !card.isFaceCard());
+    return filteredCards[filteredCards.length - 1];
+  }
+
+  isEmpty(): boolean {
+    return this.cards.length === 0;
   }
 
   // private _jackLogic(target: ICard, jackCard: ICard): void {

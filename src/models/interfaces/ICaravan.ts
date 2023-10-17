@@ -8,6 +8,9 @@ export interface ICaravan {
   suit: CardSuit | null;
   bid: number;
 
+  isEmpty(): boolean;
+  getLastValuedCard(): ICard;
+
   addCard(card: ICard): void;
   canAddCard(card: ICard): boolean;
 
