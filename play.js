@@ -21,15 +21,28 @@ function getCardString(card) {
 function logGameState() {
   const gameState = game.getCurrentGameState();
 
-  // You can create a helper function to pad strings for better alignment
+  // Helper function to pad strings for better alignment
   const padString = (str, length) => str.padEnd(length, ' ');
 
-  // Define standard widths for certain fields
-  const cardWidth = 3; // The width of a card string (e.g., "4S", "10H"), adjust if necessary
+  // Helper function to style the bid based on its value
+  const styleBid = (bid) => {
+    if (bid === 0) {
+      return chalk.gray(bid.toString()); // grayed-out if 0
+    } else if (bid >= 1 && bid <= 20) {
+      return chalk.bold.white(bid.toString()); // white if between 1-20
+    } else if (bid >= 21 && bid <= 26) {
+      return chalk.bold.yellow(bid.toString()); // bold yellow if 21-26
+    } else {
+      return chalk.bold.rgb(255, 50, 0)(bid.toString()); // bold orange if 27+
+    }
+  };
+
+  // 'Standard' width for card strings
+  const cardWidth = 3;
 
   let players = [gameState.human, gameState.AI];
   players.forEach((player, index) => {
-    // Use background colors for player headers for better visibility
+    // Background colors for player headers
     const playerHeader = index === game.currentPlayerIndex ? chalk.bold.bgRedBright : chalk.bold;
     console.log(playerHeader('\nPlayer ' + (index + 1) + ':'));
     console.log('Deck size:', player.cardSet.getSize());
@@ -44,7 +57,8 @@ function logGameState() {
     player.caravans.forEach((caravan, caravanIndex) => {
       // Create a padded caravan cards string
       const caravanCards = caravan.cards.map(card => getCardString(card).padEnd(cardWidth, ' ')).join(' ');
-      console.log(`  Caravan ${caravanIndex + 1}:`, padString(caravanCards, cardWidth * 6), `Bid: ${caravan.bid}`); // Assume a max of 8 cards for padding, adjust if necessary
+      const styledBid = styleBid(caravan.bid); // Get the styled bid
+      console.log(`  Caravan ${caravanIndex + 1}:`, padString(caravanCards, cardWidth * 6), 'Bid:', styledBid);
     });
   });
 
