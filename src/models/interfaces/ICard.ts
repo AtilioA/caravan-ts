@@ -8,6 +8,7 @@ export interface ICard {
   attachedCards: ICard[]; // to store face cards stacked to this card
 
   isFaceCard(): boolean;
+  canAttachFaceCard(card: ICard): boolean;
   attachFaceCard(card: ICard): boolean;
 
   getNumericValue(): number;

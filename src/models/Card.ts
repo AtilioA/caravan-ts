@@ -20,18 +20,28 @@ export class Card implements ICard {
     return ['Jack', 'Queen', 'King', 'Joker'].includes(this.value);
   }
 
-  attachFaceCard(card: ICard): boolean {
-    // A card can only have 3 face cards attached to it, at most (not even a Jack is allowed in order to remove them; caravan must be disbanded)
+  canAttachFaceCard(card: ICard): boolean {
     if (this.attachedCards.length === 3) {
-      throw new InvalidPlayError('Cannot attach more than 3 face cards to a single card');
+      // A card can only have 3 face cards attached to it, at most (not even a Jack is allowed in order to remove them; caravan must be disbanded)
+      return false;
+    } else if (card.isFaceCard()) {
+      if (card.value === 'Queen') {
+        return false;
+      } else {
+        return true;
+      }
     }
-    // Queens are not attached, but added to the bottom of the caravan instead
-    else if (card.isFaceCard() && card.value !== 'Queen') {
+
+    return false;
+  }
+
+  attachFaceCard(card: ICard): boolean {
+    if (this.canAttachFaceCard(card)) {
       this.attachedCards.push(card);
       return true;
     }
     else {
-      throw new InvalidPlayError('Cannot attach a Queen or any non-face card to another card');
+      throw new InvalidPlayError('Cannot attach this face card to this card; card is already full or attaching card is a Queen');
     }
   }
 
