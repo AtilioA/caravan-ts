@@ -50,6 +50,45 @@ describe('AI Strategies', () => {
   });
 
   describe('RandomStrategy', () => {
+    it('should return a valid action from possible moves during an opening round', () => {
+      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+      const action: GameAction = randomStrategy.pickMove(gameState);
+
+      const possibleMoves = gameState.AI.generatePossibleMoves(true);
+
+      expect(possibleMoves).toContainEqual(action);
+    });
+
+    it('should not return a discard during an opening round', () => {
+      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+      const invalidAction: GameAction = {
+        player: gameState.AI,
+        action: {
+          type: 'DISCARD_DRAW',
+          card: gameState.AI.hand[0]
+        }
+      };
+
+      const possibleMoves = gameState.AI.generatePossibleMoves(true);
+
+      expect(possibleMoves).not.toContainEqual(invalidAction);
+    });
+
+    it('should not return a disband during an opening round', () => {
+      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+      const invalidAction: GameAction = {
+        player: gameState.AI,
+        action: {
+          type: 'DISBAND_CARAVAN',
+          caravan: gameState.AI.caravans[0]
+        }
+      };
+
+      const possibleMoves = gameState.AI.generatePossibleMoves(true);
+
+      expect(possibleMoves).not.toContainEqual(invalidAction);
+    });
+
     it('should return a valid action from possible moves', () => {
       gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
       const action: GameAction = randomStrategy.pickMove(gameState);
