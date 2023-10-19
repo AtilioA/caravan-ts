@@ -148,7 +148,13 @@ export class Player implements IPlayer {
 
   // REFACTOR: this probably needs to be moved to the Game entity, since it needs visibility of the opponent's caravans
   // Fortunately, this will only adds more lines, and existing lines will not need to be changed
-  generatePossibleMoves(considerDiscard: boolean = true, considerFaceCards: boolean = true, considerDisbandCaravan: boolean = true): GameAction[] {
+  generatePossibleMoves(isOpeningRound: boolean = true, considerDiscard: boolean = true, considerFaceCards: boolean = true, considerDisbandCaravan: boolean = true): GameAction[] {
+    if (isOpeningRound) {
+      considerDiscard = false;
+      considerFaceCards = false;
+      considerDisbandCaravan = false;
+    }
+
     // Generate a DISCARD_DRAW GameAction for each card in the hand
     const possibleActions: GameAction[] = [];
 
@@ -166,6 +172,11 @@ export class Player implements IPlayer {
 
     // Generate a PLAY_CARD GameAction
     for (const caravan of this.caravans) {
+      // Don't add PLAY_CARD actions for non empty caravans in the opening round
+      if (isOpeningRound && !caravan.isEmpty()) {
+        continue;
+      }
+
       for (const card of this.hand) {
         // For each valued card in the hand (explicitly) that can be played to a caravan
         if (caravan.canAddCard(card) && !card.isFaceCard()) {
