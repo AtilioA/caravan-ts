@@ -4,12 +4,47 @@ import { ICard } from '../models/interfaces/ICard';
 import { EasyStrategy } from '../models/AI/EasyStrategy';
 import { RandomStrategy } from '../models/AI/RandomStrategy';
 import { createMockCard, createMockPlayer } from './__mocks__/mockFactories';
+import { AIStrategy } from '../models/interfaces/AIStrategy';
 
 describe('AI Strategies', () => {
   let gameState: GameState;
   let mockCard: MockProxy<ICard>;
   let easyStrategy: EasyStrategy;
   let randomStrategy: RandomStrategy;
+
+  function commonStrategyTests(strategy: AIStrategy, strategyName: string) {
+    describe(`Strategies common tests (testing ${strategyName})`, () => {
+      it('should not return a discard during an opening round', () => {
+        gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+        const invalidAction: GameAction = {
+          player: gameState.AI,
+          action: {
+            type: 'DISCARD_DRAW',
+            card: gameState.AI.hand[0]
+          }
+        };
+
+        const possibleMoves = gameState.AI.generatePossibleMoves(true);
+
+        expect(possibleMoves).not.toContainEqual(invalidAction);
+      });
+
+      it('should not return a disband during an opening round', () => {
+        gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
+        const invalidAction: GameAction = {
+          player: gameState.AI,
+          action: {
+            type: 'DISBAND_CARAVAN',
+            caravan: gameState.AI.caravans[0]
+          }
+        };
+
+        const possibleMoves = gameState.AI.generatePossibleMoves(true);
+
+        expect(possibleMoves).not.toContainEqual(invalidAction);
+      });
+    });
+  }
 
   beforeEach(() => {
     // Set up a mock game state
@@ -29,6 +64,8 @@ describe('AI Strategies', () => {
   });
 
   describe('EasyStrategy', () => {
+    commonStrategyTests(easyStrategy, 'EasyStrategy');
+
     it('should return a valid DISCARD_DRAW action if not on opening round', () => {
       gameState.isOpeningRound = false;
       const action: GameAction = easyStrategy.pickMove(gameState);
@@ -50,7 +87,9 @@ describe('AI Strategies', () => {
   });
 
   describe('RandomStrategy', () => {
-    it('should return a valid action from possible moves during an opening round', () => {
+    commonStrategyTests(randomStrategy, 'RandomStrategy');
+
+    it('should return a valid random action from possible moves during an opening round', () => {
       gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
       const action: GameAction = randomStrategy.pickMove(gameState);
 
@@ -59,37 +98,7 @@ describe('AI Strategies', () => {
       expect(possibleMoves).toContainEqual(action);
     });
 
-    it('should not return a discard during an opening round', () => {
-      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
-      const invalidAction: GameAction = {
-        player: gameState.AI,
-        action: {
-          type: 'DISCARD_DRAW',
-          card: gameState.AI.hand[0]
-        }
-      };
-
-      const possibleMoves = gameState.AI.generatePossibleMoves(true);
-
-      expect(possibleMoves).not.toContainEqual(invalidAction);
-    });
-
-    it('should not return a disband during an opening round', () => {
-      gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
-      const invalidAction: GameAction = {
-        player: gameState.AI,
-        action: {
-          type: 'DISBAND_CARAVAN',
-          caravan: gameState.AI.caravans[0]
-        }
-      };
-
-      const possibleMoves = gameState.AI.generatePossibleMoves(true);
-
-      expect(possibleMoves).not.toContainEqual(invalidAction);
-    });
-
-    it('should return a valid action from possible moves', () => {
+    it('should return a valid random action from possible moves', () => {
       gameState.AI.hand = [createMockCard('Ace', 'Spades'), createMockCard('7', 'Diamonds')]
       const action: GameAction = randomStrategy.pickMove(gameState);
 
