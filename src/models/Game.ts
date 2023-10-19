@@ -60,9 +60,12 @@ export class Game implements IGame {
 
     switch (play.action.type) {
       case 'PLAY_CARD':
-        // REVIEW: maybe this should be handled somewhere else? Well, this logic is related to the opening turn in the Game entity, so maybe it's fine here
+        // REVIEW: maybe this should be handled somewhere else? Well, this logic is related to the opening rounds in the Game entity, so maybe it's fine here
         if (play.action.card.isFaceCard()) {
-          throw new InvalidPlayError('Cannot play a face card on the opening turn.');
+          throw new InvalidPlayError('Cannot play a face card during opening rounds.');
+        // This isCaravan(target) should always be true during opening rounds
+        } else if (isCaravan(play.action.target) && !play.action.target.isEmpty()) {
+          throw new InvalidPlayError('Cannot play a valued card on a caravan that is not empty during opening rounds.');
         } else {
           this.playCard(play.action.card, play.action.target);
         }
@@ -297,7 +300,7 @@ export class Game implements IGame {
 
   playTurn(play: GameAction) {
     if (this.isOver) {
-      throw new InvalidGameState('Cannot play a turn on a match that is already over.');
+      throw new InvalidPlayError('Cannot play a turn on a match that is already over.');
     } else if (this.isOpeningRound) {
       if (this.currentRound >= 6) {
         this.setOpeningRound(false);

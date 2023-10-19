@@ -814,7 +814,16 @@ describe('Game - Opening rounds', () => {
     game.currentPlayerIndex = 0;
 
     // Can't disband even if there's cards in the caravan, since it's an opening round.
-    expect(() => game.playTurn({player: player1, action: {type: 'DISBAND_CARAVAN', caravan: player1.caravans[0]}})).toThrow();
+    expect(() => game.playTurn({player: player1, action: {type: 'DISBAND_CARAVAN', caravan: player1.caravans[0]}})).toThrowError(InvalidPlayError);
+  });
+
+  it('should not allow playing cards to non-empty caravans during opening rounds', () => {
+    const valuedCard = createMockCard("5", "Diamonds");
+    player1.hand.push(valuedCard);
+
+    player1.caravans[0].addCard(createMockCard("6", "Diamonds"));
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: valuedCard, target: player1.caravans[0]}})).toThrowError(InvalidPlayError);
+
   });
 
   it('should end opening rounds after 6 rounds (3 each player)', () => {
