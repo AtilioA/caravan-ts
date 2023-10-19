@@ -15,7 +15,11 @@ const rl = readline.createInterface({
 let game;
 
 function getCardString(card) {
-  return card.getNumericValue() + card.suit[0]
+  if (card.isFaceCard()) {
+    return card.value + card.suit[0]
+  } else {
+    return card.getNumericValue() + card.suit[0]
+  }
 }
 
 function logGameState() {
@@ -212,8 +216,8 @@ function checkGameStatus() {
 }
 
 function startGame() {
-  const humanPlayer = new Player(new Deck(generateCards(30)));
-  const aiPlayer = new Player(new Deck(generateCards(30)));
+  const humanPlayer = new Player(new Deck(generateCards(30, true)));
+  const aiPlayer = new Player(new Deck(generateCards(30, true)));
 
   game = new Game([humanPlayer, aiPlayer]);
   game.setAIStrategy(new RandomStrategy())
