@@ -252,11 +252,11 @@ describe('Player', () => {
         expect(possibleActions.length).toBeGreaterThan(7);
     });
 
-    it('should be able to generate an array of possible actions for playing all cards in all caravans at the start of the game', () => {
+    it('should be able to generate an array of possible actions for playing all cards in all caravans after the opening rounds', () => {
         const player = createMockPlayer();
         player.hand = generateCards(8, false);
 
-        const possibleActions = player.generatePossibleMoves();
+        const possibleActions = player.generatePossibleMoves(false);
 
         // Caravans are empty and the player has 8 cards, so they can at least discard 8 cards
         // Also, they can play all cards in hand to any caravans
@@ -277,7 +277,7 @@ describe('Player', () => {
         }
     });
 
-    it('should be able to generate an array of possible actions for taking any actions in any caravan after the start of the game', () => {
+    it('should be able to generate an array of possible actions for taking any actions in any caravan after the opening rounds', () => {
         const player = createMockPlayer();
         player.hand = generateCards(8, true);
 
@@ -288,7 +288,7 @@ describe('Player', () => {
         player.caravans[1].addCard(new Card('Ace', 'Spades'));
         player.caravans[1].addCard(new Card('4', 'Hearts'));
 
-        const possibleActions = player.generatePossibleMoves();
+        const possibleActions = player.generatePossibleMoves(false);
 
         // Player has 8 cards, so they can at least discard 8 cards
         const discardableCards = player.hand.length
@@ -348,6 +348,79 @@ describe('Player', () => {
                     card,
                 }
             });
+        }
+    });
+
+    it('should be able to generate an array of possible actions for taking any actions in any caravan during the opening rounds', () => {
+        const player = createMockPlayer();
+        player.hand = generateCards(8, true);
+
+        // Initialize Player's caravans
+        player.caravans = [createMockCaravan(), createMockCaravan(), createMockCaravan()];
+
+        // Generate possible Player actions given that it's an opening round
+        const possibleActions = player.generatePossibleMoves(true);
+
+        // Player has 8 cards, but can't discard any cards during the opening rounds
+        const discardableCards = 0
+        // Caravans can't be disbanded during the opening rounds
+        const disbandableCaravans = 0
+        // Player can play cards in hand to caravans
+        const playableCards = player.hand.filter(card => player.caravans.some(caravan => caravan.canAddCard(card))).length;
+
+        // 0 + 0 + number of valued cards
+        expect(possibleActions.length).toBeGreaterThanOrEqual(discardableCards + disbandableCaravans + playableCards);
+
+        // Now, check for the actual actions
+        // The possibleActions array should have an action for each card in hand for each caravan
+        for (const caravan of player.caravans) {
+            for (const card of player.hand) {
+                if (caravan.canAddCard(card) && !card.isFaceCard()) {
+                    expect(possibleActions).toContainEqual({
+                        player,
+                        action: {
+                            type: "PLAY_CARD",
+                            card,
+                            target: caravan
+                        }
+                    });
+                }
+
+                // Should NOT have an action for attaching each face card in hand to each valued card in each caravan
+                for (const caravanCard of caravan.cards) {
+                    if (caravanCard.canAttachFaceCard(card)) {
+                        expect(possibleActions).not.toContainEqual({
+                            player,
+                            action: {
+                                type: "PLAY_CARD",
+                                card,
+                                target: caravanCard
+                            }
+                        });
+                    }
+                }
+                // Should NOT have an action for disbanding any caravan
+                if (player.canDisbandCaravan(caravan)) {
+                    expect(possibleActions).not.toContainEqual({
+                        player,
+                        action: {
+                            type: "DISBAND_CARAVAN",
+                            caravan
+                        }
+                    });
+                }
+
+                // Finally, should NOT have an action for discarding each card in hand (any card can be discarded)
+                for (const card of player.hand) {
+                    expect(possibleActions).not.toContainEqual({
+                        player,
+                        action: {
+                            type: "DISCARD_DRAW",
+                            card,
+                        }
+                    });
+                }
+            }
         }
     });
 });
