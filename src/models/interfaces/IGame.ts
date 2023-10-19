@@ -24,13 +24,19 @@ export interface GameState {
 export interface IGame {
   isOver: boolean;
   players: IPlayer[];
+  currentRound: number;
+  isOpeningRound: boolean;
   currentPlayerIndex: number;
   currentAIStrategy: AIStrategy | null;
   events: EventEmitter;
 
+  setAIStrategy(strategy: AIStrategy): void;
+
   start(): void;
-  end(): void;
+  getCurrentPlayer(): IPlayer;
   playTurn(action: GameAction): void;
-  // validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean;
+  nextAIMove(): void;
+
   checkForWinner(): IPlayer | null;
+  end(): void;
 }

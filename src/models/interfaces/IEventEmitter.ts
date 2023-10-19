@@ -1,5 +1,5 @@
 export type eventType =
-  | 'startGame'
+  | 'gameStarted'
   | "drawInitialCards"
   | "reshuffleAndDraw"  // When reshuffling due to a lack of number cards
   | "nextTurn"          // Includes details about the next player

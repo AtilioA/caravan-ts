@@ -33,7 +33,7 @@ export class Game implements IGame {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
     this.events.on('playCardOnCard', this.playCardToCard.bind(this));
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
-    this.events.on('startGame', this.setOpeningRound.bind(this));
+    this.events.on('gameStarted', this.setOpeningRound.bind(this));
     // ...
   }
 
@@ -48,69 +48,6 @@ export class Game implements IGame {
       currentPlayerIndex: this.currentPlayerIndex,
       isOpeningRound: this.isOpeningRound,
     }
-  }
-
-  setAIStrategy(strategy: AIStrategy): void {
-    this.currentAIStrategy = strategy;
-  }
-
-  nextAIMove(): void {
-    if (!this.currentAIStrategy) {
-      throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
-    } else {
-      const move = this.currentAIStrategy.pickMove(this.getCurrentGameState());
-      this.playTurn(move);
-    }
-  }
-
-  getCurrentPlayer(): IPlayer {
-    return this.players[this.currentPlayerIndex];
-  }
-
-  moveToNextTurn(): void {
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-  }
-
-  start() {
-    // Sanity checks (sizes of players, decks, etc.)
-    if (this.players.length != 2) {
-      throw new InvalidGameState('Cannot start a game with more or less than two players.')
-    } else {
-      for (let player of this.players) {
-        if (player.cardSet.getSize() < 30) {
-          throw new InvalidGameState('Cannot start a game with a player with a deck having less than 30 cards.');
-        } else if (player.cardSet.getSize() > 216) {
-          throw new InvalidGameState('Cannot start a game with a player with a deck having more than 216 cards.');
-        }
-      }
-    }
-
-    // Initialize game, deal cards to players, etc.
-    // NOTE: this is a naive approach to convey what would happen in real life
-    for (let player of this.players) {
-      // let valuedCards = 0;
-
-      // FIXME: Keep drawing until there are at least 3 valued cards in hand
-      // while (valuedCards < 3) {
-        // Return the cards from hand to cardSet
-        // while (player.hand.length > 0) {
-        //     const card = player.hand.pop();
-        //     if (card) {
-        //         player.cardSet.addCard(card);
-        //     }
-        // }
-
-        // Reshuffle the deck and draw 8 new cards
-        player.cardSet.shuffle();
-        player.drawHand(8);
-
-        // Check how many valued cards are in hand; if less than 3, repeat
-        // valuedCards = player.getValuedCards().length;
-      // }
-    }
-
-    this.isOpeningRound = true;
-    this.events.emit('startGame', {currentPlayer: this.getCurrentPlayer()});
   }
 
   private playOpeningTurn(play: GameAction) {
@@ -133,53 +70,6 @@ export class Game implements IGame {
 
       default:
         throw new InvalidPlayError('Invalid opening turn; please check the game rules.');
-    }
-
-    this.updateBids();
-    this.endCurrentTurn();
-  }
-
-  playTurn(play: GameAction) {
-    if (this.isOver) {
-      throw new InvalidGameState('Cannot play a turn on a match that is already over.');
-    } else if (this.isOpeningRound) {
-      if (this.currentRound >= 6) {
-        this.setOpeningRound(false);
-      } else {
-      return this.playOpeningTurn(play);
-      }
-    }
-
-    const currentPlayer = this.getCurrentPlayer();
-    const player = play.player;
-
-    if (currentPlayer !== player) {
-      throw new InvalidPlayError('Cannot play a turn for a player that is not the current player.');
-    }
-
-    switch (play.action.type) {
-      case 'PLAY_CARD':
-        this.playCard(play.action.card, play.action.target);
-        break;
-
-      case 'DISBAND_CARAVAN':
-        if (this.validateCaravanDisband(currentPlayer, play.action.caravan)) {
-          this.disbandCaravan(currentPlayer, play.action.caravan)
-        } else {
-          throw new InvalidPlayError('Invalid caravan disbanding; please check the game rules or try a different move.');
-        }
-        break;
-
-      case 'DISCARD_DRAW':
-        if (this.validateDiscardDraw(currentPlayer, play.action.card)) {
-          currentPlayer.discardCard(play.action.card);
-          if (currentPlayer.canDrawCard()) {
-            currentPlayer.drawCard();
-          }
-        } else {
-          throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
-        }
-        break;
     }
 
     this.updateBids();
@@ -279,12 +169,6 @@ export class Game implements IGame {
     }
   }
 
-  // TODO: Continue from here
-  // validateMove(player: IPlayer, card: ICard, target: ICard | ICaravan): boolean {
-  //   // Validate if the move is legal according to game rules
-  //   return true;
-  // }
-
   private isPlayerOutOfCards(player: IPlayer): boolean {
     return player.hand.length === 0 && player.cardSet.cards.length === 0;
   }
@@ -348,6 +232,113 @@ export class Game implements IGame {
     }
 
     return null;
+  }
+
+  private moveToNextTurn(): void {
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+  }
+
+  setAIStrategy(strategy: AIStrategy): void {
+    this.currentAIStrategy = strategy;
+  }
+
+  nextAIMove(): void {
+  if (!this.currentAIStrategy) {
+      throw new InvalidGameState('Cannot make an AI move when there is no AI strategy set.');
+    } else {
+      const move = this.currentAIStrategy.pickMove(this.getCurrentGameState());
+      this.playTurn(move);
+    }
+  }
+
+  getCurrentPlayer(): IPlayer {
+    return this.players[this.currentPlayerIndex];
+  }
+
+  start() {
+    // Sanity checks (sizes of players, decks, etc.)
+    if (this.players.length != 2) {
+      throw new InvalidGameState('Cannot start a game with more or less than two players.')
+    } else {
+      for (let player of this.players) {
+        if (player.cardSet.getSize() < 30) {
+          throw new InvalidGameState('Cannot start a game with a player with a deck having less than 30 cards.');
+        } else if (player.cardSet.getSize() > 216) {
+          throw new InvalidGameState('Cannot start a game with a player with a deck having more than 216 cards.');
+        }
+      }
+    }
+
+    // Initialize game, deal cards to players, etc.
+    // NOTE: this is a naive approach to convey what would happen in real life
+    for (let player of this.players) {
+      player.cardSet.shuffle();
+
+      let valuedCardsAdded = 0; // Counter for valued cards added to hand
+      let cardsToKeep = []; // Cards that will remain in the cardSet
+      for (let card of player.cardSet.cards) {
+        // If it's a valued card and we still need more for the hand
+        if (!card.isFaceCard() && valuedCardsAdded < 3) {
+          player.hand.push(card);
+          valuedCardsAdded++;
+        } else {
+          cardsToKeep.push(card);
+        }
+      }
+      player.cardSet.cards = cardsToKeep; // Update the cardSet with the remaining cards
+      
+      player.drawHand(5);
+    }
+
+    this.isOpeningRound = true;
+    this.events.emit('gameStarted', {currentPlayer: this.getCurrentPlayer()});
+  }
+
+  playTurn(play: GameAction) {
+    if (this.isOver) {
+      throw new InvalidGameState('Cannot play a turn on a match that is already over.');
+    } else if (this.isOpeningRound) {
+      if (this.currentRound >= 6) {
+        this.setOpeningRound(false);
+      } else {
+      return this.playOpeningTurn(play);
+      }
+    }
+
+    const currentPlayer = this.getCurrentPlayer();
+    const player = play.player;
+
+    if (currentPlayer !== player) {
+      throw new InvalidPlayError('Cannot play a turn for a player that is not the current player.');
+    }
+
+    switch (play.action.type) {
+      case 'PLAY_CARD':
+        this.playCard(play.action.card, play.action.target);
+        break;
+
+      case 'DISBAND_CARAVAN':
+        if (this.validateCaravanDisband(currentPlayer, play.action.caravan)) {
+          this.disbandCaravan(currentPlayer, play.action.caravan)
+        } else {
+          throw new InvalidPlayError('Invalid caravan disbanding; please check the game rules or try a different move.');
+        }
+        break;
+
+      case 'DISCARD_DRAW':
+        if (this.validateDiscardDraw(currentPlayer, play.action.card)) {
+          currentPlayer.discardCard(play.action.card);
+          if (currentPlayer.canDrawCard()) {
+            currentPlayer.drawCard();
+          }
+        } else {
+          throw new InvalidPlayError('Invalid discard and draw; please check the game rules or try a different move.');
+        }
+        break;
+    }
+
+    this.updateBids();
+    this.endCurrentTurn();
   }
 
   checkForWinner(): IPlayer | null {
