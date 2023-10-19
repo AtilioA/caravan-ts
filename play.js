@@ -15,11 +15,19 @@ const rl = readline.createInterface({
 let game;
 
 function getCardString(card) {
-  if (card.isFaceCard()) {
-    return card.value + card.suit[0]
-  } else {
-    return card.getNumericValue() + card.suit[0]
+  function getAttachedCardsString(card) {
+    return card.attachedCards.length > 0 ? `(${card.attachedCards.map(getBaseCardString).join('+')})` : '';
   }
+
+  function getBaseCardString(card) {
+    if (card.isFaceCard()) {
+      return card.value + card.suit[0]
+    } else {
+      return card.getNumericValue() + card.suit[0]
+    }
+  }
+
+  return getBaseCardString(card) + getAttachedCardsString(card);
 }
 
 function logGameState() {
@@ -104,18 +112,42 @@ function promptPlayCard() {
     }
 
     rl.question('Enter the target (caravan index or card index in caravan): ', (targetIndexStr) => {
-      const targetIndex = parseInt(targetIndexStr) - 1;
-      if (isNaN(targetIndex)) {
+      // If there are two numbers, the first is the caravan index and the second is the card index
+      let caravanIndex;
+      let cardInCaravanIndex;
+      const targetIndices = targetIndexStr.split(' ');
+      if (targetIndices.length > 2) {
         console.log(chalk.red('Invalid target. Please enter a valid index.'));
+        return promptPlayCard();
+      } else {
+        if (targetIndices.length === 1) {
+          caravanIndex = parseInt(targetIndices[0]) - 1;
+        }
+        else {
+          caravanIndex = parseInt(targetIndices[0]) - 1;
+          cardInCaravanIndex = parseInt(targetIndices[1]) - 1;
+        }
+      }
+
+      if (isNaN(caravanIndex) || caravanIndex < 0 || caravanIndex > 2) {
+        console.log(chalk.red('Invalid caravan target. Please enter a valid index.'));
+        return promptPlayCard();
+      }
+
+      if (cardInCaravanIndex && isNaN(cardInCaravanIndex) || cardInCaravanIndex < 0) {
+        console.log(chalk.red(`Invalid card target from caravan ${caravanIndex + 1}. Please enter a valid index.`));
         return promptPlayCard();
       }
 
       // Determine if the target is a caravan or a card within a caravan
       let target;
-      if (targetIndex >= 0 && targetIndex < game.getCurrentPlayer().caravans.length) {
-        target = game.getCurrentPlayer().caravans[targetIndex];
+      if (cardInCaravanIndex !== undefined && cardInCaravanIndex >= 0) {
+        target = game.getCurrentPlayer().caravans[caravanIndex].cards[cardInCaravanIndex];
+      }
+      else if (caravanIndex >= 0 && caravanIndex < game.getCurrentPlayer().caravans.length) {
+        target = game.getCurrentPlayer().caravans[caravanIndex];
       } else {
-        console.log(chalk.red('Invalid caravan index. Please enter a valid index.'));
+        console.log(chalk.red('Invalid card/caravan index. Please enter a valid index.'));
         return promptPlayCard();
       }
 
