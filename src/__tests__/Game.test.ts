@@ -776,6 +776,21 @@ describe('Game - Opening rounds', () => {
     game.start();
   });
 
+    it('should not allow playing a card if it’s not the player’s turn', () => {
+      // Assuming it's player1's turn now.
+      const valuedCard = createMockCard("3", "Hearts");
+      player2.hand.push(valuedCard);
+
+      expect(() => game.playTurn({
+        player: player2,
+        action: {
+          type: 'PLAY_CARD',
+          card: valuedCard,
+          target: player2.caravans[0]
+        }
+      })).toThrowError(InvalidPlayError);
+  });
+
   it('should allow playing valued cards during the opening round', () => {
     const valuedCard = createMockCard("3", "Hearts");
     player1.hand.push(valuedCard);
