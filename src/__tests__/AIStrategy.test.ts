@@ -44,7 +44,7 @@ describe('AI Strategies', () => {
       gameState.isOpeningRound = true;
       const action: GameAction = easyStrategy.pickMove(gameState);
 
-      const possibleMoves = gameState.AI.generatePossibleMoves(!gameState.isOpeningRound, !gameState.isOpeningRound, !gameState.isOpeningRound);
+      const possibleMoves = gameState.AI.generatePossibleMoves(true);
       expect(possibleMoves).toContainEqual(action);
     });
   });

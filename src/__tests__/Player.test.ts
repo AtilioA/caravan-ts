@@ -245,7 +245,7 @@ describe('Player', () => {
         const player = createMockPlayer();
         player.drawHand(8);
 
-        const possibleActions = player.generatePossibleMoves();
+        const possibleActions = player.generatePossibleMoves(false);
 
         // Caravans are empty and the player has 8 cards, so they can at least discard 8 cards
         // (this disregards the game rule for having at least 3 valued cards)
