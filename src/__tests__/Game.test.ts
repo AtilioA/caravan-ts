@@ -359,7 +359,7 @@ describe('Game - Playing turns', () => {
           type: 'DISBAND_CARAVAN',
           caravan: caravan
         }
-      })).toThrow();
+      })).toThrowError(InvalidPlayError);
   });
 
   it('should add cards to the player\'s discard pile after a caravan is disbanded', () => {
@@ -392,7 +392,7 @@ describe('Game - Playing turns', () => {
           card: valuedCard,
           target: player1.caravans[0]
         }
-      })).toThrow();
+      })).toThrowError(InvalidPlayError);
   });
 
   it('should consider a caravan as sold only between a bid of 21-26', () => {
@@ -717,7 +717,7 @@ describe('Game - General valid/invalid moves', () => {
     // Queens are used to extend caravans, not to be played on other cards.
     expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: card7}})).toThrowError(InvalidPlayError);
     game.currentPlayerIndex = 0
-    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: player1.caravans[0]}})).not.toThrow();
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: queen, target: player1.caravans[0]}})).not.toThrowError(InvalidPlayError);
   });
 
   it('should reverse the numerical sequence direction of a caravan when a Queen is played', () => {
@@ -759,7 +759,7 @@ describe('Game - General valid/invalid moves', () => {
     player1.caravans[0].addCard(card7);
     player1.caravans[0].cards[0].attachFaceCard(king1);
 
-    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: king2, target: king1}})).not.toThrow();
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: king2, target: king1}})).not.toThrowError(InvalidPlayError);
   });
 });
 
@@ -796,14 +796,14 @@ describe('Game - Opening rounds', () => {
     player2.caravans[0].addCard(createMockCard("5", "Diamonds"));
 
     // Can't play face card during the opening round, even if there's cards in the caravans.
-    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]}})).toThrow();
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: kingCard, target: player2.caravans[0].cards[0]}})).toThrowError(InvalidPlayError);
   });
 
   it('should not allow discarding during the opening round', () => {
     const valuedCard = createMockCard("5", "Diamonds");
     player1.hand.push(valuedCard);
 
-    expect(() => game.playTurn({player: player1, action: {type: 'DISCARD_DRAW', card: valuedCard}})).toThrow();
+    expect(() => game.playTurn({player: player1, action: {type: 'DISCARD_DRAW', card: valuedCard}})).toThrowError(InvalidPlayError);
   });
 
   it('should not allow disbanding a caravan during the opening round', () => {
@@ -939,7 +939,7 @@ describe('Game - End state', () => {
   //   player1.caravans[0].addCard(card7);
   //   player1.caravans[0].cards[0].attachFaceCard(king);
 
-  //   expect(() => game.playTurn({type: 'PLAY_CARD', card: joker, target: king})).toThrow();
+  //   expect(() => game.playTurn({type: 'PLAY_CARD', card: joker, target: king})).toThrowError(InvalidPlayError);
   // });
 // });
 
@@ -974,6 +974,6 @@ describe('AI initialization', () => {
     // AI player index
     game.currentPlayerIndex = 1;
 
-    expect(() => game.nextAIMove()).not.toThrow();
+    expect(() => game.nextAIMove()).not.toThrowError(InvalidPlayError);
   });
 });
