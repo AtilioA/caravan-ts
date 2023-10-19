@@ -816,6 +816,20 @@ describe('Game - Opening rounds', () => {
     // Can't disband even if there's cards in the caravan, since it's an opening round.
     expect(() => game.playTurn({player: player1, action: {type: 'DISBAND_CARAVAN', caravan: player1.caravans[0]}})).toThrow();
   });
+
+  it('should end opening rounds after 6 rounds (3 each player)', () => {
+    expect(game.isOpeningRound).toBe(true);
+    game.setAIStrategy(new EasyStrategy())
+
+    // Play 6 turns
+    for (let i = 0; i < 6; i++) {
+      expect(game.isOpeningRound).toBe(true);
+      game.currentPlayerIndex = 1;
+      game.nextAIMove();
+    }
+
+    expect(game.isOpeningRound).toBe(false);
+  });
 });
 
 describe('Game - End state', () => {

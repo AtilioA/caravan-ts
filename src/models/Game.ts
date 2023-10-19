@@ -33,11 +33,11 @@ export class Game implements IGame {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
     this.events.on('playCardOnCard', this.playCardToCard.bind(this));
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
-    this.events.on('gameStarted', this.setOpeningRound.bind(this));
+    this.events.on('gameStarted', this.setOpeningRound.bind(this, true));
     // ...
   }
 
-  private setOpeningRound(openingRound: boolean = true): void {
+  private setOpeningRound(openingRound: boolean): void {
     this.isOpeningRound = openingRound;
   }
 
@@ -86,6 +86,7 @@ export class Game implements IGame {
   }
 
   private endCurrentTurn(): void {
+    this.currentRound++;
     // Check for any game-winning conditions
     const winner = this.checkForWinner();
     if (winner) {
@@ -286,7 +287,7 @@ export class Game implements IGame {
         }
       }
       player.cardSet.cards = cardsToKeep; // Update the cardSet with the remaining cards
-      
+
       player.drawHand(5);
     }
 
