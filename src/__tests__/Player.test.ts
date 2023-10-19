@@ -302,7 +302,7 @@ describe('Player', () => {
         // The possibleActions array should have an action for each card in hand for each caravan
         for (const caravan of player.caravans) {
             for (const card of player.hand) {
-                if (caravan.canAddCard(card)) {
+                if (caravan.canAddCard(card) && !card.isFaceCard()) {
                     expect(possibleActions).toContainEqual({
                         player,
                         action: {

@@ -167,8 +167,8 @@ export class Player implements IPlayer {
     // Generate a PLAY_CARD GameAction
     for (const caravan of this.caravans) {
       for (const card of this.hand) {
-        // For each valued card in the hand that can be played to a caravan
-        if (caravan.canAddCard(card)) {
+        // For each valued card in the hand (explicitly) that can be played to a caravan
+        if (caravan.canAddCard(card) && !card.isFaceCard()) {
           possibleActions.push({
             player: this,
             action: {
