@@ -31,10 +31,16 @@ export class Game implements IGame {
 
   private registerEventListeners() {
     this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
-    this.events.on('playCardOnCard', this.playCardToCard.bind(this));
+    this.events.on('playCardOnCard', this.playCardOnCard.bind(this));
     this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
     this.events.on('gameStarted', this.setOpeningRound.bind(this, true));
-    // ...
+    this.events.on('gameOver', this.end.bind(this));
+    this.events.on('updateCaravansBids', this.updateBids.bind(this));
+    this.events.on('updateCaravanBid', (caravan: ICaravan) => {
+      caravan.bid = caravan.computeValue();
+    });
+    this.events.on('endTurn', this.endCurrentTurn.bind(this));
+    this.events.on('nextTurn', this.moveToNextTurn.bind(this));
   }
 
   private setOpeningRound(openingRound: boolean): void {
@@ -75,28 +81,30 @@ export class Game implements IGame {
         throw new InvalidPlayError('Invalid opening turn; please check the game rules.');
     }
 
-    this.updateBids();
-    this.endCurrentTurn();
+    this.events.emit('endTurn');
   }
 
   private updateBids(): void {
     // Call compute value for each caravan of each player
     for (let player of this.players) {
       for (let caravan of player.caravans) {
-        caravan.bid = caravan.computeValue();
+        this.events.emit('updateCaravanBid', caravan);
       }
     }
   }
 
   private endCurrentTurn(): void {
+    // Update bids of all caravans
+    this.events.emit('updateCaravansBids');
+
     this.currentRound++;
+
     // Check for any game-winning conditions
     const winner = this.checkForWinner();
     if (winner) {
-      this.end();
+      this.events.emit('gameOver', {winner});
     } else {
       // Move to the next turn
-      this.moveToNextTurn();
       this.events.emit('nextTurn', {currentPlayer: this.getCurrentPlayer()});
     }
   }
@@ -294,7 +302,6 @@ export class Game implements IGame {
       player.drawHand(5);
     }
 
-    this.isOpeningRound = true;
     this.events.emit('gameStarted', {currentPlayer: this.getCurrentPlayer()});
   }
 
@@ -359,7 +366,6 @@ export class Game implements IGame {
 
   // End the Caravan match
   end(): void {
-    this.events.emit('gameOver', {winner: this.checkForWinner()});
     this.isOver = true;
   }
 }
