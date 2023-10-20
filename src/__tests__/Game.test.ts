@@ -11,6 +11,22 @@ const setCaravanBids = (player: IPlayer, bids: number[]) => {
   player.caravans.forEach((caravan, index) => caravan.bid = bids[index]);
 };
 
+// describe('Game - unit tests', () => {
+//   let game: Game;
+//   let player1: IPlayer;
+//   let player2: IPlayer;
+
+//   beforeEach(() => {
+//     player1 = createMockPlayer();
+//     player2 = createMockPlayer();
+
+//     game = new Game([player1, player2]);
+//     game.start();
+//     // Skip opening rounds
+//     game.isOpeningRound = false;
+//   });
+// });
+
 describe('Game - Initialization', () => {
   it('should initialize the game with the correct initial state', () => {
     const game = new Game();
@@ -104,6 +120,63 @@ describe('Game - Playing turns', () => {
 
     expect(player1.caravans[0].cards).toContain(valuedCard);
     expect(player1.hand).not.toContain(valuedCard);
+  });
+
+  it('should not allow a player to play/attach a valued card to a card', () => {
+    player1.caravans[0].addCard(createMockCard("2", "Diamonds"));
+
+    const valuedCard = createMockCard("3", "Diamonds");
+    player1.hand.push(valuedCard);
+
+    expect(() => {
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: valuedCard,
+          target: player1.caravans[0].cards[0]
+        }
+      });
+    }).toThrowError(InvalidPlayError);
+
+    expect(player1.caravans[0].cards).not.toContain(valuedCard);
+    expect(player1.hand).toContain(valuedCard);
+  });
+
+  it('should not allow a player to play/attach a Queen to a card', () => {
+    player1.caravans[0].addCard(createMockCard("2", "Diamonds"));
+
+    const queenCard = createMockCard("Queen", "Diamonds");
+    player1.hand.push(queenCard);
+
+    expect(() => {
+      game.playTurn({
+        player: player1,
+        action: {
+          type: 'PLAY_CARD',
+          card: queenCard,
+          target: player1.caravans[0].cards[0]
+        }
+      });
+    }).toThrowError(InvalidPlayError);
+
+    expect(player1.caravans[0].cards).not.toContain(queenCard);
+    expect(player1.hand).toContain(queenCard);
+  });
+
+  it('should change the current player after a turn is played', () => {
+    expect(game.currentPlayerIndex).toEqual(0);
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: 'PLAY_CARD',
+        card: player1.hand[0],
+        target: player1.caravans[0]
+      }
+    });
+
+    expect(game.currentPlayerIndex).toEqual(1);
   });
 
   it('should allow a player to play a valued card on their caravan and draw another one', () => {
@@ -776,7 +849,7 @@ describe('Game - Opening rounds', () => {
     game.start();
   });
 
-    it('should not allow playing a card if it’s not the player’s turn', () => {
+  it('should not allow playing a card if it’s not the player’s turn', () => {
       // Assuming it's player1's turn now.
       const valuedCard = createMockCard("3", "Hearts");
       player2.hand.push(valuedCard);
