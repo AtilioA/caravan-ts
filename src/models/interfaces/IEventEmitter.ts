@@ -20,6 +20,7 @@ export type eventType =
   | "disbandTiedTrack"        // When a tied caravan track is disbanded
   | "sabotageOpponentCaravan" // This could be a more general event that occurs when an action specifically targets the opponent's caravan
   | "gameOver"                // Details about the winner and the final state of caravans
+  | "invalidGameState"        // Details about the invalid game state
   | "invalidPlay"             // Details about the invalid play
   ;
 
