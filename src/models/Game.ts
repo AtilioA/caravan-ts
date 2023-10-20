@@ -141,43 +141,41 @@ export class Game implements IGame {
   private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard): void {
     if (isCaravan(target)) {
       this.events.emit('playCardOnCaravan', player, card, target);
+    } else if (card.isFaceCard()) {
+        this.events.emit('playCardOnCard', player, card, target);
     } else {
-      this.events.emit('playCardOnCard', player, card, target);
+      this.events.emit('invalidPlay', {player, card, target});
+      throw new InvalidPlayError('Cannot play a valued card on a card');
     }
   }
 
   private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
     if ((!card.isFaceCard() || card.value === "Queen") && player.caravans.includes(caravan)) {
       player.playCard(card, caravan);
-    } else if (card.isFaceCard() && card.value !== "Queen") {
-      this.events.emit('invalidPlay', {player, card, caravan});
-      throw new InvalidPlayError('Only a Queen can be used as face card to extend a caravan');
     } else {
       this.events.emit('invalidPlay', {player, card, caravan});
       throw new InvalidPlayError('Cannot extend an opponent\'s caravan with a valued card');
     }
   }
 
-  private playCardToCard(player: IPlayer, card: ICard, targetCard: ICard): void {
+  private playCardOnCard(player: IPlayer, card: ICard, targetCard: ICard): void {
     if (card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
-      if (card.value === "Jack") {
-        this.events.emit('playJack', {player, card, targetCard});
-      } else if (card.value === "King") {
-        this.events.emit('playKing', {player, card, targetCard});
+      // if (card.value === "Jack") {
+      //   this.events.emit('playJack', {player, card, targetCard});
+      // } else if (card.value === "King") {
+      //   this.events.emit('playKing', {player, card, targetCard});
       // } else if (card.value === "Joker") {
       //   if (targetCard.value === "Ace") {
       //     this.events.emit('playJokerOnAce', {player, card, targetCard});
       //   } else {
       //     this.events.emit('playJokerOnNumber', {player, card, targetCard});
       //   }
-      }
-    } else if (card.value === "Queen") {
-      this.events.emit('playQueen', {player, card, targetCard});
-      throw new InvalidPlayError('Cannot play a Queen on a card');
+      // }
     }
     else {
       this.events.emit('invalidPlay', {player, card, targetCard});
+      throw new InvalidPlayError('Can only attach Jacks, Kings, and Jokers to cards');
     }
   }
 
@@ -312,7 +310,7 @@ export class Game implements IGame {
       if (this.currentRound >= 6) {
         this.setOpeningRound(false);
       } else {
-      return this.playOpeningTurn(play);
+        return this.playOpeningTurn(play);
       }
     }
 
