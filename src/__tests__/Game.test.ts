@@ -846,9 +846,12 @@ describe('Game - Opening rounds', () => {
     game.setAIStrategy(new EasyStrategy())
 
     // Play 6 turns
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 3; i++) {
       expect(game.isOpeningRound).toBe(true);
-      game.currentPlayerIndex = 1;
+
+      const playerMoves = player1.generatePossibleMoves();
+      game.playTurn(playerMoves[0]);
+
       game.nextAIMove();
     }
 
