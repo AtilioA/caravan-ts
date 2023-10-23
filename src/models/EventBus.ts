@@ -1,5 +1,4 @@
-import { IEventBus } from "./interfaces/IEventBus";
-import { eventType } from "./interfaces/IEventEmitter";
+import { IEventBus, eventType } from "./interfaces/IEventBus";
 
 export class EventBus implements IEventBus {
   private static instance: EventBus;

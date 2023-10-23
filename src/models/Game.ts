@@ -1,10 +1,10 @@
 import { InvalidGameState, InvalidPlayError } from "../exceptions/GameExceptions";
 import { isCaravan } from "../utils/caravan";
-import { EventEmitter } from "./EventEmitter";
+import { EventBus } from "./EventBus";
 import { AIStrategy } from "./interfaces/AIStrategy";
 import { ICaravan } from "./interfaces/ICaravan";
 import { ICard } from "./interfaces/ICard";
-import { IEventEmitter } from "./interfaces/IEventEmitter";
+import { IEventBus } from "./interfaces/IEventBus";
 import { GameAction, GameState, IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
@@ -15,12 +15,12 @@ export class Game implements IGame {
   players: IPlayer[];
   currentPlayerIndex: number;
   currentAIStrategy: AIStrategy | null;
-  events: IEventEmitter;
+  events: IEventBus;
 
-  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, events: IEventEmitter = new EventEmitter(), isOver: boolean = false, isOpeningRound: boolean = true, currentRound: number = 1, currentAIStrategy = null) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, isOver: boolean = false, isOpeningRound: boolean = true, currentRound: number = 1, currentAIStrategy = null) {
     this.players = players;
     this.currentPlayerIndex = currentPlayerIndex || 0;
-    this.events = events;
+    this.events = EventBus.getInstance();
     this.isOver = isOver;
     this.isOpeningRound = isOpeningRound;
     this.currentRound = currentRound;
@@ -30,21 +30,21 @@ export class Game implements IGame {
   }
 
   private registerEventListeners() {
-    this.events.on('playCardOnCaravan', this.playCardToCaravan.bind(this));
-    this.events.on('playCardOnCard', this.playCardOnCard.bind(this));
-    this.events.on('disbandCaravan', this.disbandCaravan.bind(this));
-    this.events.on('gameStarted', this.setOpeningRound.bind(this, true));
-    this.events.on('gameOver', this.end.bind(this));
-    this.events.on('updateCaravansBids', this.updateBids.bind(this));
-    this.events.on('updateCaravanBid', (caravan: ICaravan) => {
+    this.events.subscribe('playCardOnCaravan', this.playCardToCaravan.bind(this));
+    this.events.subscribe('playCardOnCard', this.playCardOnCard.bind(this));
+    this.events.subscribe('disbandCaravan', this.disbandCaravan.bind(this));
+    this.events.subscribe('gameStarted', this.setOpeningRound.bind(this, true));
+    this.events.subscribe('gameOver', this.end.bind(this));
+    this.events.subscribe('updateCaravansBids', this.updateBids.bind(this));
+    this.events.subscribe('updateCaravanBid', (caravan: ICaravan) => {
       caravan.bid = caravan.computeValue();
     });
-    this.events.on('endTurn', this.endCurrentTurn.bind(this));
-    this.events.on('nextTurn', this.moveToNextTurn.bind(this));
-    this.events.on('invalidGameState', (message: string) => {
+    this.events.subscribe('endTurn', this.endCurrentTurn.bind(this));
+    this.events.subscribe('nextTurn', this.moveToNextTurn.bind(this));
+    this.events.subscribe('invalidGameState', (message: string) => {
       throw new InvalidGameState(message)
     });
-    this.events.on('invalidPlay', (message: string) => {
+    this.events.subscribe('invalidPlay', (message: string) => {
       throw new InvalidPlayError(message)
     });
   }
@@ -67,51 +67,51 @@ export class Game implements IGame {
     const player = play.player;
 
     if (currentPlayer !== player) {
-      return this.events.emit('invalidPlay', 'Cannot play a turn for a player that is not the current player.');
+      return this.events.publish('invalidPlay', 'Cannot play a turn for a player that is not the current player.');
     }
 
     switch (play.action.type) {
       case 'PLAY_CARD':
         // REVIEW: maybe this should be handled somewhere else? Well, this logic is related to the opening rounds in the Game entity, so maybe it's fine here
         if (play.action.card.isFaceCard()) {
-          return this.events.emit('invalidPlay', 'Cannot play a face card during opening rounds.');
+          return this.events.publish('invalidPlay', 'Cannot play a face card during opening rounds.');
         // This isCaravan(target) should always be true during opening rounds
         } else if (isCaravan(play.action.target) && !play.action.target.isEmpty()) {
-          return this.events.emit('invalidPlay', 'Cannot play a valued card on a caravan that is not empty during opening rounds.');
+          return this.events.publish('invalidPlay', 'Cannot play a valued card on a caravan that is not empty during opening rounds.');
         } else {
           this.playCard(play.action.card, play.action.target);
         }
         break;
 
       default:
-        return this.events.emit('invalidPlay', 'Invalid opening turn; please check the game rules.');
+        return this.events.publish('invalidPlay', 'Invalid opening turn; please check the game rules.');
     }
 
-    this.events.emit('endTurn');
+    this.events.publish('endTurn');
   }
 
   private updateBids(): void {
     // Call compute value for each caravan of each player
     for (let player of this.players) {
       for (let caravan of player.caravans) {
-        this.events.emit('updateCaravanBid', caravan);
+        this.events.publish('updateCaravanBid', caravan);
       }
     }
   }
 
   private endCurrentTurn(): void {
     // Update bids of all caravans
-    this.events.emit('updateCaravansBids');
+    this.events.publish('updateCaravansBids');
 
     this.currentRound++;
 
     // Check for any game-winning conditions
     const winner = this.checkForWinner();
     if (winner) {
-      this.events.emit('gameOver', {winner});
+      this.events.publish('gameOver', {winner});
     } else {
       // Move to the next turn
-      this.events.emit('nextTurn', {currentPlayer: this.getCurrentPlayer()});
+      this.events.publish('nextTurn', {currentPlayer: this.getCurrentPlayer()});
     }
   }
 
@@ -133,24 +133,24 @@ export class Game implements IGame {
 
   private disbandCaravan(player: IPlayer, caravan: ICaravan): void {
     player.disbandCaravan(caravan);
-    // this.events.emit('disbandCaravan', this.getCurrentPlayer(), caravan);
+    // this.events.publish('disbandCaravan', this.getCurrentPlayer(), caravan);
   }
 
   private playCard(card: ICard, target: ICard | ICaravan): void {
     // if (this.validateMove(this.getCurrentPlayer(), card, target)) {
       this.playCardToTarget(this.getCurrentPlayer(), card, target);
     // } else {
-      // return this.events.emit('invalidPlay', 'Invalid card play; please check the game rules or try a different move.');
+      // return this.events.publish('invalidPlay', 'Invalid card play; please check the game rules or try a different move.');
     // }
   }
 
   private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard): void {
     if (isCaravan(target)) {
-      this.events.emit('playCardOnCaravan', player, card, target);
+      this.events.publish('playCardOnCaravan', player, card, target);
     } else if (card.isFaceCard()) {
-        this.events.emit('playCardOnCard', player, card, target);
+        this.events.publish('playCardOnCard', player, card, target);
     } else {
-      return this.events.emit('invalidPlay', 'Cannot play a valued card on a card');
+      return this.events.publish('invalidPlay', 'Cannot play a valued card on a card');
     }
   }
 
@@ -158,7 +158,7 @@ export class Game implements IGame {
     if ((!card.isFaceCard() || card.value === "Queen") && player.caravans.includes(caravan)) {
       player.playCard(card, caravan);
     } else {
-      return this.events.emit('invalidPlay', 'Cannot extend an opponent\'s caravan with a valued card');
+      return this.events.publish('invalidPlay', 'Cannot extend an opponent\'s caravan with a valued card');
     }
   }
 
@@ -166,19 +166,19 @@ export class Game implements IGame {
     if (card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
       // if (card.value === "Jack") {
-      //   this.events.emit('playJack', {player, card, targetCard});
+      //   this.events.publish('playJack', {player, card, targetCard});
       // } else if (card.value === "King") {
-      //   this.events.emit('playKing', {player, card, targetCard});
+      //   this.events.publish('playKing', {player, card, targetCard});
       // } else if (card.value === "Joker") {
       //   if (targetCard.value === "Ace") {
-      //     this.events.emit('playJokerOnAce', {player, card, targetCard});
+      //     this.events.publish('playJokerOnAce', {player, card, targetCard});
       //   } else {
-      //     this.events.emit('playJokerOnNumber', {player, card, targetCard});
+      //     this.events.publish('playJokerOnNumber', {player, card, targetCard});
       //   }
       // }
     }
     else {
-      return this.events.emit('invalidPlay', 'Can only attach Jacks, Kings, and Jokers to cards');
+      return this.events.publish('invalidPlay', 'Can only attach Jacks, Kings, and Jokers to cards');
     }
   }
 
@@ -257,7 +257,7 @@ export class Game implements IGame {
 
   nextAIMove(): void {
   if (!this.currentAIStrategy) {
-      return this.events.emit('invalidGameState', 'Cannot make an AI move when there is no AI strategy set.');
+      return this.events.publish('invalidGameState', 'Cannot make an AI move when there is no AI strategy set.');
     } else {
       const move = this.currentAIStrategy.pickMove(this.getCurrentGameState());
       this.playTurn(move);
@@ -271,23 +271,23 @@ export class Game implements IGame {
   start() {
     // Sanity checks (sizes of players, decks, etc.)
     if (this.players.length != 2) {
-      return this.events.emit('invalidGameState', 'Cannot start a game with more or less than two players.')
+      return this.events.publish('invalidGameState', 'Cannot start a game with more or less than two players.')
     } else {
       for (let player of this.players) {
         if (player.cardSet.getSize() < 30) {
-          return this.events.emit('invalidGameState', 'Cannot start a game with a player with a deck having less than 30 cards.');
+          return this.events.publish('invalidGameState', 'Cannot start a game with a player with a deck having less than 30 cards.');
         } else if (player.cardSet.getSize() > 216) {
-          return this.events.emit('invalidGameState', 'Cannot start a game with a player with a deck having more than 216 cards.');
+          return this.events.publish('invalidGameState', 'Cannot start a game with a player with a deck having more than 216 cards.');
         }
       }
     }
 
     // Initialize game, deal cards to players, etc.
-    // NOTE: this is a naive approach to convey what would happen in real life
     for (let player of this.players) {
       player.cardSet.shuffle();
 
-      let valuedCardsAdded = 0; // Counter for valued cards added to hand
+      // Make sure each Player has at least 3 valued cards in their hand
+      let valuedCardsAdded = 0;
       let cardsToKeep = []; // Cards that will remain in the cardSet
       for (let card of player.cardSet.cards) {
         // If it's a valued card and we still need more for the hand
@@ -303,12 +303,12 @@ export class Game implements IGame {
       player.drawHand(5);
     }
 
-    this.events.emit('gameStarted', {currentPlayer: this.getCurrentPlayer()});
+    this.events.publish('gameStarted', {currentPlayer: this.getCurrentPlayer()});
   }
 
   playTurn(play: GameAction) {
     if (this.isOver) {
-      return this.events.emit('invalidPlay', 'Cannot play a turn on a match that is already over.');
+      return this.events.publish('invalidPlay', 'Cannot play a turn on a match that is already over.');
     } else if (this.isOpeningRound) {
       if (this.currentRound >= 6) {
         this.setOpeningRound(false);
@@ -321,7 +321,7 @@ export class Game implements IGame {
     const player = play.player;
 
     if (currentPlayer !== player) {
-      return this.events.emit('invalidPlay', 'Cannot play a turn for a player that is not the current player.');
+      return this.events.publish('invalidPlay', 'Cannot play a turn for a player that is not the current player.');
     }
 
     switch (play.action.type) {
@@ -333,7 +333,7 @@ export class Game implements IGame {
         if (this.validateCaravanDisband(currentPlayer, play.action.caravan)) {
           this.disbandCaravan(currentPlayer, play.action.caravan)
         } else {
-          return this.events.emit('invalidPlay', 'Invalid caravan disbanding; please check the game rules or try a different move.');
+          return this.events.publish('invalidPlay', 'Invalid caravan disbanding; please check the game rules or try a different move.');
         }
         break;
 
@@ -344,7 +344,7 @@ export class Game implements IGame {
             currentPlayer.drawCard();
           }
         } else {
-          return this.events.emit('invalidPlay', 'Invalid discard and draw; please check the game rules or try a different move.');
+          return this.events.publish('invalidPlay', 'Invalid discard and draw; please check the game rules or try a different move.');
         }
         break;
     }

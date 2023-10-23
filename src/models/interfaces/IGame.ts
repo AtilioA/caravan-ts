@@ -1,7 +1,7 @@
-import { EventEmitter } from "../EventEmitter";
 import { AIStrategy } from "./AIStrategy";
 import { ICaravan } from "./ICaravan";
 import { ICard } from "./ICard";
+import { IEventBus } from "./IEventBus";
 import { IPlayer } from "./IPlayer";
 
 export type PlayerAction =
@@ -28,7 +28,7 @@ export interface IGame {
   isOpeningRound: boolean;
   currentPlayerIndex: number;
   currentAIStrategy: AIStrategy | null;
-  events: EventEmitter;
+  events: IEventBus;
 
   setAIStrategy(strategy: AIStrategy): void;
 
