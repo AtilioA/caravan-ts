@@ -165,17 +165,18 @@ export class Game implements IGame {
   private playCardOnCard(player: IPlayer, card: ICard, targetCard: ICard): void {
     if (card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
-      // if (card.value === "Jack") {
-      //   this.events.publish('playJack', {player, card, targetCard});
-      // } else if (card.value === "King") {
-      //   this.events.publish('playKing', {player, card, targetCard});
-      // } else if (card.value === "Joker") {
-      //   if (targetCard.value === "Ace") {
-      //     this.events.publish('playJokerOnAce', {player, card, targetCard});
-      //   } else {
-      //     this.events.publish('playJokerOnNumber', {player, card, targetCard});
-      //   }
-      // }
+      if (card.value === "Jack") {
+        this.events.publish('playJack', {player, card, targetCard});
+      } else if (card.value === "King") {
+        this.events.publish('playKing', {player, card, targetCard});
+      } else if (card.value === "Joker") {
+        const targetCaravan = player.getCaravanByCard(targetCard);
+        if (targetCard.value === "Ace") {
+          this.events.publish('playJokerOnAce', {player, card, targetCard, targetCaravan});
+        } else {
+          this.events.publish('playJokerOnNumber', {player, card, targetCard, targetCaravan});
+        }
+      }
     }
     else {
       return this.events.publish('invalidPlay', 'Can only attach Jacks, Kings, and Jokers to cards');
@@ -368,5 +369,8 @@ export class Game implements IGame {
   // End the Caravan match
   end(): void {
     this.isOver = true;
+
+    // Unsubscribe all entities from the event bus
+    // this.events.unsubscribeAll();
   }
 }
