@@ -28,6 +28,15 @@ export class Player implements IPlayer {
   private _removeFromHand(card: ICard): ICard | null {
     return removeItemFromArray(this.hand, card);
   };
+  
+  getCaravanByCard(card: ICard): ICaravan | null {
+    for (const caravan of this.caravans) {
+      if (caravan.cards.includes(card)) {
+        return caravan;
+      }
+    }
+    return null;
+  }
 
   getValuedCards(): ICard[] {
     return this.hand.filter(card => !card.isFaceCard());

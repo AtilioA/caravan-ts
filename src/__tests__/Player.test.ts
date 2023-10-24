@@ -241,6 +241,22 @@ describe('Player', () => {
         });
     })
 
+    it('should be able to find a caravan by a card (card is in a caravan).', () => {
+        const player = createMockPlayer();
+        const valuedCard = createMockCard('10', 'Diamonds');
+        player.hand.push(valuedCard);
+        player.caravans[0].addCard(valuedCard);
+
+        expect(player.getCaravanByCard(valuedCard)).toEqual(player.caravans[0]);
+    });
+
+    it('should be return null when looking for a caravan by a card (card is not in any caravan).', () => {
+        const player = createMockPlayer();
+        const card = new Card('10', 'Diamonds');
+
+        expect(player.getCaravanByCard(card)).toBeNull();
+    });
+
     it('should be able to generate an array of possible actions for discarding all cards in hand.', () => {
         const player = createMockPlayer();
         player.drawHand(8);
