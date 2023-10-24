@@ -598,6 +598,8 @@ describe('Game - Playing turns', () => {
 
 //     game = new Game([player1, player2]);
 //     game.start();
+//     // Skip opening rounds
+//     game.isOpeningRound = false;
 //   });
 
 //   it('should remove both the targeted number card and any attached face cards when playing a Jack', () => {
@@ -1021,27 +1023,80 @@ describe('Game - End state', () => {
   });
 });
 
-// describe('Game - Joker', () => {
-//     // it('should handle special cards (like Joker) and their effects on the game state correctly', () => {
-//   //     const jokerCard = createMockCard("Joker", "Diamonds")
-//   //     player1.hand.push(jokerCard);
+describe('Game - Joker', () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
 
-//   //     game.playTurn({type: 'PLAY_CARD', card: jokerCard, target: player1.caravans[0]});
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
 
-//   //     // Validate effects of Joker here
-//   // });
-  // it('should not allow playing a Joker on a Face Card', () => {
-  //   const joker = createMockCard("Joker", "Diamonds");
-  //   const king = createMockCard("King", "Diamonds");
-  //   const card7 = createMockCard("7", "Diamonds");
+    game = new Game([player1, player2]);
+    game.start();
+    // Skip opening rounds
+    game.isOpeningRound = false;
+  });
 
-  //   player1.hand.push(joker);
-  //   player1.caravans[0].addCard(card7);
-  //   player1.caravans[0].cards[0].attachFaceCard(king);
+  it('should handle special cards (like Joker) and their effects on a non-ace card', () => {
+    const jokerCard = createMockCard("Joker", "Diamonds")
+    player1.hand.push(jokerCard);
 
-  //   expect(() => game.playTurn({type: 'PLAY_CARD', card: joker, target: king})).toThrowError(InvalidPlayError);
-  // });
-// });
+    player1.caravans[0].addCard(createMockCard("7", "Diamonds"));
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: jokerCard, target: player1.caravans[0].cards[0]}});
+
+    // Validate effects of Joker here
+  });
+
+  it('should handle special cards (like Joker) and their effects on a ace card', () => {
+    const jokerCard = createMockCard("Joker", "Diamonds")
+    player1.hand.push(jokerCard);
+
+    const aceSpadesCard = createMockCard("Ace", "Spades");
+    const sixSpadesCard = createMockCard("6", "Spades");
+    const sevenDiamondsCard = createMockCard("7", "Diamonds");
+    const eightHeartsCard = createMockCard("8", "Hearts");
+    const nineSpadesCard = createMockCard("9", "Spades");
+    player1.caravans[0].addCard(aceSpadesCard);
+    player1.caravans[0].addCard(sixSpadesCard);
+    player1.caravans[0].addCard(sevenDiamondsCard);
+
+    // Should stay in the caravan
+    player1.caravans[1].addCard(eightHeartsCard);
+
+    // Should be removed from the caravan
+    player1.caravans[2].addCard(nineSpadesCard);
+
+    game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: jokerCard, target: aceSpadesCard}});
+
+    // Ace should remain, joker should be attached to it, six of spades should be discarded, six of diamonds should remain, bid should be 7
+    expect(player1.caravans[0].cards).toContain(aceSpadesCard);
+    expect(aceSpadesCard.attachedCards).toContain(jokerCard);
+    expect(player1.caravans[0].cards).not.toContain(sixSpadesCard);
+    expect(player1.caravans[0].cards).toHaveLength(2);
+    expect(player1.caravans[0].cards).toContain(sevenDiamondsCard);
+    expect(player1.caravans[0].bid).toEqual(8);
+
+    expect(player1.caravans[1].cards).toContain(eightHeartsCard);
+    expect(player1.caravans[1].bid).toEqual(8);
+
+    expect(player1.caravans[2].cards).not.toContain(nineSpadesCard);
+    expect(player1.caravans[2].bid).toEqual(0);
+  });
+
+  it('should not allow playing a Joker on a Face Card', () => {
+    const joker = createMockCard("Joker", "Diamonds");
+    const king = createMockCard("King", "Diamonds");
+    const card7 = createMockCard("7", "Diamonds");
+
+    player1.hand.push(joker);
+    player1.caravans[0].addCard(card7);
+    player1.caravans[0].cards[0].attachFaceCard(king);
+
+    expect(() => game.playTurn({player: player1, action: {type: 'PLAY_CARD', card: joker, target: king}})).toThrowError(InvalidPlayError);
+  });
+});
 
 describe('AI initialization', () => {
   let game: Game;
