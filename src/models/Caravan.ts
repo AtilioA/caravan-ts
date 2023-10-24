@@ -1,6 +1,7 @@
 import { CardSuit, CardValue, ValueMapping } from '../constants/cardConstants';
 import { Direction } from '../enums/directions';
 import { InvalidPlayError } from '../exceptions/GameExceptions';
+import { EventBus } from './EventBus';
 import { ICaravan } from './interfaces/ICaravan';
 import { ICard } from './interfaces/ICard';
 
@@ -15,6 +16,36 @@ export class Caravan implements ICaravan {
     this.direction = direction;
     this.suit = suit;
     this.bid = bid;
+
+    const eventBus = EventBus.getInstance();
+    eventBus.subscribe('playJokerOnNumber', this.handleJokerOnNumber.bind(this));
+    eventBus.subscribe('playJokerOnAce', this.handleJokerOnAce.bind(this));
+    eventBus.subscribe('playJack', this._jackLogic.bind(this));
+  }
+
+   private handleJokerOnNumber({ card, targetCard }: { card: ICard; targetCard: ICard }): void {
+    if (targetCard.value === 'Ace') {
+      throw new Error('handleJokerOnNumber should only be called when the target card is not an ace.')
+    }
+
+    // Remove all other cards with the same value as the target card, excluding the target itself.
+    this.cards = this.cards.filter(card => card === targetCard || (card.value !== targetCard.value || card.isFaceCard()));
+
+  }
+
+  private handleJokerOnAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
+    // If the target is not an Ace, this handler should not process it.
+    if (targetCard.value !== 'Ace') {
+      throw new Error('handleJokerOnAce should only be called when the target card is an Ace.');
+    }
+
+    if (targetCaravan === this) {
+      // Attach the Joker to the target Ace.
+      targetCard.attachedCards.push(card);
+    }
+
+    // Remove all cards with the same suit as the Ace, excluding the Ace and any face cards.
+    this.cards = this.cards.filter(card => card === targetCard || (card.suit !== targetCard.suit || card.isFaceCard()));
   }
 
   private _isValueInDirection(value: CardValue): boolean {
@@ -33,6 +64,11 @@ export class Caravan implements ICaravan {
     }
   }
 
+  private _jackLogic(target: ICard, jackCard: ICard): void {
+    console.log('Jack played on caravan', target, jackCard);
+    // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
+  }
+
   getLastValuedCard(): ICard {
     const filteredCards = this.cards.filter(card => !card.isFaceCard());
     return filteredCards[filteredCards.length - 1];
@@ -42,9 +78,6 @@ export class Caravan implements ICaravan {
     return this.cards.length === 0;
   }
 
-  // private _jackLogic(target: ICard, jackCard: ICard): void {
-  //   // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
-  // }
 
   // private _kingLogic(target: ICard, kingCard: ICard): void {
   //   // Doubles the value of the card the king is played on. Stacks with other kings, e.g.: 2 kings on a 5 = 20.
