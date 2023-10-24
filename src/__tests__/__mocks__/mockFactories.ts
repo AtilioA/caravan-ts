@@ -22,12 +22,12 @@ export function createMockDeck(): IDeck {
 
   const cards: ICard[] = [];
 
-  for (let suit of suits) {
-      for (let value of values) {
-          cards.push(
-            new Card(value, suit)
-          );
-      }
+  for (const suit of suits) {
+    for (const value of values) {
+      cards.push(
+        new Card(value, suit)
+      );
+    }
   }
 
   return new Deck(cards);

@@ -5,9 +5,9 @@ import { IEventBus } from "./IEventBus";
 import { IPlayer } from "./IPlayer";
 
 export type PlayerAction =
-| { type: 'PLAY_CARD', card: ICard, target: ICard | ICaravan }
-| { type: 'DISBAND_CARAVAN', caravan: ICaravan }
-| { type: 'DISCARD_DRAW', card: ICard };
+| { type: "PLAY_CARD", card: ICard, target: ICard | ICaravan }
+| { type: "DISBAND_CARAVAN", caravan: ICaravan }
+| { type: "DISCARD_DRAW", card: ICard };
 
 export interface GameAction {
   player: IPlayer;

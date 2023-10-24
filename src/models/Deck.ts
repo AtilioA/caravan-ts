@@ -28,7 +28,7 @@ export class Deck implements IDeck {
   }
 
   addCards(cards: ICard[]): void {
-    for (let card of cards) {
+    for (const card of cards) {
       this.addCard(card);
     }
   }

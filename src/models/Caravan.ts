@@ -1,9 +1,9 @@
-import { CardSuit, CardValue, ValueMapping } from '../constants/cardConstants';
-import { Direction } from '../enums/directions';
-import { InvalidPlayError } from '../exceptions/GameExceptions';
-import { EventBus } from './EventBus';
-import { ICaravan } from './interfaces/ICaravan';
-import { ICard } from './interfaces/ICard';
+import { CardSuit, CardValue, ValueMapping } from "../constants/cardConstants";
+import { Direction } from "../enums/directions";
+import { InvalidPlayError } from "../exceptions/GameExceptions";
+import { EventBus } from "./EventBus";
+import { ICaravan } from "./interfaces/ICaravan";
+import { ICard } from "./interfaces/ICard";
 
 export class Caravan implements ICaravan {
   cards: ICard[] = [];
@@ -18,14 +18,22 @@ export class Caravan implements ICaravan {
     this.bid = bid;
 
     const eventBus = EventBus.getInstance();
-    eventBus.subscribe('playJokerOnNumber', this.handleJokerOnNumber.bind(this));
-    eventBus.subscribe('playJokerOnAce', this.handleJokerOnAce.bind(this));
-    eventBus.subscribe('playJack', this._jackLogic.bind(this));
+    eventBus.subscribe("playJokerOnNumber", this.handleJokerOnNumber.bind(this));
+    eventBus.subscribe("playJokerOnAce", this.handleJokerOnAce.bind(this));
+    eventBus.subscribe("playJack", this._jackLogic.bind(this));
   }
 
-   private handleJokerOnNumber({ card, targetCard }: { card: ICard; targetCard: ICard }): void {
-    if (targetCard.value === 'Ace') {
-      throw new Error('handleJokerOnNumber should only be called when the target card is not an ace.')
+  private handleJokerOnNumber({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
+    if (card.value !== "Joker") {
+      throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
+    }
+    if (targetCard.value === "Ace") {
+      throw new Error("handleJokerOnNumber should only be called when the target card is not an ace.");
+    }
+
+    if (targetCaravan === this) {
+      // Attach the Joker to the target Ace.
+      targetCard.attachedCards.push(card);
     }
 
     // Remove all other cards with the same value as the target card, excluding the target itself.
@@ -34,9 +42,11 @@ export class Caravan implements ICaravan {
   }
 
   private handleJokerOnAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
-    // If the target is not an Ace, this handler should not process it.
-    if (targetCard.value !== 'Ace') {
-      throw new Error('handleJokerOnAce should only be called when the target card is an Ace.');
+    if (card.value !== "Joker") {
+      throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
+    }
+    if (targetCard.value !== "Ace") {
+      throw new Error("handleJokerOnAce should only be called when the target card is an Ace.");
     }
 
     if (targetCaravan === this) {
@@ -50,22 +60,22 @@ export class Caravan implements ICaravan {
 
   private _isValueInDirection(value: CardValue): boolean {
     // Don't allow face cards to be considered for the direction (e.g: when using a Queen to change the direction of the caravan)
-    const lastCardValue = this.getLastValuedCard().getNumericValue()
+    const lastCardValue = this.getLastValuedCard().getNumericValue();
 
     switch (this.direction) {
-      case Direction.ASCENDING:
-        return ValueMapping[value] > lastCardValue;
-      case Direction.DESCENDING:
-        return ValueMapping[value] < lastCardValue;
+    case Direction.ASCENDING:
+      return ValueMapping[value] > lastCardValue;
+    case Direction.DESCENDING:
+      return ValueMapping[value] < lastCardValue;
       /* istanbul ignore next */
-      default:
-        // NOTE: throw an error since the direction should always be defined at this point?
-        return false;
+    default:
+      // NOTE: throw an error since the direction should always be defined at this point?
+      return false;
     }
   }
 
   private _jackLogic(target: ICard, jackCard: ICard): void {
-    console.log('Jack played on caravan', target, jackCard);
+    console.log("Jack played on caravan", target, jackCard);
     // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
   }
 
@@ -111,7 +121,7 @@ export class Caravan implements ICaravan {
 
     // If the caravan has a defined suit and the card's suit matches the caravan's suit, return true.
     if (this.suit && this.suit === card.suit) {
-        return true;
+      return true;
     }
 
     if (this.direction !== null) {
@@ -158,7 +168,7 @@ export class Caravan implements ICaravan {
       }
       */
       // Change suit and nullify direction for Queen.
-      if (card.value === 'Queen') {
+      if (card.value === "Queen") {
         this._queenLogic(card,);
       }
       // this.bid = this.computeValue();

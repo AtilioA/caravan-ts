@@ -1,5 +1,5 @@
 export type eventType =
-  | 'gameStarted'
+  | "gameStarted"
   | "drawInitialCards"
   | "endTurn"
   | "nextTurn"                // Includes details about the next player
@@ -25,7 +25,9 @@ export type eventType =
   ;
 
 export interface IEventBus {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   subscribe(event: eventType, listener: Function): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   publish(event: eventType, ...args: any[]): void;
   clear(): void;
 }

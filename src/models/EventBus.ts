@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { IEventBus, eventType } from "./interfaces/IEventBus";
 
 export class EventBus implements IEventBus {
@@ -21,6 +22,7 @@ export class EventBus implements IEventBus {
     this.listeners[event].push(listener);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   publish(event: eventType, ...args: any[]): void {
     (this.listeners[event] || []).forEach(listener => listener(...args));
   }

@@ -1,7 +1,7 @@
-import { ICaravan } from './ICaravan';
-import { ICard } from './ICard';
-import { IDeck } from './IDeck';
-import { GameAction } from './IGame';
+import { ICaravan } from "./ICaravan";
+import { ICard } from "./ICard";
+import { IDeck } from "./IDeck";
+import { GameAction } from "./IGame";
 
 export interface IPlayer {
   hand: ICard[];

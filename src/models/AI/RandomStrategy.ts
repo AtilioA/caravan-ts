@@ -1,5 +1,5 @@
-import { AIStrategy } from '../interfaces/AIStrategy';
-import { GameAction, GameState } from '../interfaces/IGame';
+import { AIStrategy } from "../interfaces/AIStrategy";
+import { GameAction, GameState } from "../interfaces/IGame";
 
 export class RandomStrategy implements AIStrategy {
   pickMove(gameState: GameState): GameAction {

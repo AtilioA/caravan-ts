@@ -27,7 +27,7 @@ export class Player implements IPlayer {
 
   private _removeFromHand(card: ICard): ICard | null {
     return removeItemFromArray(this.hand, card);
-  };
+  }
   
   getCaravanByCard(card: ICard): ICaravan | null {
     for (const caravan of this.caravans) {
@@ -72,7 +72,7 @@ export class Player implements IPlayer {
 
     // 'Useless' check, but it's here for clarity
     if (caravan.canAddCard(card)) {
-      this._removeFromHand(card)
+      this._removeFromHand(card);
       // REFACTOR: this is being checked twice
       if (this.canDrawCard()) {
         this.drawCard();

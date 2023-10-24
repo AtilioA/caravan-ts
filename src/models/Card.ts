@@ -1,6 +1,6 @@
-import { CardSuit, CardTheme, CardValue, SUITS, THEMES, VALUES, ValueMapping } from '../constants/cardConstants';
-import { InvalidPlayError } from '../exceptions/GameExceptions';
-import { ICard } from './interfaces/ICard';
+import { CardSuit, CardTheme, CardValue, ValueMapping } from "../constants/cardConstants";
+import { InvalidPlayError } from "../exceptions/GameExceptions";
+import { ICard } from "./interfaces/ICard";
 
 export class Card implements ICard {
   value: CardValue;
@@ -17,7 +17,7 @@ export class Card implements ICard {
 
   // Subclassing would probably be overkill (alternative would be using a Factory)
   isFaceCard(): boolean {
-    return ['Jack', 'Queen', 'King', 'Joker'].includes(this.value);
+    return ["Jack", "Queen", "King", "Joker"].includes(this.value);
   }
 
   canAttachFaceCard(card: ICard): boolean {
@@ -25,7 +25,7 @@ export class Card implements ICard {
       // A card can only have 3 face cards attached to it, at most (not even a Jack is allowed in order to remove them; caravan must be disbanded)
       return false;
     } else if (card.isFaceCard()) {
-      if (card.value === 'Queen') {
+      if (card.value === "Queen") {
         return false;
       } else {
         return true;
@@ -41,7 +41,7 @@ export class Card implements ICard {
       return true;
     }
     else {
-      throw new InvalidPlayError('Cannot attach this face card to this card; card is already full or attaching card is a Queen');
+      throw new InvalidPlayError("Cannot attach this face card to this card; card is already full or attaching card is a Queen");
     }
   }
 
@@ -50,11 +50,11 @@ export class Card implements ICard {
   }
 
   computeValue(): number {
-    const nKingsAttached = this.attachedCards.filter((card) => card.value === 'King').length;
+    const nKingsAttached = this.attachedCards.filter((card) => card.value === "King").length;
     if (nKingsAttached > 0) {
       return Number(this.getNumericValue()) * Math.pow(2, nKingsAttached);
     } else {
-      return Number(this.getNumericValue())
+      return Number(this.getNumericValue());
     }
   }
 }

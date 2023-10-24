@@ -9,12 +9,16 @@
     "build": "tsc",
     "start": "node ./dist/index.js",
     "doc": "typedoc",
-    "play": "npx tsc && node ./play.js"
+    "play": "npx tsc && node ./play.js",
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "author": "AtilioA",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/jest": "^29.5.5",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "eslint": "^8.52.0",
     "jest": "^29.7.0",
     "jest-mock-extended": "^3.0.5",
     "ts-jest": "^29.1.1",

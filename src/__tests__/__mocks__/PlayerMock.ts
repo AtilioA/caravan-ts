@@ -1,9 +1,9 @@
-import { Deck } from "../../models/Deck";
-import { ICaravan } from "../../models/interfaces/ICaravan";
-import { ICard } from "../../models/interfaces/ICard";
-import { IDeck } from "../../models/interfaces/IDeck";
-import { IPlayer } from "../../models/interfaces/IPlayer";
-import { createMockDeck } from "./mockFactories";
+// import { Deck } from "../../models/Deck";
+// import { ICaravan } from "../../models/interfaces/ICaravan";
+// import { ICard } from "../../models/interfaces/ICard";
+// import { IDeck } from "../../models/interfaces/IDeck";
+// import { IPlayer } from "../../models/interfaces/IPlayer";
+// import { createMockDeck } from "./mockFactories";
 
 // MockedPlayer.ts
 // export class MockedPlayer implements IPlayer {
