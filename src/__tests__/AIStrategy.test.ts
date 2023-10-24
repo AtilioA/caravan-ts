@@ -14,7 +14,7 @@ describe("AI Strategies", () => {
 
   function commonStrategyTests(strategy: AIStrategy, strategyName: string) {
     describe(`Strategies common tests (testing ${strategyName})`, () => {
-      it("should not return a discard during an opening round", () => {
+      it("should not return a discard during an opening round.", () => {
         gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
         const invalidAction: GameAction = {
           player: gameState.AI,
@@ -29,7 +29,7 @@ describe("AI Strategies", () => {
         expect(possibleMoves).not.toContainEqual(invalidAction);
       });
 
-      it("should not return a disband during an opening round", () => {
+      it("should not return a disband during an opening round.", () => {
         gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
         const invalidAction: GameAction = {
           player: gameState.AI,
@@ -66,7 +66,7 @@ describe("AI Strategies", () => {
   describe("EasyStrategy", () => {
     commonStrategyTests(easyStrategy, "EasyStrategy");
 
-    it("should return a valid DISCARD_DRAW action if not on opening round", () => {
+    it("should return a valid DISCARD_DRAW action if not on opening round.", () => {
       gameState.isOpeningRound = false;
       const action: GameAction = easyStrategy.pickMove(gameState);
 
@@ -77,7 +77,7 @@ describe("AI Strategies", () => {
       });
     });
 
-    it("should return a valid opening round action", () => {
+    it("should return a valid opening round action.", () => {
       gameState.isOpeningRound = true;
       const action: GameAction = easyStrategy.pickMove(gameState);
 
@@ -89,7 +89,7 @@ describe("AI Strategies", () => {
   describe("RandomStrategy", () => {
     commonStrategyTests(randomStrategy, "RandomStrategy");
 
-    it("should return a valid random action from possible moves during an opening round", () => {
+    it("should return a valid random action from possible moves during an opening round.", () => {
       gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
       const action: GameAction = randomStrategy.pickMove(gameState);
 
@@ -98,7 +98,7 @@ describe("AI Strategies", () => {
       expect(possibleMoves).toContainEqual(action);
     });
 
-    it("should return a valid random action from possible moves", () => {
+    it("should return a valid random action from possible moves.", () => {
       gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
       const action: GameAction = randomStrategy.pickMove(gameState);
 

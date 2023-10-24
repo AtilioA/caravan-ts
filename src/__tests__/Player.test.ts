@@ -9,29 +9,29 @@ import { generateCards } from "../utils/card";
 import { createMockCaravan, createMockCard, createMockPlayer } from "./__mocks__/mockFactories";
 
 describe("Player", () => {
-  it("should create a player with an empty set of cards", () => {
+  it("should create a player with an empty set of cards.", () => {
     const player = new Player();
     expect(player.cardSet.getSize()).toEqual(0);
   });
 
-  it("should create a player with an empty discard pile", () => {
+  it("should create a player with an empty discard pile.", () => {
     const player = new Player();
     expect(player.discardPile.getSize()).toEqual(0);
   });
 
-  it("should create a player with a set of cards", () => {
+  it("should create a player with a set of cards.", () => {
     const playerDeck = new Deck();
     playerDeck.generate(40);
     const player = new Player(playerDeck);
     expect(player.cardSet.getSize()).toEqual(40);
   });
 
-  it("should create a player with an empty hand", () => {
+  it("should create a player with an empty hand.", () => {
     const player = new Player();
     expect(player.hand.length).toEqual(0);
   });
 
-  it("should be able to draw a hand of n cards from the cardSet", () => {
+  it("should be able to draw a hand of n cards from the cardSet.", () => {
     const deckSize = Math.floor(Math.random() * (60 - 40 + 1) + 40);
     const handSize = Math.floor(Math.random() * (10 - 5 + 1) + 5);
 
@@ -45,7 +45,7 @@ describe("Player", () => {
     expect(player.cardSet.getSize()).toEqual(deckSize - handSize);
   });
 
-  it("should be able to discard a card from the hand", () => {
+  it("should be able to discard a card from the hand.", () => {
     const playerDeck = new Deck();
     playerDeck.generate(40);
     const player = new Player(playerDeck);
@@ -61,14 +61,14 @@ describe("Player", () => {
     expect(player.discardPile.cards).toContain(discardedCard);
   });
 
-  it("should not draw a card if cardSet is empty", () => {
+  it("should not draw a card if cardSet is empty.", () => {
     const player = new Player();
 
     expect(() => player.drawCard()).toThrowError(InvalidPlayError);
     expect(player.hand.length).toEqual(0);
   });
 
-  it("should be able to draw a card if hand is empty but cardSet is not", () => {
+  it("should be able to draw a card if hand is empty but cardSet is not.", () => {
     const playerDeck = new Deck();
     playerDeck.generate(40);
     const player = new Player(playerDeck);
@@ -82,7 +82,7 @@ describe("Player", () => {
     expect(player.cardSet.getSize()).toEqual(39);
   });
 
-  it("should play a valued card from hand to a caravan and not have it in hand anymore", () => {
+  it("should play a valued card from hand to a caravan and not have it in hand anymore.", () => {
     const playerValuedDeck = new Deck(generateCards(40, false));
     const player = new Player(playerValuedDeck);
     player.drawHand(5);
@@ -93,7 +93,7 @@ describe("Player", () => {
     expect(player.hand).not.toContain(cardToPlay);
   });
 
-  it("should not play a card not present in hand", () => {
+  it("should not play a card not present in hand.", () => {
     // Assuming there is an appropriate method or mechanism to check this in the player class
     const playerDeck = new Deck();
     playerDeck.generate(40);
@@ -268,7 +268,7 @@ describe("Player", () => {
     expect(possibleActions.length).toBeGreaterThan(7);
   });
 
-  it("should be able to generate an array of possible actions for playing all cards in all caravans after the opening rounds", () => {
+  it("should be able to generate an array of possible actions for playing all cards in all caravans after the opening rounds.", () => {
     const player = createMockPlayer();
     player.hand = generateCards(8, false);
 
@@ -293,7 +293,7 @@ describe("Player", () => {
     }
   });
 
-  it("should be able to generate an array of possible actions for taking any actions in any caravan after the opening rounds", () => {
+  it("should be able to generate an array of possible actions for taking any actions in any caravan after the opening rounds.", () => {
     const player = createMockPlayer();
     player.hand = generateCards(8, true);
 
@@ -367,7 +367,7 @@ describe("Player", () => {
     }
   });
 
-  it("should be able to generate an array of possible actions for taking any actions in any caravan at the start of the opening rounds", () => {
+  it("should be able to generate an array of possible actions for taking any actions in any caravan at the start of the opening rounds.", () => {
     const player = createMockPlayer();
     player.hand = generateCards(8, true);
 
@@ -440,7 +440,7 @@ describe("Player", () => {
     }
   });
 
-  it("should be able to generate an array of possible actions for taking any actions in any caravan during the opening rounds", () => {
+  it("should be able to generate an array of possible actions for taking any actions in any caravan during the opening rounds.", () => {
     const player = createMockPlayer();
     player.hand = generateCards(8, true);
 

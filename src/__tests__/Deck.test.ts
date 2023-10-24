@@ -5,18 +5,18 @@ import { Deck } from "../models/Deck";
 
 describe("Deck", () => {
   // Deck initialization
-  it("should create a deck with an empty set of cards", () => {
+  it("should create a deck with an empty set of cards.", () => {
     const deck = new Deck();
     expect(deck.cards.length).toEqual(0);
   });
 
-  it("should create a deck with a set of cards", () => {
+  it("should create a deck with a set of cards.", () => {
     const deck = new Deck();
     deck.generate(40);
     expect(deck.cards.length).toEqual(40);
   });
 
-  it("should be able to be initialized with at least 30 cards", () => {
+  it("should be able to be initialized with at least 30 cards.", () => {
     const deck = new Deck();
     // Generate between 30 and 60 cards
     deck.generate(Math.floor(Math.random() * 30) + 30);
@@ -24,20 +24,20 @@ describe("Deck", () => {
   });
 
   // NOTE: this is not a valid deck for playing, but this behavior should be allowed by the Deck class
-  it("should be able to be initialized with more than least 216 cards", () => {
+  it("should be able to be initialized with more than least 216 cards.", () => {
     const deck = new Deck();
     deck.generate(217);
     expect(deck.cards.length).toEqual(217);
   });
 
   // Card addition
-  it("should add a card to the deck", () => {
+  it("should add a card to the deck.", () => {
     const deck = new Deck();
     deck.addCard(new Card("Ace", "Spades"));
     expect(deck.cards.length).toEqual(1);
   });
 
-  it("should not allow duplicate cards from the same set", () => {
+  it("should not allow duplicate cards from the same set.", () => {
     const deck = new Deck();
     // Both are 'default'-themed cards
     deck.addCard(new Card("Ace", "Spades"));
@@ -45,7 +45,7 @@ describe("Deck", () => {
     expect(deck.cards.length).toEqual(1);
   });
 
-  it("should allow duplicate cards with different themes", () => {
+  it("should allow duplicate cards with different themes.", () => {
     const deck = new Deck();
 
     const sampleThemes = (arr: CardTheme[], n: number) => arr.sort(() => 0.5 - Math.random()).slice(0, n);
@@ -57,7 +57,7 @@ describe("Deck", () => {
   });
 
   // Card drawing
-  it("should draw a card from the deck (drawn card should be the first in the deck and no longer in the deck)", () => {
+  it("should draw a card from the deck (drawn card should be the first in the deck and no longer in the deck).", () => {
     const deck = new Deck();
     deck.generate(40);
 
@@ -77,12 +77,12 @@ describe("Deck", () => {
     expect(drawnCard).toEqual(firstCard);
   });
 
-  it("should not allow drawing from an empty deck", () => {
+  it("should not allow drawing from an empty deck.", () => {
     const deck = new Deck();
     expect(() => deck.drawCard()).toThrowError(InvalidPlayError);
   });
 
-  it("should shuffle the deck of cards", () => {
+  it("should shuffle the deck of cards.", () => {
     const deck = new Deck();
     deck.generate(40);
 
