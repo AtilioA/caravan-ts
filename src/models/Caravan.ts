@@ -20,7 +20,7 @@ export class Caravan implements ICaravan {
     const eventBus = EventBus.getInstance();
     eventBus.subscribe("playJokerOnNumber", this.handleJokerOnNonAce.bind(this));
     eventBus.subscribe("playJokerOnAce", this.handleJokerOnAce.bind(this));
-    eventBus.subscribe("playJack", this._jackLogic.bind(this));
+    eventBus.subscribe("playJack", this.handleJackLogic.bind(this));
   }
 
   private handleJokerOnNonAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
@@ -104,9 +104,22 @@ export class Caravan implements ICaravan {
     }
   }
 
-  private _jackLogic(target: ICard, jackCard: ICard): void {
-    console.log("Jack played on caravan", target, jackCard);
-    // Removes the card the Jack is played on as well as any face cards/Jokers attached, to the discard pile.
+  // FIXME: discarded cards are being added to every Player's discard piles.
+  private handleJackLogic({card, targetCard}: {card: ICard, targetCard: ICard}): void {
+    // Removes the card the Jack is played on
+    this.removeCard(targetCard);
+
+    // Move them to the discard pile.
+    const eventBus = EventBus.getInstance();
+    // Discard attached cards first.
+    if (targetCard.attachedCards) {
+      for (const attachedCard of targetCard.attachedCards) {
+        eventBus.publish("cardDiscarded", { card: attachedCard, sourceCaravan: this });
+      }
+    }
+    // Discard targetCard and Jack cards
+    eventBus.publish("cardDiscarded", { card: targetCard, sourceCaravan: this });
+    eventBus.publish("cardDiscarded", { card: card, sourceCaravan: this });
   }
 
   getLastValuedCard(): ICard {
