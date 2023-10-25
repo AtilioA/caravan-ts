@@ -25,9 +25,11 @@ export class Caravan implements ICaravan {
 
   private handleJokerOnNumber({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
     if (card.value !== "Joker") {
+      // istanbul ignore next
       throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
     }
     if (targetCard.value === "Ace") {
+      // istanbul ignore next
       throw new Error("handleJokerOnNumber should only be called when the target card is not an ace.");
     }
 
@@ -43,9 +45,11 @@ export class Caravan implements ICaravan {
 
   private handleJokerOnAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
     if (card.value !== "Joker") {
+      // istanbul ignore next
       throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
     }
     if (targetCard.value !== "Ace") {
+      // istanbul ignore next
       throw new Error("handleJokerOnAce should only be called when the target card is an Ace.");
     }
 

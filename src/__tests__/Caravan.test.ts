@@ -123,19 +123,19 @@ describe("Caravan", () => {
     expect(caravan.bid).toEqual(12);
   });
 
-  // Attaching cards should be handled by the game logic perhaps
-  // it('should correctly update the bid when adding a King', () => {
-  //     const caravan = new Caravan([new Card('5', 'Diamonds')]);
-  //     caravan.addCard(new Card('King', 'Clubs')); // Assuming King doubles the last card value
+  // TODO: update bid within each Caravan (instead of Game calls to update)
+  // it("should correctly update the bid when adding a King", () => {
+  //   const caravan = new Caravan([new Card("5", "Diamonds")]);
+  //   caravan.addCard(new Card("King", "Clubs")); // Assuming King doubles the last card value
 
-  //     expect(caravan.bid).toEqual(10);
+  //   expect(caravan.bid).toEqual(10);
   // });
 
-  // it('should correctly update the bid when adding a Jack', () => {
-  //     const caravan = new Caravan([new Card('5', 'Diamonds'), new Card('7', 'Clubs')]);
-  //     caravan.addCard(new Card('Jack', 'Hearts')); // Assuming Jack removes all the cards of the same suit
+  // it("should correctly update the bid when adding a Jack", () => {
+  //   const caravan = new Caravan([new Card("5", "Diamonds"), new Card("7", "Clubs")]);
+  //   caravan.addCard(new Card("Jack", "Hearts")); // Assuming Jack removes all the cards of the same suit
 
-  //     expect(caravan.bid).toEqual(5); // 7 removed by Jack
+  //   expect(caravan.bid).toEqual(5); // 7 removed by Jack
   // });
 
   it("should correctly update the suit and direction when adding a Queen.", () => {
