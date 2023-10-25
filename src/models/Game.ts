@@ -30,7 +30,7 @@ export class Game implements IGame {
   }
 
   private registerEventListeners() {
-    this.events.subscribe("playCardOnCaravan", this.playCardToCaravan.bind(this));
+    this.events.subscribe("playCardOnCaravan", this.playCardOnCaravan.bind(this));
     this.events.subscribe("playCardOnCard", this.playCardOnCard.bind(this));
     this.events.subscribe("disbandCaravan", this.disbandCaravan.bind(this));
     this.events.subscribe("gameStarted", this.setOpeningRound.bind(this, true));
@@ -154,7 +154,7 @@ export class Game implements IGame {
     }
   }
 
-  private playCardToCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
+  private playCardOnCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
     if ((!card.isFaceCard() || card.value === "Queen") && player.caravans.includes(caravan)) {
       player.playCard(card, caravan);
     } else {
@@ -163,7 +163,7 @@ export class Game implements IGame {
   }
 
   private playCardOnCard(player: IPlayer, card: ICard, targetCard: ICard): void {
-    if (card.isFaceCard() && card.value !== "Queen") {
+    if (!targetCard.isFaceCard() && card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
       if (card.value === "Jack") {
         this.events.publish("playJack", {player, card, targetCard});
@@ -179,7 +179,7 @@ export class Game implements IGame {
       }
     }
     else {
-      return this.events.publish("invalidPlay", "Can only attach Jacks, Kings, and Jokers to cards");
+      return this.events.publish("invalidPlay", "Can only attach Jacks, Kings, and Jokers to valued cards");
     }
   }
 

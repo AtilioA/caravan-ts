@@ -825,7 +825,7 @@ describe("Game - General valid/invalid moves", () => {
     expect(player1.caravans[0].suit).toEqual("Hearts");
   });
 
-  it("should allow playing a King on another King.", () => {
+  it("should not allow playing a King on another King.", () => {
     const king1 = createMockCard("King", "Diamonds");
     const king2 = createMockCard("King", "Hearts");
     const card7 = createMockCard("7", "Diamonds");
@@ -834,7 +834,8 @@ describe("Game - General valid/invalid moves", () => {
     player1.caravans[0].addCard(card7);
     player1.caravans[0].cards[0].attachFaceCard(king1);
 
-    expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: king2, target: king1}})).not.toThrowError(InvalidPlayError);
+    // King should be attached to the 7 of Diamonds instead of the King of Diamonds.
+    expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: king2, target: king1}})).toThrowError(InvalidPlayError);
   });
 });
 

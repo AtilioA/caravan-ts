@@ -28,7 +28,7 @@ export class Player implements IPlayer {
   private _removeFromHand(card: ICard): ICard | null {
     return removeItemFromArray(this.hand, card);
   }
-  
+
   getCaravanByCard(card: ICard): ICaravan | null {
     for (const caravan of this.caravans) {
       if (caravan.cards.includes(card)) {
@@ -61,7 +61,7 @@ export class Player implements IPlayer {
     }
   }
 
-  // Should be named playCardToCaravan instead
+  // Should be named playCardOnCaravan instead
   playCard(card: ICard, caravan: ICaravan): void {
     if (!this.hand.includes(card)) {
       throw new InvalidPlayError("Cannot play a card that is not in the player's hand");
