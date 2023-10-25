@@ -2,6 +2,7 @@ import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { removeItemFromArray } from "../utils/array";
 import { Caravan } from "./Caravan";
 import { Deck } from "./Deck";
+import { EventBus } from "./EventBus";
 import { ICaravan } from "./interfaces/ICaravan";
 import { ICard } from "./interfaces/ICard";
 import { IDeck } from "./interfaces/IDeck";
@@ -19,6 +20,15 @@ export class Player implements IPlayer {
     this.hand = hand;
     this.caravans = caravans;
     this.discardPile = discardPile;
+
+    const eventBus = EventBus.getInstance();
+    eventBus.subscribe("cardDiscarded", this.handleCardDiscarded.bind(this));
+  }
+
+  private handleCardDiscarded({ card, sourceCaravan }: { card: ICard, sourceCaravan: ICaravan }): void {
+    if (this.caravans.includes(sourceCaravan)) {
+      this.discardPile.addCard(card);
+    }
   }
 
   private _addToHand(card: ICard): void {

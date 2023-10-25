@@ -2,6 +2,7 @@ export type eventType =
   | "gameStarted"
   | "drawInitialCards"
   | "endTurn"
+  | "cardDiscarded"           // Includes details about the card discarded and the caravan it was discarded from
   | "nextTurn"                // Includes details about the next player
   | "playCardOnCaravan"       // Includes details about which caravan with which card
   | "playCardOnCard"          // Includes details about which card was targeted with which card

@@ -166,7 +166,7 @@ export class Game implements IGame {
     if (!targetCard.isFaceCard() && card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
       if (card.value === "Jack") {
-        this.events.publish("playJack", {player, card, targetCard});
+        this.events.publish("playJack", {card, targetCard});
       } else if (card.value === "King") {
         this.events.publish("playKing", {player, card, targetCard});
       } else if (card.value === "Joker") {
