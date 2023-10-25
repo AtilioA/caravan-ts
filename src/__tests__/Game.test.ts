@@ -587,147 +587,223 @@ describe("Game - Playing turns", () => {
   });
 });
 
-// describe('Game - Playing Jacks', () => {
-//   let game: Game;
-//   let player1: IPlayer;
-//   let player2: IPlayer;
 
-//   beforeEach(() => {
-//     player1 = createMockPlayer();
-//     player2 = createMockPlayer();
+describe("Game - Playing Joker", () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
 
-//     game = new Game([player1, player2]);
-//     game.start();
-//     // Skip opening rounds
-//     game.isOpeningRound = false;
-//   });
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
 
-//   it('should remove both the targeted number card and any attached face cards when playing a Jack', () => {
-//     const jackCard = createMockCard("Jack", "Diamonds");
-//     const kingCard = createMockCard("King", "Diamonds");
+    game = new Game([player1, player2]);
+    game.start();
+    // Skip opening rounds
+    game.isOpeningRound = false;
+  });
 
-//     const caravan = player1.caravans[0];
-//     caravan.addCard(createMockCard("7", "Diamonds"));
-//     caravan.cards[0].attachFaceCard(kingCard);
-//     caravan.addCard(createMockCard("6", "Diamonds"));
+  it("should handle special cards (like Joker) and their effects on a non-ace card.", () => {
+    const jokerCard = createMockCard("Joker", "Diamonds");
+    player1.hand.push(jokerCard);
 
-//     player1.hand.push(jackCard);
+    player1.caravans[0].addCard(createMockCard("7", "Diamonds"));
 
-//     game.playTurn({
-//       player: player1,
-//       action: {
-//         type: 'PLAY_CARD',
-//         card: jackCard,
-//         target: caravan.cards[0]
-//       }
-//     });
+    game.playTurn({player: player1, action: {type: "PLAY_CARD", card: jokerCard, target: player1.caravans[0].cards[0]}});
 
-//     expect(caravan.cards).not.toContain(caravan.cards[0]);
-//     expect(caravan.cards).not.toContain(kingCard);
-//     expect(caravan.cards[0].getNumericValue).toEqual(6);
-//     expect(caravan.cards.length).toEqual(1);
-//     expect(caravan.bid).toEqual(6);
+    // Validate effects of Joker here
+  });
 
-//     // NOTE: testing if the cards were actually dettached is not important given that the cards are not used anymore.
-//     // This could be enhanced if we had a use for the discard pile.
-//   });
+  it("should handle special cards (like Joker) and their effects on a ace card.", () => {
+    const jokerCard = createMockCard("Joker", "Diamonds");
+    player1.hand.push(jokerCard);
 
-//   it('should maintain the caravan\'s direction if Jack removes a card, if it leaves two identical number cards', () => {
-//     // Set up caravan with possibility of Jack removing a card and leaving two identical number cards.
-//     const caravan = player2.caravans[0];
-//     caravan.addCard(createMockCard("6", "Diamonds"));
-//     caravan.addCard(createMockCard("7", "Spades"));
-//     caravan.addCard(createMockCard("Queen", "Diamonds"));
-//     caravan.addCard(createMockCard("6", "Hearts"));
+    const aceSpadesCard = createMockCard("Ace", "Spades");
+    const sixSpadesCard = createMockCard("6", "Spades");
+    const sevenDiamondsCard = createMockCard("7", "Diamonds");
+    const eightHeartsCard = createMockCard("8", "Hearts");
+    const nineSpadesCard = createMockCard("9", "Spades");
+    player1.caravans[0].addCard(aceSpadesCard);
+    player1.caravans[0].addCard(sixSpadesCard);
+    player1.caravans[0].addCard(sevenDiamondsCard);
 
-//     const jackCard = createMockCard("Jack", "Diamonds");
-//     player1.hand.push(jackCard);
-//     game.playTurn({
-//       player: player1,
-//       action: {
-//         type: 'PLAY_CARD',
-//         card: jackCard,
-//         target: caravan.cards[1]
-//       }
-//     });
+    // Should stay in the caravan
+    player1.caravans[1].addCard(eightHeartsCard);
 
-//     expect(caravan.cards.length).toEqual(3);
-//     expect(caravan.direction).toEqual(Direction.DESCENDING);
-//   });
+    // Should be removed from the caravan
+    player1.caravans[2].addCard(nineSpadesCard);
 
-//   it('should change the caravan\'s direction if Jack removes a card, not leaving two identical number cards', () => {
-//     // Set up caravan with possibility of Jack removing a card and changing the direction.
-//     const caravan = player2.caravans[0];
-//     caravan.addCard(createMockCard("2", "Diamonds"));
-//     caravan.addCard(createMockCard("6", "Hearts"));
-//     caravan.addCard(createMockCard("4", "Hearts"));
+    game.playTurn({player: player1, action: {type: "PLAY_CARD", card: jokerCard, target: aceSpadesCard}});
 
-//     const jackCard = createMockCard("Jack", "Diamonds");
-//     player1.hand.push(jackCard);
-//     game.playTurn({
-//       player: player1,
-//       action: {
-//         type: 'PLAY_CARD',
-//         card: jackCard,
-//         target: caravan.cards[1]
-//       }
-//     });
+    // Ace should remain, joker should be attached to it, six of spades should be discarded, six of diamonds should remain, bid should be 7
+    expect(player1.caravans[0].cards).toContain(aceSpadesCard);
+    expect(aceSpadesCard.attachedCards).toContain(jokerCard);
+    expect(player1.caravans[0].cards).not.toContain(sixSpadesCard);
+    expect(player1.caravans[0].cards).toHaveLength(2);
+    expect(player1.caravans[0].cards).toContain(sevenDiamondsCard);
+    expect(player1.caravans[0].bid).toEqual(8);
 
-//     expect(caravan.cards.length).toEqual(2);
-//     expect(caravan.direction).toEqual(Direction.ASCENDING);
-//   });
+    expect(player1.caravans[1].cards).toContain(eightHeartsCard);
+    expect(player1.caravans[1].bid).toEqual(8);
+
+    expect(player1.caravans[2].cards).not.toContain(nineSpadesCard);
+    expect(player1.caravans[2].bid).toEqual(0);
+  });
+
+  it("should not allow playing a Joker on a face card.", () => {
+    const joker = createMockCard("Joker", "Diamonds");
+    const king = createMockCard("King", "Diamonds");
+    const card7 = createMockCard("7", "Diamonds");
+
+    player1.hand.push(joker);
+    player1.caravans[0].addCard(card7);
+    player1.caravans[0].cards[0].attachFaceCard(king);
+
+    expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: joker, target: king}})).toThrowError(InvalidPlayError);
+  });
+});
+
+describe("Game - Playing Jacks", () => {
+  let game: Game;
+  let player1: IPlayer;
+  let player2: IPlayer;
+
+  beforeEach(() => {
+    player1 = createMockPlayer();
+    player2 = createMockPlayer();
+
+    game = new Game([player1, player2]);
+    game.start();
+    // Skip opening rounds
+    game.isOpeningRound = false;
+  });
+
+  it("should remove both the targeted number card and any attached face cards when playing a Jack", () => {
+    const jackCard = createMockCard("Jack", "Diamonds");
+    const kingCard = createMockCard("King", "Diamonds");
+
+    const caravan = player1.caravans[0];
+    caravan.addCard(createMockCard("7", "Diamonds"));
+    caravan.cards[0].attachFaceCard(kingCard);
+    caravan.addCard(createMockCard("6", "Diamonds"));
+
+    player1.hand.push(jackCard);
+
+    game.playTurn({
+      player: player1,
+      action: {
+        type: "PLAY_CARD",
+        card: jackCard,
+        target: caravan.cards[0]
+      }
+    });
+
+    expect(caravan.cards).not.toContain(caravan.cards[0]);
+    expect(caravan.cards).not.toContain(kingCard);
+    expect(caravan.cards[0].getNumericValue).toEqual(6);
+    expect(caravan.cards.length).toEqual(1);
+    expect(caravan.bid).toEqual(6);
+
+    // NOTE: testing if the cards were actually dettached is not important given that the cards are not used anymore.
+    // This could be enhanced if we had a use for the discard pile.
+  });
+
+  it("should maintain the caravan's direction if Jack removes a card, if it leaves two identical number cards", () => {
+    // Set up caravan with possibility of Jack removing a card and leaving two identical number cards.
+    const caravan = player2.caravans[0];
+    caravan.addCard(createMockCard("6", "Diamonds"));
+    caravan.addCard(createMockCard("7", "Spades"));
+    caravan.addCard(createMockCard("Queen", "Diamonds"));
+    caravan.addCard(createMockCard("6", "Hearts"));
+
+    const jackCard = createMockCard("Jack", "Diamonds");
+    player1.hand.push(jackCard);
+    game.playTurn({
+      player: player1,
+      action: {
+        type: "PLAY_CARD",
+        card: jackCard,
+        target: caravan.cards[1]
+      }
+    });
+
+    expect(caravan.cards.length).toEqual(3);
+    expect(caravan.direction).toEqual(Direction.DESCENDING);
+  });
+
+  it("should change the caravan's direction if Jack removes a card, not leaving two identical number cards", () => {
+    // Set up caravan with possibility of Jack removing a card and changing the direction.
+    const caravan = player2.caravans[0];
+    caravan.addCard(createMockCard("2", "Diamonds"));
+    caravan.addCard(createMockCard("6", "Hearts"));
+    caravan.addCard(createMockCard("4", "Hearts"));
+
+    const jackCard = createMockCard("Jack", "Diamonds");
+    player1.hand.push(jackCard);
+    game.playTurn({
+      player: player1,
+      action: {
+        type: "PLAY_CARD",
+        card: jackCard,
+        target: caravan.cards[1]
+      }
+    });
+
+    expect(caravan.cards.length).toEqual(2);
+    expect(caravan.direction).toEqual(Direction.ASCENDING);
+  });
 
 
-//   it('should add cards to the player\'s discard pile after a Jack is played (opponent)', () => {
-//     const jackCard = createMockCard("Jack", "Diamonds");
-//     const kingCard = createMockCard("King", "Diamonds");
+  it("should add cards to the player's discard pile after a Jack is played (opponent)", () => {
+    const jackCard = createMockCard("Jack", "Diamonds");
+    const kingCard = createMockCard("King", "Diamonds");
 
-//     const caravan = player2.caravans[0];
-//     caravan.addCard(createMockCard("5", "Diamonds"));
-//     caravan.cards[0].attachFaceCard(kingCard);
-//     caravan.addCard(createMockCard("6", "Diamonds"));
+    const caravan = player2.caravans[0];
+    caravan.addCard(createMockCard("5", "Diamonds"));
+    caravan.cards[0].attachFaceCard(kingCard);
+    caravan.addCard(createMockCard("6", "Diamonds"));
 
-//     player1.hand.push(jackCard);
+    player1.hand.push(jackCard);
 
-//     game.playTurn({
-//       player: player1,
-//       action: {
-//         type: 'PLAY_CARD',
-//         card: jackCard,
-//         target: caravan.cards[0]
-//       }
-//     });
+    game.playTurn({
+      player: player1,
+      action: {
+        type: "PLAY_CARD",
+        card: jackCard,
+        target: caravan.cards[0]
+      }
+    });
 
-//     // 5 of Diamonds and King of Diamonds should be in Player 2's discard pile; 6 of Diamonds should remain in the caravan
-//     expect(player2.discardPile.cards.length).toEqual(2);
-//     expect(player1.discardPile.cards.length).toEqual(1); // Jack is discarded after use
-//   });
+    // 5 of Diamonds and King of Diamonds should be in Player 2's discard pile; 6 of Diamonds should remain in the caravan
+    expect(player2.discardPile.cards.length).toEqual(2);
+    expect(player1.discardPile.cards.length).toEqual(1); // Jack is discarded after use
+  });
 
-//   it('should add cards to the player\'s discard pile after a Jack is played (self)', () => {
-//     const jackCard = createMockCard("Jack", "Diamonds");
-//     const kingCard = createMockCard("King", "Diamonds");
+  it("should add cards to the player's discard pile after a Jack is played (self)", () => {
+    const jackCard = createMockCard("Jack", "Diamonds");
+    const kingCard = createMockCard("King", "Diamonds");
 
-//     const caravan = player1.caravans[0];
-//     caravan.addCard(createMockCard("5", "Diamonds"));
-//     caravan.cards[0].attachFaceCard(kingCard);
-//     caravan.addCard(createMockCard("6", "Diamonds"));
+    const caravan = player1.caravans[0];
+    caravan.addCard(createMockCard("5", "Diamonds"));
+    caravan.cards[0].attachFaceCard(kingCard);
+    caravan.addCard(createMockCard("6", "Diamonds"));
 
-//     player1.hand.push(jackCard);
+    player1.hand.push(jackCard);
 
-//     game.playTurn({
-//       player: player1,
-//       action: {
-//         type: 'PLAY_CARD',
-//         card: jackCard,
-//         target: caravan.cards[0]
-//       }
-//     });
+    game.playTurn({
+      player: player1,
+      action: {
+        type: "PLAY_CARD",
+        card: jackCard,
+        target: caravan.cards[0]
+      }
+    });
 
-//     // 5 of Diamonds and King of Diamonds should be in Player 1's discard pile; 6 of Diamonds should remain in the caravan
-//     expect(player1.discardPile.cards.length).toEqual(3); // Two cards + Jack
-//     expect(player2.discardPile.cards.length).toEqual(0); // Two cards + Jack
-//   });
-// });
+    // 5 of Diamonds and King of Diamonds should be in Player 1's discard pile; 6 of Diamonds should remain in the caravan
+    expect(player1.discardPile.cards.length).toEqual(3); // Two cards + Jack
+    expect(player2.discardPile.cards.length).toEqual(0); // Two cards + Jack
+  });
+});
 
 describe("Game - General valid/invalid moves", () => {
   let game: Game;
@@ -1021,81 +1097,6 @@ describe("Game - End state", () => {
     setCaravanBids(player1, [22, 23, 25]);
     setCaravanBids(player2, [22, 23, 25]);
     expect(game.checkForWinner()).toBeNull();
-  });
-});
-
-describe("Game - Joker", () => {
-  let game: Game;
-  let player1: IPlayer;
-  let player2: IPlayer;
-
-  beforeEach(() => {
-    player1 = createMockPlayer();
-    player2 = createMockPlayer();
-
-    game = new Game([player1, player2]);
-    game.start();
-    // Skip opening rounds
-    game.isOpeningRound = false;
-  });
-
-  it("should handle special cards (like Joker) and their effects on a non-ace card.", () => {
-    const jokerCard = createMockCard("Joker", "Diamonds");
-    player1.hand.push(jokerCard);
-
-    player1.caravans[0].addCard(createMockCard("7", "Diamonds"));
-
-    game.playTurn({player: player1, action: {type: "PLAY_CARD", card: jokerCard, target: player1.caravans[0].cards[0]}});
-
-    // Validate effects of Joker here
-  });
-
-  it("should handle special cards (like Joker) and their effects on a ace card.", () => {
-    const jokerCard = createMockCard("Joker", "Diamonds");
-    player1.hand.push(jokerCard);
-
-    const aceSpadesCard = createMockCard("Ace", "Spades");
-    const sixSpadesCard = createMockCard("6", "Spades");
-    const sevenDiamondsCard = createMockCard("7", "Diamonds");
-    const eightHeartsCard = createMockCard("8", "Hearts");
-    const nineSpadesCard = createMockCard("9", "Spades");
-    player1.caravans[0].addCard(aceSpadesCard);
-    player1.caravans[0].addCard(sixSpadesCard);
-    player1.caravans[0].addCard(sevenDiamondsCard);
-
-    // Should stay in the caravan
-    player1.caravans[1].addCard(eightHeartsCard);
-
-    // Should be removed from the caravan
-    player1.caravans[2].addCard(nineSpadesCard);
-
-    game.playTurn({player: player1, action: {type: "PLAY_CARD", card: jokerCard, target: aceSpadesCard}});
-
-    // Ace should remain, joker should be attached to it, six of spades should be discarded, six of diamonds should remain, bid should be 7
-    expect(player1.caravans[0].cards).toContain(aceSpadesCard);
-    expect(aceSpadesCard.attachedCards).toContain(jokerCard);
-    expect(player1.caravans[0].cards).not.toContain(sixSpadesCard);
-    expect(player1.caravans[0].cards).toHaveLength(2);
-    expect(player1.caravans[0].cards).toContain(sevenDiamondsCard);
-    expect(player1.caravans[0].bid).toEqual(8);
-
-    expect(player1.caravans[1].cards).toContain(eightHeartsCard);
-    expect(player1.caravans[1].bid).toEqual(8);
-
-    expect(player1.caravans[2].cards).not.toContain(nineSpadesCard);
-    expect(player1.caravans[2].bid).toEqual(0);
-  });
-
-  it("should not allow playing a Joker on a Face Card.", () => {
-    const joker = createMockCard("Joker", "Diamonds");
-    const king = createMockCard("King", "Diamonds");
-    const card7 = createMockCard("7", "Diamonds");
-
-    player1.hand.push(joker);
-    player1.caravans[0].addCard(card7);
-    player1.caravans[0].cards[0].attachFaceCard(king);
-
-    expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: joker, target: king}})).toThrowError(InvalidPlayError);
   });
 });
 
