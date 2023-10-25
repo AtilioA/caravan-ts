@@ -18,19 +18,19 @@ export class Caravan implements ICaravan {
     this.bid = bid;
 
     const eventBus = EventBus.getInstance();
-    eventBus.subscribe("playJokerOnNumber", this.handleJokerOnNumber.bind(this));
+    eventBus.subscribe("playJokerOnNumber", this.handleJokerOnNonAce.bind(this));
     eventBus.subscribe("playJokerOnAce", this.handleJokerOnAce.bind(this));
     eventBus.subscribe("playJack", this._jackLogic.bind(this));
   }
 
-  private handleJokerOnNumber({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
+  private handleJokerOnNonAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
+    // istanbul ignore next
     if (card.value !== "Joker") {
-      // istanbul ignore next
-      throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
+      throw new Error("handleJokerOnNonAce should only be called when the card is a Joker.");
     }
+    // istanbul ignore next
     if (targetCard.value === "Ace") {
-      // istanbul ignore next
-      throw new Error("handleJokerOnNumber should only be called when the target card is not an ace.");
+      throw new Error("handleJokerOnNonAce should only be called when the target card is not an ace.");
     }
 
     if (targetCaravan === this) {
@@ -39,17 +39,31 @@ export class Caravan implements ICaravan {
     }
 
     // Remove all other cards with the same value as the target card, excluding the target itself.
-    this.cards = this.cards.filter(card => card === targetCard || (card.value !== targetCard.value || card.isFaceCard()));
+    const cardsToDiscard = this.cards.filter(card => card !== targetCard && card.value === targetCard.value);
 
+    // Emit events for each card to be discarded.
+    // TODO: add 'owner' attribute to the Caravan class so that we can emit the event with the owner of the card.
+    // REVIEW: maybe add 'owner' to the ICard interface too?
+    const eventBus = EventBus.getInstance();
+    cardsToDiscard.forEach(cardToDiscard => {
+      eventBus.publish("cardDiscarded", { card: cardToDiscard, sourceCaravan: this });
+    });
+
+    // Update this.cards.
+    this.cards = this.cards.filter(card => !cardsToDiscard.includes(card));
+  }
+
+  private removeCard(card: ICard): void {
+    this.cards = this.cards.filter(c => c !== card);
   }
 
   private handleJokerOnAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {
+    // istanbul ignore next
     if (card.value !== "Joker") {
-      // istanbul ignore next
-      throw new Error("handleJokerOnNumber should only be called when the card is a Joker.");
+      throw new Error("handleJokerOnNonAce should only be called when the card is a Joker.");
     }
+    // istanbul ignore next
     if (targetCard.value !== "Ace") {
-      // istanbul ignore next
       throw new Error("handleJokerOnAce should only be called when the target card is an Ace.");
     }
 
@@ -59,7 +73,19 @@ export class Caravan implements ICaravan {
     }
 
     // Remove all cards with the same suit as the Ace, excluding the Ace and any face cards.
-    this.cards = this.cards.filter(card => card === targetCard || (card.suit !== targetCard.suit || card.isFaceCard()));
+    // Collect cards that need to be discarded so that the Player can add them to the discard pile.
+    const cardsToDiscard = this.cards.filter(card => card !== targetCard && card.suit === targetCard.suit);
+
+    // Emit events for each card to be discarded.
+    // TODO: add 'owner' attribute to the Caravan class so that we can emit the event with the owner of the card.
+    // REVIEW: maybe add 'owner' to the ICard interface too?
+    const eventBus = EventBus.getInstance();
+    cardsToDiscard.forEach(cardToDiscard => {
+      eventBus.publish("cardDiscarded", { card: cardToDiscard, sourceCaravan: this });
+    });
+
+    // Update this.cards.
+    this.cards = this.cards.filter(card => !cardsToDiscard.includes(card));
   }
 
   private _isValueInDirection(value: CardValue): boolean {
