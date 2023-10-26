@@ -2,12 +2,22 @@ import { CardSuit, CardTheme, CardValue, ValueMapping } from "../constants/cardC
 import { InvalidPlayError } from "../exceptions/GameExceptions";
 import { ICard } from "./interfaces/ICard";
 
+/**
+ * Represents a card in the Caravan game.
+ */
 export class Card implements ICard {
   value: CardValue;
   suit: CardSuit;
   theme: CardTheme = "Default";
   attachedCards: ICard[] = [];
 
+  /**
+   * Constructs a new card.
+   * @param value - The value of the card.
+   * @param suit - The suit of the card.
+   * @param theme - The theme of the card. Defaults to "Default".
+   * @param attachedCards - Initial set of attached cards. Defaults to an empty array.
+   */
   constructor(value: CardValue, suit: CardSuit, theme: CardTheme = "Default", attachedCards: ICard[] = []) {
     this.value = value;
     this.suit = suit;
