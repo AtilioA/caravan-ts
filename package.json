@@ -11,7 +11,7 @@
     "doc": "typedoc",
     "play": "npx tsc && node ./play.js",
     "lint": "eslint . --ext .ts,.tsx",
-    "docs": "typedoc --out docs/ src/"
+    "docs": "typedoc --options typedoc.json"
   },
   "author": "AtilioA",
   "license": "GPL-3.0-or-later",
