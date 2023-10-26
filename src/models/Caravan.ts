@@ -11,6 +11,13 @@ export class Caravan implements ICaravan {
   suit: CardSuit | null = null;
   bid: number = 0;
 
+  /**
+   * Creates a new caravan instance.
+   * @param cards - Initial cards for the caravan.
+   * @param direction - Initial direction for the caravan.
+   * @param suit - Initial suit for the caravan.
+   * @param bid - Initial bid for the caravan.
+   */
   constructor(cards: ICard[] = [], direction: Direction | null = null, suit: CardSuit | null = null, bid: number = 0) {
     this.cards = cards;
     this.direction = direction;
