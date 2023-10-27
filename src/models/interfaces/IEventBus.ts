@@ -1,3 +1,6 @@
+/**
+ * Represents various events that can occur during a game.
+ */
 export type eventType =
   | "gameStarted"
   | "drawInitialCards"
@@ -25,10 +28,28 @@ export type eventType =
   | "invalidPlay"             // Details about the invalid play
   ;
 
+/**
+ * Interface for the event bus system.
+ */
 export interface IEventBus {
+  /**
+   * Subscribe to an event.
+   * @param event - Type of event to listen for.
+   * @param listener - Callback function to be executed when the event is fired.
+   */
   // eslint-disable-next-line @typescript-eslint/ban-types
   subscribe(event: eventType, listener: Function): void;
+
+  /**
+   * Publish (trigger) an event.
+   * @param event - Type of event to be triggered.
+   * @param args - Arguments to be passed to the subscribed listeners.
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   publish(event: eventType, ...args: any[]): void;
+
+  /**
+   * Clear all event listeners.
+   */
   clear(): void;
 }
