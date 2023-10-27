@@ -168,6 +168,7 @@ export class Player implements IPlayer {
   // REFACTOR: this probably needs to be moved to the Game entity, since it needs visibility of the opponent's caravans
   // Fortunately, this will only adds more lines, and existing lines will not need to be changed
   generatePossibleMoves(isOpeningRound: boolean = true, considerDiscard: boolean = true, considerFaceCards: boolean = true, considerDisbandCaravan: boolean = true): GameAction[] {
+    // REFACTOR: split into separate method for opening round
     if (isOpeningRound) {
       considerDiscard = false;
       considerFaceCards = false;
