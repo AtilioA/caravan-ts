@@ -741,6 +741,8 @@ describe("Game - Playing Jacks", () => {
     expect(caravan.cards[0].getNumericValue()).toEqual(6);
     expect(caravan.cards[0].attachedCards).not.toContain(kingCard);
 
+    expect(player1.hand.length).toEqual(9); // New card is drawn
+
     // NOTE: testing if the cards were actually dettached is not important given that the cards are not used anymore.
     // This could be enhanced if we had a use for the discard pile.
   });
@@ -948,6 +950,8 @@ describe("Game - General valid/invalid moves", () => {
 
     // King should be attached to the 7 of Diamonds instead of the King of Diamonds.
     expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: king2, target: king1}})).toThrowError(InvalidPlayError);
+
+    expect(player1.hand.length).toEqual(9); // New card is drawn
   });
 });
 

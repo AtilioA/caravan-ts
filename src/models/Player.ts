@@ -102,6 +102,10 @@ export class Player implements IPlayer {
       targetCard.attachFaceCard(faceCard);
 
       this._removeFromHand(faceCard);
+      // REFACTOR: this might be being checked twice
+      if (this.canDrawCard()) {
+        this.drawCard();
+      }
     } else {
       throw new InvalidPlayError("Can only attach Jacks, Kings, and Jokers to cards");
     }
