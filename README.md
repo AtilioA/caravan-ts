@@ -13,7 +13,7 @@ Originating from the popular video game Fallout: New Vegas, Caravan offers a ble
 The aim is to sell two or three of your caravans with a higher sum than your opponent. A caravan's bid is the total of its number cards, including any multipliers from Kings. To be considered "sold," a caravan must have a bid between 21-26.
 
 ### Rules
-First and foremost, special thanks to /u/NedvedPetrXbox for their [rules breakdown on Reddit](https://www.reddit.com/r/cardgames/comments/97c7g2/caravan_card_game_in_reallife_detailed_rules/). Use it as a general reference for the rules of the game implemented in this project, just note that the post is more focused on transposing the card game to a real-life setting and may not be totally applicable to this digital recreation at certain points.
+First and foremost, special thanks to /u/NedvedPetrXbox for their [rules breakdown on Reddit](https://www.reddit.com/r/cardgames/comments/97c7g2/caravan_card_game_in_reallife_detailed_rules/). Feel free to use it as a general reference for the rules of the game implemented in this project, but just note that the post is more focused on transposing the card game to a real-life setting and may not be totally applicable to this digital recreation at certain minor aspects.
 
 Caravan's rules are a bit complex and inconsistent throughout the game; the game has a few discrepancies between the in-game tutorial and the actual gameplay. This project aims to implement the rules as faithfully as possible to the actual rules set out in the game, so it may not match the in-game logic. Discrepancies are thoroughly discussed in the aforementioned Reddit post.
 
