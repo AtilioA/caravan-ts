@@ -665,17 +665,22 @@ describe("Game - Playing Joker", () => {
     expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: joker, target: king}})).toThrowError(InvalidPlayError);
   });
 
-  it("should only remove cards with the same value when Joker is played on a non-ace, non-face card.", () => {
+  it("should only remove cards with the same value when Joker is played on a non-ace card.", () => {
     const jokerCard = createMockCard("Joker", "Diamonds");
     player1.hand.push(jokerCard);
 
     const sevenDiamondsCard = createMockCard("7", "Diamonds");
+    const sevenSpadesCard = createMockCard("7", "Spades");
     const eightDiamondsCard = createMockCard("8", "Diamonds");
+
     player1.caravans[0].addCard(sevenDiamondsCard);
     player1.caravans[0].addCard(eightDiamondsCard);
+    // Will get removed with the Joker
+    player1.caravans[1].addCard(sevenSpadesCard);
 
     expect(player1.caravans[0].cards).toContain(sevenDiamondsCard);
     expect(player1.caravans[0].cards).toContain(eightDiamondsCard);
+    expect(player1.caravans[1].cards).toContain(sevenSpadesCard);
 
     game.playTurn({player: player1, action: {type: "PLAY_CARD", card: jokerCard, target: sevenDiamondsCard}});
 
@@ -683,8 +688,16 @@ describe("Game - Playing Joker", () => {
     expect(player1.caravans[0].cards[0].attachedCards).toContain(jokerCard);
     expect(player1.caravans[0].cards).toContain(sevenDiamondsCard);
     expect(player1.caravans[0].cards).toContain(eightDiamondsCard);
+    expect(player1.caravans[1].cards).not.toContain(sevenSpadesCard);
+
+    // 15 because no cards were removed
     expect(player1.caravans[0].bid).toEqual(15);
-    expect(player1.discardPile.cards.length).toEqual(0);
+    // 0 because the seven of spades was removed
+    expect(player1.caravans[1].bid).toEqual(0);
+
+    // Player 1's discard pile should contain only the seven of spades
+    expect(player1.discardPile.cards.length).toEqual(1);
+    expect(player1.discardPile.cards).toContain(sevenSpadesCard);
   });
 });
 
