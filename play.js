@@ -1,11 +1,12 @@
-const readline = require('readline');
-const chalk = require('chalk');
-const { Game } = require('./dist/models/Game');
-const { Player } = require('./dist/models/Player');
-const { Deck } = require('./dist/models/Deck');
-const { RandomStrategy } = require('./dist/models/AI/RandomStrategy');
-const { generateCards } = require('./dist/utils/card');
-const { exit } = require('process');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const readline = require("readline");
+const chalk = require("chalk");
+const { Game } = require("./dist/models/Game");
+const { Player } = require("./dist/models/Player");
+const { Deck } = require("./dist/models/Deck");
+const { RandomStrategy } = require("./dist/models/AI/RandomStrategy");
+const { generateCards } = require("./dist/utils/card");
+const { exit } = require("process");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -16,14 +17,14 @@ let game;
 
 function getCardString(card) {
   function getAttachedCardsString(card) {
-    return card.attachedCards.length > 0 ? `(${card.attachedCards.map(getBaseCardString).join('+')})` : '';
+    return card.attachedCards.length > 0 ? `(${card.attachedCards.map(getBaseCardString).join("+")})` : "";
   }
 
   function getBaseCardString(card) {
     if (card.isFaceCard()) {
-      return card.value + card.suit[0]
+      return card.value + card.suit[0];
     } else {
-      return card.getNumericValue() + card.suit[0]
+      return card.getNumericValue() + card.suit[0];
     }
   }
 
@@ -34,7 +35,7 @@ function logGameState() {
   const gameState = game.getCurrentGameState();
 
   // Helper function to pad strings for better alignment
-  const padString = (str, length) => str.padEnd(length, ' ');
+  const padString = (str, length) => str.padEnd(length, " ");
 
   // Helper function to style the bid based on its value
   const styleBid = (bid) => {
@@ -52,25 +53,25 @@ function logGameState() {
   // 'Standard' width for card strings
   const cardWidth = 3;
 
-  let players = [gameState.human, gameState.AI];
+  let players = [gameState.humanPlayer, gameState.AIPlayer];
   players.forEach((player, index) => {
     // Background colors for player headers
     const playerHeader = index === game.currentPlayerIndex ? chalk.bold.bgRedBright : chalk.bold;
-    console.log(playerHeader('\nPlayer ' + (index + 1) + ':'));
-    console.log('Deck size:', player.cardSet.getSize());
+    console.log(playerHeader("\nPlayer " + (index + 1) + ":"));
+    console.log("Deck size:", player.cardSet.getSize());
 
     // Create a padded hand string
     const handString = player.hand
-      .map((card, index) => `${index+1}:${chalk.bold.cyan(getCardString(card).padEnd(cardWidth, ' '))}`)
-      .join(' ');
-    console.log('Hand:    ', handString);
+      .map((card, index) => `${index+1}:${chalk.bold.cyan(getCardString(card).padEnd(cardWidth, " "))}`)
+      .join(" ");
+    console.log("Hand:    ", handString);
 
-    console.log(chalk.bold('Caravans:'));
+    console.log(chalk.bold("Caravans:"));
     player.caravans.forEach((caravan, caravanIndex) => {
       // Create a padded caravan cards string
-      const caravanCards = caravan.cards.map(card => getCardString(card).padEnd(cardWidth, ' ')).join(' ');
+      const caravanCards = caravan.cards.map(card => getCardString(card).padEnd(cardWidth, " ")).join(" ");
       const styledBid = styleBid(caravan.bid); // Get the styled bid
-      console.log(`  Caravan ${caravanIndex + 1}:`, padString(caravanCards, cardWidth * 6), 'Bid:', styledBid);
+      console.log(`  Caravan ${caravanIndex + 1}:`, padString(caravanCards, cardWidth * 6), "Bid:", styledBid);
     });
   });
 
@@ -78,46 +79,46 @@ function logGameState() {
 }
 
 function promptUser() {
-  rl.question('Choose an action: (play, disband, discard, quit) ', (action) => {
+  rl.question("Choose an action: (play, disband, discard, quit) ", (action) => {
     switch (action) {
-      case 'play':
-      case 'p':
-        promptPlayCard();
-        break;
-      case 'disband':
-        promptDisbandCaravan();
-        break;
-      case 'discard':
-      case 'd':
-        promptDiscardCard();
-        break;
-      case 'quit':
-      case 'q':
-        rl.close();
-        break;
-      default:
-        console.log(chalk.red('Invalid action. Please choose a valid action: play, disband, discard, quit'));
-        promptUser();
-        break;
+    case "play":
+    case "p":
+      promptPlayCard();
+      break;
+    case "disband":
+      promptDisbandCaravan();
+      break;
+    case "discard":
+    case "d":
+      promptDiscardCard();
+      break;
+    case "quit":
+    case "q":
+      rl.close();
+      break;
+    default:
+      console.log(chalk.red("Invalid action. Please choose a valid action: play, disband, discard, quit"));
+      promptUser();
+      break;
     }
   });
 }
 
 function promptPlayCard() {
-  rl.question('Enter the card to play (index in hand): ', (cardIndexStr) => {
+  rl.question("Enter the card to play (index in hand): ", (cardIndexStr) => {
     const cardIndex = parseInt(cardIndexStr) - 1;
     if (isNaN(cardIndex) || cardIndex < 0 || cardIndex >= game.getCurrentPlayer().hand.length) {
-      console.log(chalk.red('Invalid card index. Please enter a valid index.'));
+      console.log(chalk.red("Invalid card index. Please enter a valid index."));
       return promptPlayCard();
     }
 
-    rl.question('Enter the target (caravan index or card index in caravan): ', (targetIndexStr) => {
+    rl.question("Enter the target (caravan index or card index in caravan): ", (targetIndexStr) => {
       // If there are two numbers, the first is the caravan index and the second is the card index
       let caravanIndex;
       let cardInCaravanIndex;
-      const targetIndices = targetIndexStr.split(' ');
+      const targetIndices = targetIndexStr.split(" ");
       if (targetIndices.length > 2) {
-        console.log(chalk.red('Invalid target. Please enter a valid index.'));
+        console.log(chalk.red("Invalid target. Please enter a valid index."));
         return promptPlayCard();
       } else {
         if (targetIndices.length === 1) {
@@ -129,8 +130,8 @@ function promptPlayCard() {
         }
       }
 
-      if (isNaN(caravanIndex) || caravanIndex < 0 || caravanIndex > 2) {
-        console.log(chalk.red('Invalid caravan target. Please enter a valid index.'));
+      if (isNaN(caravanIndex) || caravanIndex < 0 || caravanIndex > 5) {
+        console.log(chalk.red("Invalid caravan target. Please enter a valid index."));
         return promptPlayCard();
       }
 
@@ -142,21 +143,25 @@ function promptPlayCard() {
       // Determine if the target is a caravan or a card within a caravan
       let target;
       if (cardInCaravanIndex !== undefined && cardInCaravanIndex >= 0) {
-        target = game.getCurrentPlayer().caravans[caravanIndex].cards[cardInCaravanIndex];
+        if (caravanIndex >= game.getCurrentPlayer().caravans.length) {
+          target = game.players[1].caravans[caravanIndex - game.getCurrentPlayer().caravans.length].cards[cardInCaravanIndex];
+        } else {
+          target = game.getCurrentPlayer().caravans[caravanIndex].cards[cardInCaravanIndex];
+        }
       }
       else if (caravanIndex >= 0 && caravanIndex < game.getCurrentPlayer().caravans.length) {
         target = game.getCurrentPlayer().caravans[caravanIndex];
       } else {
-        console.log(chalk.red('Invalid card/caravan index. Please enter a valid index.'));
+        console.log(chalk.red("Invalid card/caravan index. Please enter a valid index."));
         return promptPlayCard();
       }
 
       try {
         game.playTurn({
           action: {
-            type: 'PLAY_CARD',
+            type: "PLAY_CARD",
             card: game.getCurrentPlayer().hand[cardIndex],
-            target: target,
+            target,
           },
           player: game.getCurrentPlayer(),
         });
@@ -171,17 +176,17 @@ function promptPlayCard() {
 }
 
 function promptDisbandCaravan() {
-  rl.question('Enter the caravan to disband (index): ', (caravanIndexStr) => {
+  rl.question("Enter the caravan to disband (index): ", (caravanIndexStr) => {
     const caravanIndex = parseInt(caravanIndexStr) - 1;
     if (isNaN(caravanIndex) || caravanIndex < 0 || caravanIndex >= game.getCurrentPlayer().caravans.length) {
-      console.log(chalk.red('Invalid caravan index. Please enter a valid index.'));
+      console.log(chalk.red("Invalid caravan index. Please enter a valid index."));
       return promptDisbandCaravan();
     }
 
     try {
       game.playTurn({
         action: {
-          type: 'DISBAND_CARAVAN',
+          type: "DISBAND_CARAVAN",
           caravan: game.getCurrentPlayer().caravans[caravanIndex],
         },
         player: game.getCurrentPlayer(),
@@ -196,17 +201,17 @@ function promptDisbandCaravan() {
 }
 
 function promptDiscardCard() {
-  rl.question('Enter the card to discard (index in hand): ', (cardIndexStr) => {
+  rl.question("Enter the card to discard (index in hand): ", (cardIndexStr) => {
     const cardIndex = parseInt(cardIndexStr) - 1;
     if (isNaN(cardIndex) || cardIndex < 0 || cardIndex >= game.getCurrentPlayer().hand.length) {
-      console.log(chalk.red('Invalid card index. Please enter a valid index.'));
+      console.log(chalk.red("Invalid card index. Please enter a valid index."));
       return promptDiscardCard();
     }
 
     try {
       game.playTurn({
         action: {
-          type: 'DISCARD_DRAW',
+          type: "DISCARD_DRAW",
           card: game.getCurrentPlayer().hand[cardIndex],
         },
         player: game.getCurrentPlayer(),
@@ -242,8 +247,8 @@ function checkGameStatus() {
   //   rl.close();
   //   exit();
   // } else {
-    // If the game is not over, proceed to the next turn
-    handleTurn();
+  // If the game is not over, proceed to the next turn
+  handleTurn();
   // }
 }
 
@@ -252,16 +257,16 @@ function startGame() {
   const aiPlayer = new Player(new Deck(generateCards(30, true)));
 
   game = new Game([humanPlayer, aiPlayer]);
-  game.setAIStrategy(new RandomStrategy())
+  game.setAIStrategy(new RandomStrategy());
 
-  game.events.on('nextTurn', () => {
+  game.events.subscribe("nextTurn", () => {
     checkGameStatus(); // Proceed to next turn or end the game if over
   });
 
-  game.events.on('gameOver', ({ winner }) => {
+  game.events.subscribe("gameOver", ({ winner }) => {
     logGameState();
     const gameState = game.getCurrentGameState();
-    console.log(chalk.bold(`Game over! The winner is the ${gameState.human === winner ? 'human' : 'AI'}!`));
+    console.log(chalk.bold(`Game over! The winner is the ${gameState.humanPlayer === winner ? "human" : "AI"}!`));
     rl.close();
     exit();
   });
