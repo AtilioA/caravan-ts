@@ -1,13 +1,13 @@
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  testPathIgnorePatterns: ['jest', '/node_modules/', '/__mocks__/', '/dist/'],
-  coverageDirectory: 'coverage',
+  preset: "ts-jest",
+  testEnvironment: "node",
+  testPathIgnorePatterns: ["jest", "/node_modules/", "/__mocks__/", "/dist/"],
+  coverageDirectory: "coverage",
   coverageReporters: ["json", "lcov", "text", "clover"],
   collectCoverageFrom: [
-    'src/**/*.ts', '!src/**/*.d.ts',
+    "src/**/*.ts", "!src/**/*.d.ts",
   ],
-  setupFilesAfterEnv: ['./src/__tests__/jest.globalSetup.ts'],
+  setupFilesAfterEnv: ["./src/__tests__/jest.globalSetup.ts"],
   coverageThreshold: {
     "global": {
       "branches": 95,
