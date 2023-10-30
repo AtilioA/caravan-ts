@@ -40,10 +40,10 @@ export class Caravan implements ICaravan {
       throw new Error("handleJokerOnNonAce should only be called when the target card is not an ace.");
     }
 
-    if (targetCaravan === this) {
-      // Attach the Joker to the target Ace.
-      targetCard.attachedCards.push(card);
-    }
+    // if (targetCaravan === this) {
+    //   // Attach the Joker to the target Ace.
+    //   targetCard.attachedCards.push(card);
+    // }
 
     // Remove all other cards with the same value as the target card, excluding the target itself.
     const cardsToDiscard = this.cards.filter(card => card !== targetCard && card.value === targetCard.value);
@@ -74,10 +74,10 @@ export class Caravan implements ICaravan {
       throw new Error("handleJokerOnAce should only be called when the target card is an Ace.");
     }
 
-    if (targetCaravan === this) {
-      // Attach the Joker to the target Ace.
-      targetCard.attachedCards.push(card);
-    }
+    // if (targetCaravan === this) {
+    //   // Attach the Joker to the target Ace.
+    //   targetCard.attachedCards.push(card);
+    // }
 
     // Remove all cards with the same suit as the Ace, excluding the Ace and any face cards.
     // Collect cards that need to be discarded so that the Player can add them to the discard pile.
