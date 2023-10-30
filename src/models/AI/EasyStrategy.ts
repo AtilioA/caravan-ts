@@ -14,10 +14,10 @@ export class EasyStrategy implements AIStrategy {
    */
   pickMove(gameState: GameState): GameAction {
     if (!gameState.isOpeningRound) {
-      return { player: gameState.AI, action: { type: "DISCARD_DRAW", card: gameState.AI.hand[0] } };
+      return { player: gameState.AIPlayer, action: { type: "DISCARD_DRAW", card: gameState.AIPlayer.hand[0] } };
     } else {
       // REFACTOR: maybe remove this duplication
-      const possibleMoves = gameState.AI.generatePossibleMoves(gameState.isOpeningRound);
+      const possibleMoves = gameState.AIPlayer.generatePossibleMoves(gameState.isOpeningRound);
 
       // Randomly select one move from all possible moves
       return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];

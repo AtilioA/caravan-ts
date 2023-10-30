@@ -55,8 +55,8 @@ export class Game implements IGame {
 
   private getCurrentGameState(): GameState {
     return {
-      human: this.players[0],
-      AI: this.players[1],
+      humanPlayer: this.players[0],
+      AIPlayer: this.players[1],
       currentPlayerIndex: this.currentPlayerIndex,
       isOpeningRound: this.isOpeningRound,
     };

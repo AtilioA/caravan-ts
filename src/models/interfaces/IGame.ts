@@ -38,9 +38,9 @@ export interface GameAction {
  */
 export interface GameState {
   /** The humanPlayer player. */
-  human: IPlayer;
-  AI: IPlayer;
+  humanPlayer: IPlayer;
   /** The AI player. */
+  AIPlayer: IPlayer;
   /** The index of the current player. */
   currentPlayerIndex: number;
   /** Whether the game is in its opening rounds. */

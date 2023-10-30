@@ -15,31 +15,31 @@ describe("AI Strategies", () => {
   function commonStrategyTests(strategy: AIStrategy, strategyName: string) {
     describe(`Strategies common tests (testing ${strategyName})`, () => {
       it("should not return a discard during an opening round.", () => {
-        gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
+        gameState.AIPlayer.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
         const invalidAction: GameAction = {
-          player: gameState.AI,
+          player: gameState.AIPlayer,
           action: {
             type: "DISCARD_DRAW",
-            card: gameState.AI.hand[0]
+            card: gameState.AIPlayer.hand[0]
           }
         };
 
-        const possibleMoves = gameState.AI.generatePossibleMoves(true);
+        const possibleMoves = gameState.AIPlayer.generatePossibleMoves(true);
 
         expect(possibleMoves).not.toContainEqual(invalidAction);
       });
 
       it("should not return a disband during an opening round.", () => {
-        gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
+        gameState.AIPlayer.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
         const invalidAction: GameAction = {
-          player: gameState.AI,
+          player: gameState.AIPlayer,
           action: {
             type: "DISBAND_CARAVAN",
-            caravan: gameState.AI.caravans[0]
+            caravan: gameState.AIPlayer.caravans[0]
           }
         };
 
-        const possibleMoves = gameState.AI.generatePossibleMoves(true);
+        const possibleMoves = gameState.AIPlayer.generatePossibleMoves(true);
 
         expect(possibleMoves).not.toContainEqual(invalidAction);
       });
@@ -49,14 +49,14 @@ describe("AI Strategies", () => {
   beforeEach(() => {
     // Set up a mock game state
     gameState = {
-      human: createMockPlayer(),
-      AI: createMockPlayer(),
+      humanPlayer: createMockPlayer(),
+      AIPlayer: createMockPlayer(),
       currentPlayerIndex: 1, // Assume it's the AI's turn
       isOpeningRound: true, // Assume it's the opening round
     };
 
-    gameState.AI.drawHand(8);
-    gameState.human.drawHand(8);
+    gameState.AIPlayer.drawHand(8);
+    gameState.humanPlayer.drawHand(8);
 
     // Initialize strategies
     easyStrategy = new EasyStrategy();
@@ -72,8 +72,8 @@ describe("AI Strategies", () => {
 
       // Check that the action is of type DISCARD_DRAW and involves the first card in the player's hand
       expect(action).toEqual({
-        player: gameState.AI,
-        action: { type: "DISCARD_DRAW", card: gameState.AI.hand[0] }
+        player: gameState.AIPlayer,
+        action: { type: "DISCARD_DRAW", card: gameState.AIPlayer.hand[0] }
       });
     });
 
@@ -81,7 +81,7 @@ describe("AI Strategies", () => {
       gameState.isOpeningRound = true;
       const action: GameAction = easyStrategy.pickMove(gameState);
 
-      const possibleMoves = gameState.AI.generatePossibleMoves(true);
+      const possibleMoves = gameState.AIPlayer.generatePossibleMoves(true);
       expect(possibleMoves).toContainEqual(action);
     });
   });
@@ -90,19 +90,19 @@ describe("AI Strategies", () => {
     commonStrategyTests(randomStrategy, "RandomStrategy");
 
     it("should return a valid random action from possible moves during an opening round.", () => {
-      gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
+      gameState.AIPlayer.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
       const action: GameAction = randomStrategy.pickMove(gameState);
 
-      const possibleMoves = gameState.AI.generatePossibleMoves(true);
+      const possibleMoves = gameState.AIPlayer.generatePossibleMoves(true);
 
       expect(possibleMoves).toContainEqual(action);
     });
 
     it("should return a valid random action from possible moves.", () => {
-      gameState.AI.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
+      gameState.AIPlayer.hand = [createMockCard("Ace", "Spades"), createMockCard("7", "Diamonds")];
       const action: GameAction = randomStrategy.pickMove(gameState);
 
-      const possibleMoves = gameState.AI.generatePossibleMoves();
+      const possibleMoves = gameState.AIPlayer.generatePossibleMoves();
 
       expect(possibleMoves).toContainEqual(action);
     });

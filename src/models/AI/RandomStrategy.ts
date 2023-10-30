@@ -12,7 +12,7 @@ export class RandomStrategy implements AIStrategy {
    * @returns {GameAction} - A random action the AI decides to take.
    */
   pickMove(gameState: GameState): GameAction {
-    const possibleMoves = gameState.AI.generatePossibleMoves(gameState.isOpeningRound);
+    const possibleMoves = gameState.AIPlayer.generatePossibleMoves(gameState.isOpeningRound);
 
     // Randomly select one move from all possible moves
     return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
