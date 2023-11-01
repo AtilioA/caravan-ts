@@ -83,6 +83,11 @@ export class Game implements IGame {
       return this.events.publish("invalidPlay", "Invalid opening turn; please check the game rules.");
     }
 
+    // End opening rounds after 6 turns
+    if (this.currentRound >= 6) {
+      this.events.publish("endOpeningRounds");
+    }
+
     this.events.publish("endTurn");
   }
 
@@ -98,11 +103,6 @@ export class Game implements IGame {
   // }
 
   private endCurrentTurn(): void {
-    // Update bids of all caravans
-    this.events.publish("updateCaravansBids");
-
-    this.currentRound++;
-
     // Check for any game-winning conditions
     // This _could_ be handled by events, but was kept for clarity
     const winner = this.checkForWinner();
@@ -247,6 +247,7 @@ export class Game implements IGame {
   }
 
   private moveToNextTurn(): void {
+    this.currentRound++;
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
   }
 
@@ -259,6 +260,7 @@ export class Game implements IGame {
       return this.events.publish("invalidGameState", "Cannot make an AI move when there is no AI strategy set.");
     } else {
       const move = this.currentAIStrategy.pickMove(this.getCurrentGameState());
+      // REVIEW: use event to play AI turn?
       this.playTurn(move);
     }
   }
@@ -308,12 +310,10 @@ export class Game implements IGame {
   playTurn(play: GameAction) {
     if (this.isOver) {
       return this.events.publish("invalidPlay", "Cannot play a turn on a match that is already over.");
-    } else if (this.isOpeningRound) {
-      if (this.currentRound >= 6) {
-        this.setOpeningRound(false);
-      } else {
-        return this.playOpeningTurn(play);
-      }
+    }
+
+    if (this.isOpeningRound) {
+      return this.playOpeningTurn(play);
     }
 
     const currentPlayer = this.getCurrentPlayer();
@@ -338,6 +338,7 @@ export class Game implements IGame {
 
     case "DISCARD_DRAW":
       if (this.validateDiscardDraw(currentPlayer, play.action.card)) {
+        // REFACTOR: modularize this
         currentPlayer.discardCard(play.action.card);
         if (currentPlayer.canDrawCard()) {
           currentPlayer.drawCard();
