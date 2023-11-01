@@ -23,11 +23,25 @@ export class Player implements IPlayer {
 
     const eventBus = EventBus.getInstance();
     eventBus.subscribe("cardDiscarded", this.handleCardDiscarded.bind(this));
+    eventBus.subscribe("playCard", this.handleCardPlayed.bind(this));
+    eventBus.subscribe("disbandCaravan", this.handleDisbandCaravan.bind(this));
+  }
+
+  private handleDisbandCaravan({player, caravan}: {player: IPlayer, caravan: ICaravan}): void {
+    if (player === this) {
+      player.disbandCaravan(caravan);
+    }
+  }
+
+  private handleCardPlayed({player, card, caravan}: {player: IPlayer, card: ICard, caravan: ICaravan}): void {
+    if (player === this) {
+      player.playCard(card, caravan);
+    }
   }
 
   private handleCardDiscarded({ card, sourceCaravan }: { card: ICard, sourceCaravan: ICaravan }): void {
     if (this.caravans.includes(sourceCaravan)) {
-      this.discardPile.addCard(card);
+      return this.discardPile.addCard(card);
     }
   }
 

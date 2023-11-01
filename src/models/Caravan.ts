@@ -25,9 +25,14 @@ export class Caravan implements ICaravan {
     this.bid = bid;
 
     const eventBus = EventBus.getInstance();
+    eventBus.subscribe("updateCaravansBids", this.handleUpdateCaravansBid.bind(this));
     eventBus.subscribe("playJokerOnNumber", this.handleJokerOnNonAce.bind(this));
     eventBus.subscribe("playJokerOnAce", this.handleJokerOnAce.bind(this));
     eventBus.subscribe("playJack", this.handleJackLogic.bind(this));
+  }
+
+  private handleUpdateCaravansBid(): void {
+    this.bid = this.computeValue();
   }
 
   private handleJokerOnNonAce({ card, targetCard, targetCaravan }: { card: ICard; targetCard: ICard, targetCaravan: ICaravan }): void {

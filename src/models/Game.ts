@@ -32,15 +32,11 @@ export class Game implements IGame {
   private registerEventListeners() {
     this.events.subscribe("playCardOnCaravan", this.playCardOnCaravan.bind(this));
     this.events.subscribe("playCardOnCard", this.playCardOnCard.bind(this));
-    this.events.subscribe("disbandCaravan", this.disbandCaravan.bind(this));
     this.events.subscribe("gameStarted", this.setOpeningRound.bind(this, true));
     this.events.subscribe("gameOver", this.end.bind(this));
-    this.events.subscribe("updateCaravansBids", this.updateBids.bind(this));
-    this.events.subscribe("updateCaravanBid", (caravan: ICaravan) => {
-      caravan.bid = caravan.computeValue();
-    });
     this.events.subscribe("endTurn", this.endCurrentTurn.bind(this));
     this.events.subscribe("nextTurn", this.moveToNextTurn.bind(this));
+    this.events.subscribe("endOpeningRounds", this.setOpeningRound.bind(this, false));
     this.events.subscribe("invalidGameState", (message: string) => {
       throw new InvalidGameState(message);
     });
@@ -90,14 +86,16 @@ export class Game implements IGame {
     this.events.publish("endTurn");
   }
 
-  private updateBids(): void {
-    // Call compute value for each caravan of each player
-    for (const player of this.players) {
-      for (const caravan of player.caravans) {
-        this.events.publish("updateCaravanBid", caravan);
-      }
-    }
-  }
+  // private updateBids(): void {
+  //   // Call compute value for each caravan of each player
+  //   this.events.publish("updateCaravanBid");
+
+  //   // for (const player of this.players) {
+  //   //   for (const caravan of player.caravans) {
+  //   //     this.events.publish("updateCaravanBid", caravan);
+  //   //   }
+  //   // }
+  // }
 
   private endCurrentTurn(): void {
     // Update bids of all caravans
@@ -106,6 +104,7 @@ export class Game implements IGame {
     this.currentRound++;
 
     // Check for any game-winning conditions
+    // This _could_ be handled by events, but was kept for clarity
     const winner = this.checkForWinner();
     if (winner) {
       this.events.publish("gameOver", {winner});
@@ -132,8 +131,7 @@ export class Game implements IGame {
   }
 
   private disbandCaravan(player: IPlayer, caravan: ICaravan): void {
-    player.disbandCaravan(caravan);
-    // this.events.publish('disbandCaravan', this.getCurrentPlayer(), caravan);
+    return this.events.publish("disbandCaravan", { player, caravan });
   }
 
   private playCard(card: ICard, target: ICard | ICaravan): void {
@@ -146,9 +144,9 @@ export class Game implements IGame {
 
   private playCardToTarget(player: IPlayer, card: ICard, target: ICaravan | ICard): void {
     if (isCaravan(target)) {
-      this.events.publish("playCardOnCaravan", player, card, target);
+      return this.events.publish("playCardOnCaravan", player, card, target);
     } else if (card.isFaceCard()) {
-      this.events.publish("playCardOnCard", player, card, target);
+      return this.events.publish("playCardOnCard", player, card, target);
     } else {
       return this.events.publish("invalidPlay", "Cannot play a valued card on a card");
     }
@@ -156,7 +154,7 @@ export class Game implements IGame {
 
   private playCardOnCaravan(player: IPlayer, card: ICard, caravan: ICaravan): void {
     if ((!card.isFaceCard() || card.value === "Queen") && player.caravans.includes(caravan)) {
-      player.playCard(card, caravan);
+      return this.events.publish("playCard", {player, card, caravan});
     } else {
       return this.events.publish("invalidPlay", "Cannot extend an opponent's caravan with a valued card");
     }
@@ -166,15 +164,15 @@ export class Game implements IGame {
     if (!targetCard.isFaceCard() && card.isFaceCard() && card.value !== "Queen") {
       player.attachFaceCard(card, targetCard);
       if (card.value === "Jack") {
-        this.events.publish("playJack", {card, targetCard});
+        return this.events.publish("playJack", {card, targetCard});
       } else if (card.value === "King") {
-        this.events.publish("playKing", {player, card, targetCard});
+        return this.events.publish("playKing", {player, card, targetCard});
       } else if (card.value === "Joker") {
         const targetCaravan = player.getCaravanByCard(targetCard);
         if (targetCard.value === "Ace") {
-          this.events.publish("playJokerOnAce", {player, card, targetCard, targetCaravan});
+          return this.events.publish("playJokerOnAce", {player, card, targetCard, targetCaravan});
         } else {
-          this.events.publish("playJokerOnNumber", {player, card, targetCard, targetCaravan});
+          return this.events.publish("playJokerOnNumber", {player, card, targetCard, targetCaravan});
         }
       }
     }
@@ -350,8 +348,8 @@ export class Game implements IGame {
       break;
     }
 
-    this.updateBids();
-    this.endCurrentTurn();
+    this.events.publish("updateCaravansBids");
+    this.events.publish("endTurn");
   }
 
   checkForWinner(): IPlayer | null {
@@ -370,7 +368,7 @@ export class Game implements IGame {
   end(): void {
     this.isOver = true;
 
-    // Unsubscribe all entities from the event bus
-    // this.events.unsubscribeAll();
+    // Unsubscribe all entities from the event bus, somehow
+    // this.events.clear();
   }
 }

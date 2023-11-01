@@ -5,10 +5,12 @@ export type eventType =
   | "gameStarted"
   | "drawInitialCards"
   | "endTurn"
+  | "endOpeningRounds"
   | "cardDiscarded"           // Includes details about the card discarded and the caravan it was discarded from
   | "nextTurn"                // Includes details about the next player
   | "playCardOnCaravan"       // Includes details about which caravan with which card
   | "playCardOnCard"          // Includes details about which card was targeted with which card
+  | "playCard"                // Includes details about which player played which card on which caravan
   | "discardCard"             // Includes details about the card discarded
   | "disbandCaravan"          // Which caravan was disbanded
   | "updateCaravanBid"        // Which caravan should be updated
@@ -23,7 +25,8 @@ export type eventType =
   | "trackTied"               // When a caravan track reaches a tie
   | "disbandTiedTrack"        // When a tied caravan track is disbanded
   | "sabotageOpponentCaravan" // This could be a more general event that occurs when an action specifically targets the opponent's caravan
-  | "gameOver"                // Details about the winner and the final state of caravans
+  | "gameOver"                // Details about the winner and the fin1al state of caravans
+  | "unsubscribeAll"
   | "invalidGameState"        // Details about the invalid game state
   | "invalidPlay"             // Details about the invalid play
   ;
