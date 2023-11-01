@@ -1,6 +1,6 @@
 {
   "name": "caravan-ts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A TypeScript module implementing the game logic for Caravan, a card game from Fallout: New Vegas, allowing developers to integrate it into various applications or environments.",
   "main": "index.ts",
   "scripts": {
