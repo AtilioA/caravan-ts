@@ -326,6 +326,10 @@ export class Game implements IGame {
     switch (play.action.type) {
     case "PLAY_CARD":
       this.playCard(play.action.card, play.action.target);
+      // REFACTOR: modularize this into events
+      if (currentPlayer.canDrawCard()) {
+        currentPlayer.drawCard();
+      }
       break;
 
     case "DISBAND_CARAVAN":

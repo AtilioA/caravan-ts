@@ -1043,7 +1043,14 @@ describe("Game - Opening rounds", () => {
 
     player1.caravans[0].addCard(createMockCard("6", "Diamonds"));
     expect(() => game.playTurn({player: player1, action: {type: "PLAY_CARD", card: valuedCard, target: player1.caravans[0]}})).toThrowError(InvalidPlayError);
+  });
 
+  it("should not make players draw cards after playing during the opening rounds.", () => {
+    const valuedCard = player1.getValuedCards()[0];
+    player1.hand.push(valuedCard);
+
+    game.playTurn({player: player1, action: {type: "PLAY_CARD", card: valuedCard, target: player1.caravans[0]}});
+    expect(player1.hand.length).toEqual(8); // 7 + 0 (no draw)
   });
 
   it("should end opening rounds after 6 rounds (3 each player).", () => {

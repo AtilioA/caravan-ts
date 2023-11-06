@@ -98,9 +98,9 @@ export class Player implements IPlayer {
     if (caravan.canAddCard(card)) {
       this._removeFromHand(card);
       // REFACTOR: this is being checked twice
-      if (this.canDrawCard()) {
-        this.drawCard();
-      }
+      // if (this.canDrawCard()) {
+      //   this.drawCard();
+      // }
     }
     caravan.addCard(card);
   }
@@ -117,9 +117,9 @@ export class Player implements IPlayer {
 
       this._removeFromHand(faceCard);
       // REFACTOR: this might be being checked twice
-      if (this.canDrawCard()) {
-        this.drawCard();
-      }
+      // if (this.canDrawCard()) {
+      //   this.drawCard();
+      // }
     } else {
       throw new InvalidPlayError("Can only attach Jacks, Kings, and Jokers to cards");
     }
