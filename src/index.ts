@@ -28,3 +28,6 @@ export * from "./models/interfaces/IPlayer";
 export * from "./utils/array";
 export * from "./utils/caravan";
 export * from "./utils/card";
+
+// Mocks (for prototyping)
+export * from "./__tests__/__mocks__/mockFactories";
