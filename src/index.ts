@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 // Constants and Enums
 export * from "./constants/cardConstants";
 export * from "./enums/directions";
