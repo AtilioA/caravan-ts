@@ -9,7 +9,8 @@ import { GameAction, GameState, IGame } from "./interfaces/IGame";
 import { IPlayer } from "./interfaces/IPlayer";
 
 export class Game implements IGame {
-  isOver: boolean = false;
+  hasStarted: boolean = false;
+  hasEnded: boolean = false;
   isOpeningRound: boolean = true;
   currentRound: number = 1;
   players: IPlayer[];
@@ -17,11 +18,12 @@ export class Game implements IGame {
   currentAIStrategy: AIStrategy | null;
   events: IEventBus;
 
-  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, isOver: boolean = false, isOpeningRound: boolean = true, currentRound: number = 1, currentAIStrategy = null) {
+  constructor(players: IPlayer[] = [], currentPlayerIndex: number = 0, hasStarted: boolean = false, hasEnded: boolean = false, isOpeningRound: boolean = true, currentRound: number = 1, currentAIStrategy = null) {
     this.players = players;
     this.currentPlayerIndex = currentPlayerIndex || 0;
     this.events = EventBus.getInstance();
-    this.isOver = isOver;
+    this.hasStarted = hasStarted;
+    this.hasEnded = hasEnded;
     this.isOpeningRound = isOpeningRound;
     this.currentRound = currentRound;
     this.currentAIStrategy = currentAIStrategy;
@@ -270,6 +272,9 @@ export class Game implements IGame {
   }
 
   start() {
+    if (this.hasStarted) {
+      return this.events.publish("invalidGameState", "Cannot start a game that has already started.");
+    }
     // Sanity checks (sizes of players, decks, etc.)
     if (this.players.length != 2) {
       return this.events.publish("invalidGameState", "Cannot start a game with more or less than two players.");
@@ -304,11 +309,12 @@ export class Game implements IGame {
       player.drawHand(5);
     }
 
+    this.hasStarted = true;
     this.events.publish("gameStarted", {currentPlayer: this.getCurrentPlayer()});
   }
 
   playTurn(play: GameAction) {
-    if (this.isOver) {
+    if (this.hasEnded) {
       return this.events.publish("invalidPlay", "Cannot play a turn on a match that is already over.");
     }
 
@@ -371,7 +377,7 @@ export class Game implements IGame {
 
   // End the Caravan match
   end(): void {
-    this.isOver = true;
+    this.hasEnded = true;
 
     // Unsubscribe all entities from the event bus, somehow
     // this.events.clear();

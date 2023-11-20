@@ -53,8 +53,10 @@ export interface GameState {
  * It is responsible for coordinating the game's flow and ensuring that the overarching game rules are followed.
  */
 export interface IGame {
+  /** Whether the game has started. */
+  hasStarted: boolean;
   /** Whether the game is over. */
-  isOver: boolean;
+  hasEnded: boolean;
   /** The array of players involved in the game. */
   players: IPlayer[];
   /** The number of rounds played so far. */

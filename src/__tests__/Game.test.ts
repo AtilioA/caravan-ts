@@ -73,6 +73,13 @@ describe("Game - Initialization", () => {
     expect(mockPlayers[1].hand.length).toEqual(8);
   });
 
+  it("should not start the game again if it has already started.", () => {
+    const mockPlayers = [createMockPlayer(), createMockPlayer()];
+    const game = new Game(mockPlayers);
+    game.start();
+    expect(() => game.start()).toThrowError(InvalidGameState);
+  });
+
   it("should be able to start the game, dealing 8 cards to each player; these cards must come from their decks.", () => {
     const mockPlayers = [createMockPlayer(), createMockPlayer()];
     const game = new Game(mockPlayers);
