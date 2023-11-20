@@ -49,15 +49,6 @@ export class Game implements IGame {
     this.isOpeningRound = openingRound;
   }
 
-  private getCurrentGameState(): GameState {
-    return {
-      humanPlayer: this.players[0],
-      AIPlayer: this.players[1],
-      currentPlayerIndex: this.currentPlayerIndex,
-      isOpeningRound: this.isOpeningRound,
-    };
-  }
-
   private playOpeningTurn(play: GameAction) {
     const currentPlayer = this.getCurrentPlayer();
     const player = play.player;
@@ -249,6 +240,15 @@ export class Game implements IGame {
   private moveToNextTurn(): void {
     this.currentRound++;
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+  }
+
+  getCurrentGameState(): GameState {
+    return {
+      humanPlayer: this.players[0],
+      AIPlayer: this.players[1],
+      currentPlayerIndex: this.currentPlayerIndex,
+      isOpeningRound: this.isOpeningRound,
+    };
   }
 
   setAIStrategy(strategy: AIStrategy): void {

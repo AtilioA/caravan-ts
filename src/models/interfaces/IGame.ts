@@ -69,6 +69,12 @@ export interface IGame {
   events: IEventBus;
 
   /**
+   * Returns the current state of the game.
+   * @returns The current state of the game.
+   */
+  getCurrentGameState(): GameState;
+
+  /**
    * Allows an AI strategy to be set for the Game instance. This strategy will be used to determine the AI's moves.
    * @param strategy - The AI strategy to use for the game.
    */
