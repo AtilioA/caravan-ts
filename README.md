@@ -19,15 +19,11 @@ Caravan's rules are a bit complex and inconsistent throughout the game; the game
 
 Furthermore, this project was developed using a test-driven development (TDD) approach, so the tests are a great resource for understanding the rules of the game.
 
-## Installation & Setup
-WIP
-`caravan-ts` has zero dependencies, so installation is straightforward [...]:
+<!-- ## Installation & Setup -->
 
-```bash
-```
-
-### Basic Usage
+<!-- ### Basic Usage
 WIP
+-->
 
 ### Documentation
 To generate the documentation, run the following command:
